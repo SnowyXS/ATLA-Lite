@@ -13,7 +13,7 @@ local Character = LocalPlayer.Character
 local autofarmCheckBox = UI:new("Checkbox", "AutoFarm")
 local godmodeCheckBox = UI:new("Checkbox", "GodMode")
 local infiniteStaminaCheckBox = UI:new("Checkbox", "Infinite Stamina")
-local sprintSpeedSlider = UI:new("Slider", "Sprint Speed", 26, 0, 1000, 1)
+local sprintSpeedSlider = UI:new("Slider", "Sprint Speed", 25, 0, 1000, 1)
 
 local autofarmCategory = autofarmCheckBox:CreateCategory()
 local minimumXpSlider = autofarmCategory:new("Slider", "Minimum XP", 0, 0, 3000, 100)
