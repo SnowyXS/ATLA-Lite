@@ -20,45 +20,46 @@ local SubCategories do
 		_object.Text = _object.Text .. " (+)"
 
 		local Category = setmetatable({
-			_objects = {}
+			_objects = {},
+			OpenCategory = self.OpenCategory,
+			CloseCategory = self.CloseCategory
 		}, Controller)
 
-		function Category:_opencategory()
-			local _openedCategories = self._openedCategories
-			local previousCategory = _openedCategories[#_openedCategories] or Controller
-
-			previousCategory:SetVisible(false)
-
-			table.insert(self._openedCategories, self)
-
-			self:SetVisible(true)
-		end
-	
-		function Category:_closecategory()
-			local _openedCategories = self._openedCategories
-			local previousCategory = _openedCategories[#_openedCategories - 1] or Controller
-
-			self:SetVisible(false)
-
-			table.remove(self._openedCategories, table.find(_openedCategories, self))
-
-			previousCategory:SetVisible(true)
-		end
-
-		self._isValidCategory = true
-		self._CategoryClass = Category
+		self.Category = Category
 
 		table.insert(Category._categories, Category)
 
 		return Category
 	end
 
+	function SubCategories:OpenCategory()
+		local _openedCategories = self._openedCategories
+		local previousCategory = _openedCategories[#_openedCategories] or Controller
+
+		previousCategory:SetVisible(false)
+
+		table.insert(self._openedCategories, self)
+
+		self:SetVisible(true)
+	end
+
+	function SubCategories:CloseCategory()
+		local _openedCategories = self._openedCategories
+		local previousCategory = _openedCategories[#_openedCategories - 1] or Controller
+
+		self:SetVisible(false)
+
+		table.remove(self._openedCategories, table.find(_openedCategories, self))
+
+		previousCategory:SetVisible(true)
+	end
+
 	function SubCategories:HasCategory()
-		return self._isValidCategory ~= nil
+		return self.Category ~= nil
 	end
 
 	function SubCategories:GetCategoryClass()
-		return self._CategoryClass or {}
+		return self.Category or {}
 	end
 end
 
@@ -188,7 +189,7 @@ local Slider do
             if sliderObject.Visible and arrow.Position.Y == sliderObject.Position.Y then
                 local count = 0.1
 
-                while (UserInputService:IsKeyDown(Enum.KeyCode.Right) and slider:SetValue(slider._value + (jumps or 1))) or (UserInputService:IsKeyDown(Enum.KeyCode.Left) and slider:SetValue(slider._value - (jumps or 1))) do
+                while not UserInputService:IsKeyDown(Enum.KeyCode.LeftAlt) and (UserInputService:IsKeyDown(Enum.KeyCode.Right) and slider:SetValue(slider._value + (jumps or 1))) or (UserInputService:IsKeyDown(Enum.KeyCode.Left) and slider:SetValue(slider._value - (jumps or 1))) do
                     task.wait(count)
                     count = math.clamp(count - 0.005, 0, 0.1)
                 end
@@ -254,7 +255,7 @@ local ListSelector do
             if listObject.Visible and arrow.Position.Y == listObject.Position.Y then
                 local count = 0.25
 
-                while (UserInputService:IsKeyDown(Enum.KeyCode.Right) and listSelector:SetSelected(listSelector._selected + 1)) or (UserInputService:IsKeyDown(Enum.KeyCode.Left) and listSelector:SetSelected(listSelector._selected - 1)) do
+                while not UserInputService:IsKeyDown(Enum.KeyCode.LeftAlt) and (UserInputService:IsKeyDown(Enum.KeyCode.Right) and listSelector:SetSelected(listSelector._selected + 1)) or (UserInputService:IsKeyDown(Enum.KeyCode.Left) and listSelector:SetSelected(listSelector._selected - 1)) do
                     task.wait(count)
                     count = math.clamp(count - 0.005, 0, 0.25)
                 end
@@ -378,25 +379,24 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
 		Category:SelectPreviousObject()
 	elseif input.KeyCode == Enum.KeyCode.Down then
 		Category:SelectNextObject()
-	elseif (input.KeyCode == Enum.KeyCode.LeftAlt and UserInputService:IsKeyDown(Enum.KeyCode.Right)) or (input.KeyCode == Enum.KeyCode.Right and UserInputService:IsKeyDown(Enum.KeyCode.LeftAlt)) then
-
+	elseif (UserInputService:IsKeyDown(Enum.KeyCode.LeftAlt) and UserInputService:IsKeyDown(Enum.KeyCode.Right)) or (UserInputService:IsKeyDown(Enum.KeyCode.Right) and UserInputService:IsKeyDown(Enum.KeyCode.LeftAlt)) then
         if selectedObject:HasCategory() then
 			local newCategory = selectedObject:GetCategoryClass()
 			local _objects = newCategory._objects
 			local newArrowPosition = (#_objects >= table.find(Category._objects, selectedObject) and arrow.Position.Y) or _objects[#_objects]._position.Y
 
 			arrow.Position = Vector2.new(arrow.Position.X, newArrowPosition)
-			newCategory:_opencategory()
+			newCategory:OpenCategory()
 		end
 	elseif input.KeyCode == Enum.KeyCode.Backspace then
-		if Category._closecategory then
+		if Category.CloseCategory then
 			local previousCategory = Controller:GetPreviousCategory()
 			local _objects = previousCategory._objects
 			local newArrowPosition = (#_objects >= table.find(Category._objects, selectedObject) and arrow.Position.Y) or _objects[#_objects]._position.Y
 
 			arrow.Position = Vector2.new(arrow.Position.X, newArrowPosition)
 
-			Category:_closecategory()
+			Category:CloseCategory()
 		end
 	elseif input.keyCode == Enum.KeyCode.Delete then
 		arrow.Visible = not arrow.Visible
