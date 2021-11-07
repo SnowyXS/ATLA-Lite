@@ -21,5 +21,5 @@ Run this script `loadstring(game:HttpGet("https://raw.githubusercontent.com/Snow
 - Right-Arrow: will either increase a value, go one further in a list
 - Left-Arrow: Will either decrease a value, go back one in the list
 - Enter: Will either toggle a Checkbox, press a Button, 
-- LEFT ALT + Right-Arrow: will open the sub category if there is one
+- Left-Alt + Right-Arrow: will open the sub category if there is one
 - Backspace: Will close the sub category
