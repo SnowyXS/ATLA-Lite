@@ -16,9 +16,10 @@ Run this script `loadstring(game:HttpGet("https://raw.githubusercontent.com/Snow
 - How much should I put in the Minimum XP?
 > I recommend 3000, if you wanna max out your level in 20 - 30 mins.
 # UI Controls
-- Right-Arrow: will either increase a value, go one further in a list, open a sub category
-- Left-Arrow: Will either decrease a value, go back one in the list
 - Arrow-UP: Will move up
 - Arrow-Down: Will move down
-- Enter: Will either toggle a ToggleButton, press a Button, 
+- Right-Arrow: will either increase a value, go one further in a list
+- Left-Arrow: Will either decrease a value, go back one in the list
+- Enter: Will either toggle a Checkbox, press a Button, 
+- LEFT ALT + Right-Arrow: will open the sub category if there is one
 - Backspace: Will close the sub category
