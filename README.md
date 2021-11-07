@@ -7,7 +7,7 @@ Run this script `loadstring(game:HttpGet("https://raw.githubusercontent.com/Snow
 - Synapse X 
 - Most of them should work but untested
 # Status
-- Testing
+- Undetected
 # FAQ
 - Will I get banned? 
 > Probably not but still use at your own risk!
