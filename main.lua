@@ -34,7 +34,7 @@ local questNPCs = MainControl.QuestNPCs
 local NPCList = getupvalue(Quests.RefreshNPCs, 3)
 local OldDecreaseStamina = rawget(MainControl, "DecreaseStamina")
 
-local function completeQuest(quest)
+local function CompleteQuest(quest)
     local currentNPC
     
     local expection = {RedLotus1 = CFrame.new(896.94488525391, 236.26509094238, -3067.7453613281)}
@@ -86,7 +86,7 @@ autofarmCheckBox:OnChanged(function()
                 break
             end
             
-            completeQuest(i) 
+            CompleteQuest(i) 
             
             task.wait()
         end
