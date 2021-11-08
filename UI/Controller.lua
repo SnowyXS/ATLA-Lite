@@ -136,17 +136,19 @@ local Checkbox do
 
 		UserInputService.InputBegan:Connect(function(input, gameProcessed)
 			if input.KeyCode == Enum.KeyCode.Return and checkboxObject.Visible and arrow.Position.Y == checkboxObject.Position.Y then
-				checkbox._isToggled = not checkbox._isToggled
-
-                if checkbox._callback then
-                    task.spawn(checkbox._callback)
-                end
-
-				checkboxObject.Color = (checkbox._isToggled and Color3.fromRGB(0, 255, 0)) or Color3.fromRGB(255, 0, 0)
+				checkbox:SetToggle(not checkbox._isToggled)
 			end
 		end)
 
 		return checkbox
+	end
+
+	function Checkbox:SetToggle(bool)
+		self._isToggled = bool
+
+		self._object.Color = (self._isToggled and Color3.fromRGB(0, 255, 0)) or Color3.fromRGB(255, 0, 0)
+
+		return self._isToggled, self._callback and task.spawn(self._callback)
 	end
 
 	function Checkbox:IsToggled()
