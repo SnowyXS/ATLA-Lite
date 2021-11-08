@@ -119,30 +119,30 @@ local Checkbox do
 		local preivousObject = _objects[#_objects]
 		local position = (preivousObject and preivousObject._position.Y + preivousObject._object.TextBounds.Y / 2 + 3) or (0.5 * camera.ViewportSize.Y)
 
-		local buttonObject = Drawing.new("Text")
-		buttonObject.Text = name
-		buttonObject.Size = 24
-		buttonObject.Color = Color3.fromRGB(255,0,0)
-		buttonObject.Position = Vector2.new(arrow.Position.X + arrow.TextBounds.X + 3, position)
-		buttonObject.Visible = self._objects == Controller._objects
+		local checkboxObject = Drawing.new("Text")
+		checkboxObject.Text = name
+		checkboxObject.Size = 24
+		checkboxObject.Color = Color3.fromRGB(255,0,0)
+		checkboxObject.Position = Vector2.new(arrow.Position.X + arrow.TextBounds.X + 3, position)
+		checkboxObject.Visible = self._objects == Controller._objects
 	
 		local checkbox = setmetatable({
 			_isToggled = false,
-			_object = buttonObject,
-			_position = buttonObject.Position
+			_object = checkboxObject,
+			_position = checkboxObject.Position
 		}, self)
 
 		table.insert(self._objects, checkbox)
 
 		UserInputService.InputBegan:Connect(function(input, gameProcessed)
-			if input.KeyCode == Enum.KeyCode.Return and buttonObject.Visible and arrow.Position.Y == buttonObject.Position.Y then
+			if input.KeyCode == Enum.KeyCode.Return and checkboxObject.Visible and arrow.Position.Y == checkboxObject.Position.Y then
 				checkbox._isToggled = not checkbox._isToggled
 
                 if checkbox._callback then
                     task.spawn(checkbox._callback)
                 end
 
-				buttonObject.Color = (checkbox._isToggled and Color3.fromRGB(0, 255, 0)) or Color3.fromRGB(255, 0, 0)
+				checkboxObject.Color = (checkbox._isToggled and Color3.fromRGB(0, 255, 0)) or Color3.fromRGB(255, 0, 0)
 			end
 		end)
 
@@ -205,7 +205,6 @@ local Slider do
 
     function Slider:SetValue(value)
         local sliderObject = self._object
-        local shouldCallBack = self._callback and task.spawn(self._callback)
 
         local oldValue = self._value
         local newValue = math.clamp(value, self._minimumValue, self._maxValue)
@@ -214,7 +213,7 @@ local Slider do
 
         sliderObject.Text = sliderObject.Text:gsub(oldValue, newValue)
 
-        return oldValue, newValue
+        return oldValue, newValue, self._callback and task.spawn(self._callback)
     end
 
 	function Slider:OnChanged(callback)
@@ -229,7 +228,7 @@ local ListSelector do
 	function ListSelector:_new(list, selected)
 		local _objects = self._objects
 
-        assert(list and #list >= 1, "Illegal list.")
+        assert(list and #list >= 1 and typeof(list) == "table", "Illegal list.")
 
 		local preivousObject = _objects[#_objects]
 		local position = (preivousObject and preivousObject._position.Y + preivousObject._object.TextBounds.Y / 2 + 3) or (0.5 * camera.ViewportSize.Y)
@@ -265,9 +264,21 @@ local ListSelector do
 		return listSelector
 	end
 
+	function ListSelector:ChangeList(list)
+		assert(typeof(list) == "table", "Illegal list.")
+
+		local oldList = self._list
+		local oldSelected = self._selected
+
+		local newSelected = (oldSelected >= #list and #list) or oldSelected
+
+		self._list = list
+		self._selected = newSelected
+		self._object.Text = list[newSelected] .. " (" .. (newSelected) .. "/" .. #list .. ")"
+	end
+
     function ListSelector:SetSelected(newSelectedIndex)
         local listObject = self._object
-        local shouldCallBack = self._callback and task.spawn(self._callback)
         local list = self._list
 
         local oldSelectedIndex = self._selected
@@ -278,12 +289,14 @@ local ListSelector do
 
         self._selected = newSelectedIndex
 
-        print(oldSelectedIndex, newSelectedIndex)
-
         listObject.Text = listObject.Text:gsub(oldSelected, newSelected):gsub(oldSelectedIndex .. "/", newSelectedIndex .. "/")
 
-        return oldSelected, newSelected
+        return oldSelected, newSelected, self._callback and task.spawn(self._callback)
     end
+
+	function ListSelector:GetSelected()
+		return self._list[self._selected]
+	end
 
 	function ListSelector:OnChanged(callback)
 		self._callback = callback
