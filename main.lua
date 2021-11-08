@@ -10,7 +10,14 @@ local gameEvent = networkFolder.GameEvent
 local LocalPlayer = Players.LocalPlayer
 local Character = LocalPlayer.Character
 
+local playerData = LocalPlayer.PlayerData
+local appearance = playerData.Appearance
+
+local specialAbility = appearance.Special
+local secondSpecialAbility = appearance.Special2
+
 local autofarmCheckBox = UI:new("Checkbox", "AutoFarm")
+local subChangerCheckBox = UI:new("Checkbox", "Sub Changer")
 local godmodeCheckBox = UI:new("Checkbox", "GodMode")
 local infiniteStaminaCheckBox = UI:new("Checkbox", "Infinite Stamina")
 local sprintSpeedSlider = UI:new("Slider", "Sprint Speed", 25, 25, 1000, 1)
@@ -19,12 +26,22 @@ local autofarmCategory = autofarmCheckBox:CreateCategory()
 local minimumXpSlider = autofarmCategory:new("Slider", "Minimum XP", 0, 0, 3000, 100)
 local delaySlider = autofarmCategory:new("Slider", "Delay", 3, 3, 5, 1)
 
-local MainControl
+local subChangerCategory = subChangerCheckBox:CreateCategory()
+local elementSelector = subChangerCategory:new("ListSelector", {"Air", "Water", "Fire", "Earth"})
+local specialSelector = subChangerCategory:new("ListSelector", {"Flight"})
+local secondSpecialSelector = subChangerCategory:new("ListSelector", {"None"})
+
+local MainControl, BaseSelection
 
 for i,v in pairs(getgc(true)) do
-    if typeof(v) == "table" and rawget(v, "QuestModule") then
-        MainControl = v
-        break
+    if typeof(v) == "table"  then
+        if MainControl and BaseSelection then
+            break
+        elseif rawget(v, "QuestModule") then
+            MainControl = v
+        elseif rawget(v, "Elements") then
+            BaseSelection = v
+        end
     end
 end
 
@@ -33,6 +50,20 @@ local questNPCs = MainControl.QuestNPCs
 
 local NPCList = getupvalue(Quests.RefreshNPCs, 3)
 local OldDecreaseStamina = rawget(MainControl, "DecreaseStamina")
+
+local specialElements = {
+    Air = {"Flight"},
+    Water = {"Ice", "Plant"},
+    Fire = {"Lightning", "Combustion"},
+    Earth = {"Lava", "Metal", "Sand"}
+}
+
+local secondSpecialElements = {
+    Ice = {"None", "Ice Healing"},
+    Plant = {"None", "Plant Healing"},
+    Earth = {"None", "Lava Seismic", "Metal Seismic", "Sand Seismic"}
+}
+
 
 local function CompleteQuest(quest)
     local currentNPC
@@ -79,6 +110,36 @@ local function CompleteQuest(quest)
     end
 end
 
+function ChangeElement()
+    if subChangerCheckBox:IsToggled() and not canElementFarming  then
+        local selectedSpecial = specialSelector:GetSelected()
+        local selectedSecondSpecial = secondSpecialSelector:GetSelected()
+        
+        canElementFarming = true
+
+        local OldMainFrame = LocalPlayer.PlayerGui:FindFirstChild("MainMenu") 
+        
+        Character.Humanoid.Health = 0
+        
+        repeat task.wait() until OldMainFrame ~= LocalPlayer.PlayerGui:WaitForChild("MainMenu")
+        
+        BaseSelection.Elements = elementSelector:GetSelected()
+    
+        canElementFarming = false
+
+        print(selectedSpecial, specialAbility.Value == selectedSpecial)
+        print(selectedSecondSpecial, secondSpecialAbility.Value == selectedSecondSpecial)
+
+        return (subChangerCheckBox:IsToggled() and (specialAbility.Value ~= selectedSpecial or secondSpecialAbility.Value ~= selectedSecondSpecial) and gameFunction:InvokeServer("NewGame", {Selections = BaseSelection}) and ChangeElement()) or (specialAbility.Value == selectedSpecial and secondSpecialAbility.Value == selectedSecondSpecial and subChangerCheckBox:SetToggle(false)) 
+    end
+end
+
+subChangerCheckBox:OnChanged(function()
+    if subChangerCheckBox:IsToggled() then
+        ChangeElement()
+    end
+end)
+
 autofarmCheckBox:OnChanged(function()
     while autofarmCheckBox:IsToggled() do
         for i,v in pairs(Quests) do
@@ -91,6 +152,15 @@ autofarmCheckBox:OnChanged(function()
             task.wait()
         end
     end
+end)
+
+elementSelector:OnChanged(function()
+    specialSelector:ChangeList(specialElements[elementSelector:GetSelected()])
+    secondSpecialSelector:ChangeList(secondSpecialElements[specialSelector:GetSelected()] or secondSpecialElements[elementSelector:GetSelected()] or {"None"})
+end)
+
+specialSelector:OnChanged(function()
+    secondSpecialSelector:ChangeList(secondSpecialElements[specialSelector:GetSelected()] or secondSpecialElements[elementSelector:GetSelected()] or {"None"})
 end)
 
 OldNewIndex = hookmetamethod(game, "__newindex", function(self, index, value)
@@ -122,13 +192,13 @@ Character.BattlerHealth:GetPropertyChangedSignal("Value"):Connect(function()
 end)
 
 LocalPlayer.CharacterAdded:Connect(function(char)
+    Character = char
+
     local MainMenu = LocalPlayer.PlayerGui:WaitForChild("MainMenu")
     local MenuControl = LocalPlayer.PlayerGui.MainMenu:WaitForChild("MenuControl")
     local BattlerHealth = char:WaitForChild("BattlerHealth")
 
     repeat task.wait() until getsenv(MenuControl).DecreaseStamina
-
-    Character = char
 
     for i,v in pairs(getgc(true)) do
         if typeof(v) == "table" and rawget(v, "QuestModule") then
