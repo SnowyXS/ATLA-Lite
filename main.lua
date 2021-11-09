@@ -18,9 +18,9 @@ local secondSpecialAbility = appearance.Special2
 
 local autofarmCheckBox = UI:new("Checkbox", "AutoFarm")
 local subChangerCheckBox = UI:new("Checkbox", "Sub Changer")
-local godmodeCheckBox = UI:new("Checkbox", "GodMode")
-local infiniteStaminaCheckBox = UI:new("Checkbox", "Infinite Stamina")
-local sprintSpeedSlider = UI:new("Slider", "Sprint Speed", 25, 25, 1000, 1)
+local characterModificationText = UI:new("Text", "Character Modification")
+local teleportText = UI:new("Text", "Teleport")
+local miscText = UI:new("Text", "Misc")
 
 local autofarmCategory = autofarmCheckBox:CreateCategory()
 local minimumXpSlider = autofarmCategory:new("Slider", "Minimum XP", 0, 0, 3000, 100)
@@ -30,6 +30,23 @@ local subChangerCategory = subChangerCheckBox:CreateCategory()
 local elementSelector = subChangerCategory:new("ListSelector", {"Air", "Water", "Fire", "Earth"})
 local specialSelector = subChangerCategory:new("ListSelector", {"Flight"})
 local secondSpecialSelector = subChangerCategory:new("ListSelector", {"None"})
+
+local teleportCategory = teleportText:CreateCategory()
+local playersTeleportText = teleportCategory:new("Text", "Players")
+local mapTeleportText = teleportCategory:new("Text", "Map")
+
+local playersTeleportCategory = playersTeleportText:CreateCategory()
+local mapTeleportCategory = mapTeleportText:CreateCategory()
+
+local characterModificationCategory = characterModificationText:CreateCategory()
+local walkSpeedSpeedSlider = characterModificationCategory:new("Slider", "WalkSpeed", 16, 16, 1000, 1)
+local jumpPowerSlider = characterModificationCategory:new("Slider", "JumpPower", 50, 50, 1000, 1)
+local sprintSpeedSlider = characterModificationCategory:new("Slider", "Sprint Speed", 25, 25, 1000, 1)
+
+local miscCategory = miscText:CreateCategory()
+local godmodeCheckBox = miscCategory:new("Checkbox", "GodMode")
+local infiniteStaminaCheckBox = miscCategory:new("Checkbox", "Infinite Stamina")
+local disableDamageCheckBox = miscCategory:new("Checkbox", "Disable tornado and burn damage")
 
 local MainControl, BaseSelection
 
@@ -64,6 +81,60 @@ local secondSpecialElements = {
     Earth = {"None", "Lava Seismic", "Metal Seismic", "Sand Seismic"}
 }
 
+local teleportPresets = {
+    [1] = {
+        name = "Air",
+        places = {
+            ["Western Air Temple"] = CFrame.new(7945, 183, -2050),
+            ["Southern Air Temple"] = CFrame.new(1706, 396, -2256),
+            ["Air Temple Shop"] = CFrame.new(1634, 457, -2370),
+            ["Air Temple Vehicle Shop"] = CFrame.new(1892, 263, -2113)
+        }
+    },
+    [2] = {
+        name = "Water",
+        places = {
+            ["Northern Water Tribe"] = CFrame.new(9007, 109, 788),
+            ["Southern Water Tribe"] = CFrame.new(49, 11, 480),
+            ["Water Weapon Shop"] = CFrame.new(8790, 61, 957),
+            ["Water Vehicle Shop"] = CFrame.new(7972, 8, 763)
+        }
+    },
+    [3] = {
+        name = "Earth",
+        places = {
+            ["Inner Walls"] = CFrame.new(5915, 8, 5052),
+            ["Outer Walls"] = CFrame.new(5910, 8, 4337),
+            ["Earth Weapon Shop"] = CFrame.new(5636, 8, 5113),
+            ["Earth Vehicle Shop"] = CFrame.new(5865, 8, 4369)
+        }
+    },
+    [4] = {
+        name = "Fire",
+        places = {
+            ["Roku's Temple"] = CFrame.new(5915, 8, 5052),
+            ["CalderaCity"] = CFrame.new(5910, 8, 4337),
+            ["Royal Plaza"] = CFrame.new(5636, 8, 5113),
+            ["Fire Weapon Shop"] = CFrame.new(5865, 8, 4369),
+            ["Fire Vehicle Shop"] = CFrame.new(5832, 14, 467)
+        }
+    },
+    [5] = {
+        name = "Others",
+        places = {
+            ["Kyoshi"] = CFrame.new(1795, 11, 2263),
+            ["Kyoshi Shop"] = CFrame.new(1813, 11, 2199),
+            ["Desert"] = CFrame.new(3512, 8, 3956),
+            ["The Swamp"] = CFrame.new(3706, 7, 2744),
+            ["White Lotus"] = CFrame.new(3408, 7, 4026),
+            ["Red Lotus"] = CFrame.new(898, 236, -3075),
+            ["Acrobats NPC"] = CFrame.new(5516, 27, -4497),
+            ["Chi NPC"] = CFrame.new(-57, 12, 475)
+        }
+    }
+}
+
+local playersTeleportObjects = {}
 
 local function CompleteQuest(quest)
     local currentNPC
@@ -122,6 +193,40 @@ function ChangeElement()
     return ((specialAbility.Value ~= selectedSpecial or secondSpecialAbility.Value ~= selectedSecondSpecial) and gameFunction:InvokeServer("NewGame", {Selections = BaseSelection})) or (specialAbility.Value == selectedSpecial and secondSpecialAbility.Value == selectedSecondSpecial and subChangerCheckBox:SetToggle(false)) 
 end
 
+for i, v in ipairs(teleportPresets) do
+    local text = mapTeleportCategory:new("Text", v.name)
+    local category = text:CreateCategory()
+
+    for name, position in pairs(v.places) do
+        local button = category:new("Button", name)
+
+        button:OnPressed(function()
+            Character.HumanoidRootPart.CFrame = position
+        end)
+    end
+end
+
+
+for _, v in pairs(Players:GetPlayers()) do
+    if v ~= LocalPlayer then
+        local button = playersTeleportCategory:new("Button", v.Name)
+
+        button:OnPressed(function()
+            Character.HumanoidRootPart.CFrame = v.Character.HumanoidRootPart.CFrame
+        end)
+
+        playersTeleportObjects[v] = button
+    end
+end
+
+walkSpeedSpeedSlider:OnChanged(function()
+    Character.Humanoid.WalkSpeed = walkSpeedSpeedSlider:GetValue()
+end)
+
+jumpPowerSlider:OnChanged(function()
+    Character.Humanoid.JumpPower = jumpPowerSlider:GetValue()
+end)
+
 subChangerCheckBox:OnChanged(function()
     if subChangerCheckBox:IsToggled() then
         Character.Humanoid.Health = 0
@@ -151,11 +256,24 @@ specialSelector:OnChanged(function()
     secondSpecialSelector:ChangeList(secondSpecialElements[specialSelector:GetSelected()] or secondSpecialElements[elementSelector:GetSelected()] or {"None"})
 end)
 
+OldNameCall = hookmetamethod(game, "__namecall", function(self, ...)
+    local args = {...}
+    local method = getnamecallmethod()
+    
+    if not checkcaller() and method == "FireServer" and disableDamageCheckBox:IsToggled() and (args[2] and (args[2].Key == "Burn" or args[2].Ability == "TornadoPush")) then
+        return
+    end
+
+    return OldNameCall(self, ...) 
+end)
+
 OldNewIndex = hookmetamethod(game, "__newindex", function(self, index, value)
     if not checkcaller() and index == "WalkSpeed" then
         if value == 25 then
             return OldNewIndex(self, index, sprintSpeedSlider:GetValue()) 
         end
+
+        return OldNewIndex(self, index, walkSpeedSpeedSlider:GetValue()) 
     end
     
     return OldNewIndex(self, index, value)
@@ -177,6 +295,25 @@ Character.BattlerHealth:GetPropertyChangedSignal("Value"):Connect(function()
             Opponent = LocalPlayer
         })
     end
+end)
+
+Players.PlayerAdded:Connect(function(player)
+    local button = playersTeleportCategory:new("Button", player.Name)
+
+    button:OnPressed(function()
+        Character.HumanoidRootPart.CFrame = player.Character.HumanoidRootPart.CFrame
+    end)
+
+    playersTeleportObjects[player] = button
+
+    print(player, "Joined")
+end)
+
+Players.PlayerRemoving:Connect(function(player)
+    playersTeleportObjects[player]:Destroy()
+	playersTeleportObjects[player] = nil
+
+    print(player, "Left")
 end)
 
 LocalPlayer.CharacterAdded:Connect(function(character)
@@ -218,6 +355,9 @@ LocalPlayer.CharacterAdded:Connect(function(character)
             })
         end
     end)
-
+    
+    character.Humanoid.WalkSpeed = walkSpeedSpeedSlider:GetValue()
+    character.Humanoid.JumpPower = jumpPowerSlider:GetValue()
+    
     Character = character
 end)
