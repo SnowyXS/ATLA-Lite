@@ -111,32 +111,20 @@ local function CompleteQuest(quest)
 end
 
 function ChangeElement()
-    if subChangerCheckBox:IsToggled() and not canElementFarming  then
-        local selectedSpecial = specialSelector:GetSelected()
-        local selectedSecondSpecial = secondSpecialSelector:GetSelected()
-        
-        canElementFarming = true
-
-        local OldMainFrame = LocalPlayer.PlayerGui:FindFirstChild("MainMenu") 
-        
-        Character.Humanoid.Health = 0
-        
-        repeat task.wait() until OldMainFrame ~= LocalPlayer.PlayerGui:WaitForChild("MainMenu")
-        
-        BaseSelection.Elements = elementSelector:GetSelected()
+    local selectedSpecial = specialSelector:GetSelected()
+    local selectedSecondSpecial = secondSpecialSelector:GetSelected()
     
-        canElementFarming = false
+    BaseSelection.Elements = elementSelector:GetSelected()
 
-        print(selectedSpecial, specialAbility.Value == selectedSpecial)
-        print(selectedSecondSpecial, secondSpecialAbility.Value == selectedSecondSpecial)
+    print(selectedSpecial, specialAbility.Value == selectedSpecial)
+    print(selectedSecondSpecial, secondSpecialAbility.Value == selectedSecondSpecial)
 
-        return (subChangerCheckBox:IsToggled() and (specialAbility.Value ~= selectedSpecial or secondSpecialAbility.Value ~= selectedSecondSpecial) and gameFunction:InvokeServer("NewGame", {Selections = BaseSelection}) and ChangeElement()) or (specialAbility.Value == selectedSpecial and secondSpecialAbility.Value == selectedSecondSpecial and subChangerCheckBox:SetToggle(false)) 
-    end
+    return ((specialAbility.Value ~= selectedSpecial or secondSpecialAbility.Value ~= selectedSecondSpecial) and gameFunction:InvokeServer("NewGame", {Selections = BaseSelection})) or (specialAbility.Value == selectedSpecial and secondSpecialAbility.Value == selectedSecondSpecial and subChangerCheckBox:SetToggle(false)) 
 end
 
 subChangerCheckBox:OnChanged(function()
     if subChangerCheckBox:IsToggled() then
-        ChangeElement()
+        Character.Humanoid.Health = 0
     end
 end)
 
@@ -191,14 +179,18 @@ Character.BattlerHealth:GetPropertyChangedSignal("Value"):Connect(function()
     end
 end)
 
-LocalPlayer.CharacterAdded:Connect(function(char)
-    Character = char
+LocalPlayer.CharacterAdded:Connect(function(character)
+    if subChangerCheckBox:IsToggled() then
+        ChangeElement()
 
-    local MainMenu = LocalPlayer.PlayerGui:WaitForChild("MainMenu")
-    local MenuControl = LocalPlayer.PlayerGui.MainMenu:WaitForChild("MenuControl")
-    local BattlerHealth = char:WaitForChild("BattlerHealth")
+        task.wait()
 
-    repeat task.wait() until getsenv(MenuControl).DecreaseStamina
+        character:WaitForChild("Humanoid").Health = 0
+    end
+
+    local BattlerHealth = character:WaitForChild("BattlerHealth")
+
+    repeat task.wait() until LocalPlayer.PlayerGui:FindFirstChild("MainMenu") and getsenv(LocalPlayer.PlayerGui.MainMenu.MenuControl).DecreaseStamina
 
     for i,v in pairs(getgc(true)) do
         if typeof(v) == "table" and rawget(v, "QuestModule") then
@@ -226,4 +218,6 @@ LocalPlayer.CharacterAdded:Connect(function(char)
             })
         end
     end)
+
+    Character = character
 end)
