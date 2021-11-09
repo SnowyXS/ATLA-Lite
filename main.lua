@@ -78,7 +78,9 @@ local specialElements = {
 local secondSpecialElements = {
     Ice = {"None", "Ice Healing"},
     Plant = {"None", "Plant Healing"},
-    Earth = {"None", "Lava Seismic", "Metal Seismic", "Sand Seismic"}
+    Lava = {"None", "Lava Seismic"},
+    Metal = {"None", "Metal Seismic"},
+    Sand = {"None", "Sand Seismic"},
 }
 
 local teleportPresets = {
