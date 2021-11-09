@@ -305,6 +305,39 @@ local ListSelector do
 	end
 end
 
+
+local Text do 
+	Text = {}
+	Text.__index = Text
+
+	function Text:_new(name)
+		local _objects = self._objects
+
+		local preivousObject = _objects[#_objects]
+		local position = (preivousObject and preivousObject._position.Y + preivousObject._object.TextBounds.Y / 2 + 3) or (0.5 * camera.ViewportSize.Y)
+
+		local TextObject = Drawing.new("Text")
+		TextObject.Text = name
+		TextObject.Size = 24
+		TextObject.Color = Color3.fromRGB(211,211,211)
+		TextObject.Position = Vector2.new(arrow.Position.X + arrow.TextBounds.X + 3, position)
+		TextObject.Visible = self._objects == Controller._objects
+	
+		local text = setmetatable({
+			_object = TextObject,
+			_position = TextObject.Position
+		}, self)
+
+		table.insert(self._objects, text)
+
+		return text
+	end
+
+	function Text:Set(text)
+		self._object.Text = text
+	end
+end
+
 do 
     Controller = {
         _categories = {},
@@ -317,6 +350,7 @@ do
     Controller.Checkbox = Checkbox
     Controller.Slider = Slider
     Controller.ListSelector = ListSelector
+	Controller.Text = Text
 
     function Controller:new(type, ...)
         local item = Controller[type]
