@@ -420,6 +420,37 @@ do
     end
 end
 
+do
+	local function FixScaling(objects)
+		for i, v in ipairs(objects) do
+			local _object = v._object
+			local preivousObject = objects[i - 1]
+
+			_object.Position = Vector2.new(
+				v._position.X, 
+				(preivousObject and preivousObject._position.Y + preivousObject._object.TextBounds.Y / 2 + 4) or (0.5 * CurrentCamera.ViewportSize.Y))
+
+			v._position = _object.Position
+
+			if v:HasCategory() then
+				local Category = v:GetCategoryClass()
+				local _objects = Category._objects
+
+				FixScaling(_objects)
+			end
+		end
+	end
+
+	CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(function()
+		local viewportSize = CurrentCamera.ViewportSize
+		local _objects = Controller._objects
+
+		arrow.Position = Vector2.new(arrow.Position.X, (0.5 * CurrentCamera.ViewportSize.Y))
+
+		FixScaling(_objects)
+	end)
+end
+
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
 	local Category = Controller:GetOpenedCategory()
 	local selectedObject = Category:GetSelectedObject()
@@ -451,24 +482,6 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
 		arrow.Visible = not arrow.Visible
 		Category:SetVisible(arrow.Visible)
 	end
-end)
-
-CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(function()
-	local Category = Controller:GetOpenedCategory()
-    local viewportSize = CurrentCamera.ViewportSize
-
-    for _, v in ipairs(Category._objects) do
-		local _object = v._object
-        local size = _object.size
-        local position = _object.position
-
-        _object.Size = Vector2.new(
-            size.X.Scale * viewportSize.X + size.X.Offset,
-            size.Y.Scale * viewportSize.Y + size.Y.Offset)
-			_object.Position = Vector2.new(
-            position.X.Scale * viewportSize.X + position.X.Offset,
-            position.Y.Scale * viewportSize.Y + position.Y.Offset)
-    end
 end)
 
 return Controller
