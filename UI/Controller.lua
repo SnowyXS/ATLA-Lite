@@ -78,16 +78,16 @@ local Button do
 		buttonObject.Size = 24
 		buttonObject.Color = Color3.fromRGB(255,255,255)
 		buttonObject.Position = Vector2.new(arrow.Position.X + arrow.TextBounds.X + 3, position)
-		buttonObject.Visible = self._objects == Controller._objects
+		buttonObject.Visible = Controller:GetOpenedCategory()._objects == _objects
 	
 		local button = setmetatable({
 			_object = buttonObject,
-			_position = buttonObject.Position
+			_position = buttonObject.Position,
 		}, self)
 
 		table.insert(self._objects, button)
 
-		UserInputService.InputBegan:Connect(function(input, gameProcessed)
+		button._input = UserInputService.InputBegan:Connect(function(input, gameProcessed)
 			if input.KeyCode == Enum.KeyCode.Return and buttonObject.Visible and arrow.Position.Y == buttonObject.Position.Y then
                 if button._callback then
                     task.spawn(button._callback)
@@ -104,7 +104,11 @@ local Button do
 		return button
 	end
 
-	function Button:OnChanged(callback)
+	function Button:Destroy()
+		return Controller.DestroyObject(self)
+	end
+
+	function Button:OnPressed(callback)
 		self._callback = callback
 	end
 end
@@ -124,7 +128,7 @@ local Checkbox do
 		checkboxObject.Size = 24
 		checkboxObject.Color = Color3.fromRGB(255,0,0)
 		checkboxObject.Position = Vector2.new(arrow.Position.X + arrow.TextBounds.X + 3, position)
-		checkboxObject.Visible = self._objects == Controller._objects
+		checkboxObject.Visible = Controller:GetOpenedCategory()._objects == _objects
 	
 		local checkbox = setmetatable({
 			_isToggled = false,
@@ -155,6 +159,10 @@ local Checkbox do
 		return self._isToggled
 	end
 	
+	function Checkbox:Destroy()
+		return Controller.DestroyObject(self)
+	end
+
 	function Checkbox:OnChanged(callback)
 		self._callback = callback
 	end
@@ -175,7 +183,7 @@ local Slider do
 		sliderObject.Size = 24
 		sliderObject.Color = Color3.fromRGB(255,255,255)
 		sliderObject.Position = Vector2.new(arrow.Position.X + arrow.TextBounds.X + 3, position)
-		sliderObject.Visible = self._objects == Controller._objects
+		sliderObject.Visible = Controller:GetOpenedCategory()._objects == _objects
 	
 		local slider = setmetatable({
             _value = math.clamp(tonumber(value) or 0, minimumValue, maxValue),
@@ -218,6 +226,10 @@ local Slider do
         return oldValue, newValue, self._callback and task.spawn(self._callback)
     end
 
+	function Slider:Destroy()
+		return Controller.DestroyObject(self)
+	end
+
 	function Slider:OnChanged(callback)
 		self._callback = callback
 	end
@@ -235,13 +247,12 @@ local ListSelector do
 		local preivousObject = _objects[#_objects]
 		local position = (preivousObject and preivousObject._position.Y + preivousObject._object.TextBounds.Y / 2 + 4) or (0.5 * CurrentCamera.ViewportSize.Y)
 
-        print(list[selected or 1], selected or 1, #list)
 		local listObject = Drawing.new("Text")
 		listObject.Text = list[selected or 1] .. " (" .. (selected or 1) .. "/" .. #list .. ")"
 		listObject.Size = 24
 		listObject.Color = Color3.fromRGB(255,255,255)
 		listObject.Position = Vector2.new(arrow.Position.X + arrow.TextBounds.X + 3, position)
-		listObject.Visible = self._objects == Controller._objects
+		listObject.Visible = Controller:GetOpenedCategory()._objects == _objects
 	
 		local listSelector = setmetatable({
             _list = list,
@@ -300,6 +311,10 @@ local ListSelector do
 		return self._list[self._selected]
 	end
 
+	function ListSelector:Destroy()
+		return Controller.DestroyObject(self)
+	end
+
 	function ListSelector:OnChanged(callback)
 		self._callback = callback
 	end
@@ -321,7 +336,7 @@ local Text do
 		TextObject.Size = 24
 		TextObject.Color = Color3.fromRGB(211,211,211)
 		TextObject.Position = Vector2.new(arrow.Position.X + arrow.TextBounds.X + 3, position)
-		TextObject.Visible = self._objects == Controller._objects
+		TextObject.Visible = Controller:GetOpenedCategory()._objects == _objects
 	
 		local text = setmetatable({
 			_object = TextObject,
@@ -335,6 +350,10 @@ local Text do
 
 	function Text:Set(text)
 		self._object.Text = text
+	end
+
+	function Text:Destroy()
+		return Controller.DestroyObject(self)
 	end
 end
 
@@ -418,6 +437,33 @@ do
             v._object.Visible = bool
         end
     end
+
+	function Controller.DestroyObject(object)
+		local _objects = object._objects
+		local objectIndex = table.find(_objects, object)
+
+		object._object:Remove()
+		object._input:Disconnect()
+
+		table.remove(_objects, objectIndex)
+		table.clear(object)
+
+		for i, v in ipairs(_objects) do
+			local _object = v._object
+			local preivousObject = _objects[i - 1]
+
+			_object.Position = Vector2.new(
+				v._position.X, 
+				(preivousObject and preivousObject._position.Y + preivousObject._object.TextBounds.Y / 2 + 4) or (0.5 * CurrentCamera.ViewportSize.Y))
+
+			_objects[i]._position = _object.Position
+		end
+
+		local lastObject = _objects[#_objects]
+		local lastObjectPosition = lastObject._position
+
+		arrow.Position = (lastObject._object.Visible and not Controller:GetOpenedCategory():GetSelectedObject()) and Vector2.new(arrow.Position.X, lastObjectPosition.Y) or arrow.Position
+	end
 end
 
 do
@@ -430,7 +476,7 @@ do
 				v._position.X, 
 				(preivousObject and preivousObject._position.Y + preivousObject._object.TextBounds.Y / 2 + 4) or (0.5 * CurrentCamera.ViewportSize.Y))
 
-			v._position = _object.Position
+			_objects[i]._position = _object.Position
 
 			if v:HasCategory() then
 				local Category = v:GetCategoryClass()
