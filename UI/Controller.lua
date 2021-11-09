@@ -71,7 +71,7 @@ local Button do
 		local _objects = self._objects
 
 		local preivousObject = _objects[#_objects]
-		local position = (preivousObject and preivousObject._position.Y + preivousObject._object.TextBounds.Y / 2 + 3) or (0.5 * camera.ViewportSize.Y)
+		local position = (preivousObject and preivousObject._position.Y + preivousObject._object.TextBounds.Y / 2 + 5) or (0.5 * camera.ViewportSize.Y)
 
 		local buttonObject = Drawing.new("Text")
 		buttonObject.Text = name
@@ -117,7 +117,7 @@ local Checkbox do
 		local _objects = self._objects
 
 		local preivousObject = _objects[#_objects]
-		local position = (preivousObject and preivousObject._position.Y + preivousObject._object.TextBounds.Y / 2 + 3) or (0.5 * camera.ViewportSize.Y)
+		local position = (preivousObject and preivousObject._position.Y + preivousObject._object.TextBounds.Y / 2 + 5) or (0.5 * camera.ViewportSize.Y)
 
 		local checkboxObject = Drawing.new("Text")
 		checkboxObject.Text = name
@@ -168,7 +168,7 @@ local Slider do
 		local _objects = self._objects
 
 		local preivousObject = _objects[#_objects]
-		local position = (preivousObject and preivousObject._position.Y + preivousObject._object.TextBounds.Y / 2 + 3) or (0.5 * camera.ViewportSize.Y)
+		local position = (preivousObject and preivousObject._position.Y + preivousObject._object.TextBounds.Y / 2 + 5) or (0.5 * camera.ViewportSize.Y)
 
 		local sliderObject = Drawing.new("Text")
 		sliderObject.Text = name .. ": " .. math.clamp(tonumber(value) or 0, minimumValue, maxValue)
@@ -233,7 +233,7 @@ local ListSelector do
         assert(list and #list >= 1 and typeof(list) == "table", "Illegal list.")
 
 		local preivousObject = _objects[#_objects]
-		local position = (preivousObject and preivousObject._position.Y + preivousObject._object.TextBounds.Y / 2 + 3) or (0.5 * camera.ViewportSize.Y)
+		local position = (preivousObject and preivousObject._position.Y + preivousObject._object.TextBounds.Y / 2 + 5) or (0.5 * camera.ViewportSize.Y)
 
         print(list[selected or 1], selected or 1, #list)
 		local listObject = Drawing.new("Text")
@@ -314,7 +314,7 @@ local Text do
 		local _objects = self._objects
 
 		local preivousObject = _objects[#_objects]
-		local position = (preivousObject and preivousObject._position.Y + preivousObject._object.TextBounds.Y / 2 + 3) or (0.5 * camera.ViewportSize.Y)
+		local position = (preivousObject and preivousObject._position.Y + preivousObject._object.TextBounds.Y / 2 + 5) or (0.5 * camera.ViewportSize.Y)
 
 		local TextObject = Drawing.new("Text")
 		TextObject.Text = name
