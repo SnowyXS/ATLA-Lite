@@ -327,6 +327,8 @@ LocalPlayer.CharacterAdded:Connect(function(character)
         character:WaitForChild("Humanoid").Health = 0
     end
 
+    Character = character
+
     local BattlerHealth = character:WaitForChild("BattlerHealth")
 
     repeat task.wait() until LocalPlayer.PlayerGui:FindFirstChild("MainMenu") and getsenv(LocalPlayer.PlayerGui.MainMenu.MenuControl).DecreaseStamina
@@ -360,6 +362,4 @@ LocalPlayer.CharacterAdded:Connect(function(character)
     
     character.Humanoid.WalkSpeed = walkSpeedSpeedSlider:GetValue()
     character.Humanoid.JumpPower = jumpPowerSlider:GetValue()
-    
-    Character = character
 end)
