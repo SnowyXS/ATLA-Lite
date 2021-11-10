@@ -114,10 +114,10 @@ local teleportPresets = {
     [4] = {
         name = "Fire",
         places = {
-            ["Roku's Temple"] = CFrame.new(5915, 8, 5052),
-            ["CalderaCity"] = CFrame.new(5910, 8, 4337),
-            ["Royal Plaza"] = CFrame.new(5636, 8, 5113),
-            ["Fire Weapon Shop"] = CFrame.new(5865, 8, 4369),
+            ["Roku's Temple"] = CFrame.new(6154, 128, 199),
+            ["CalderaCity"] = CFrame.new(6375, 162, -6483),
+            ["Royal Plaza"] = CFrame.new(5509, 21, -3910),
+            ["Fire Weapon Shop"] = CFrame.new(6201, 161, -5862),
             ["Fire Vehicle Shop"] = CFrame.new(5832, 14, 467)
         }
     },
