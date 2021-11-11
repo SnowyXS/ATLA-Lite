@@ -20,6 +20,7 @@ local autofarmCheckBox = UI:new("Checkbox", "AutoFarm")
 local subChangerCheckBox = UI:new("Checkbox", "Sub Changer")
 local characterModificationText = UI:new("Text", "Character Modification")
 local teleportText = UI:new("Text", "Teleport")
+local playersText = UI:new("Text", "Players")
 local miscText = UI:new("Text", "Misc")
 
 local autofarmCategory = autofarmCheckBox:CreateCategory()
@@ -31,11 +32,11 @@ local elementSelector = subChangerCategory:new("ListSelector", {"Air", "Water", 
 local specialSelector = subChangerCategory:new("ListSelector", {"Flight"})
 local secondSpecialSelector = subChangerCategory:new("ListSelector", {"None"})
 
+local playersCategory = playersText:CreateCategory()
+
 local teleportCategory = teleportText:CreateCategory()
-local playersTeleportText = teleportCategory:new("Text", "Players")
 local mapTeleportText = teleportCategory:new("Text", "Map")
 
-local playersTeleportCategory = playersTeleportText:CreateCategory()
 local mapTeleportCategory = mapTeleportText:CreateCategory()
 
 local characterModificationCategory = characterModificationText:CreateCategory()
@@ -136,7 +137,7 @@ local teleportPresets = {
     }
 }
 
-local playersTeleportObjects = {}
+local playersUIObjects = {}
 
 local function CompleteQuest(quest)
     local currentNPC
@@ -210,15 +211,39 @@ end
 
 
 for _, v in pairs(Players:GetPlayers()) do
-    if v ~= LocalPlayer then
-        local button = playersTeleportCategory:new("Button", v.Name)
+    local playerText = playersCategory:new("Text", v.Name)
+    playerText:SetColor((v == LocalPlayer and Color3.fromRGB(184, 255, 184)) or Color3.fromRGB(211,211,211))
 
-        button:OnPressed(function()
-            Character.HumanoidRootPart.CFrame = v.Character.HumanoidRootPart.CFrame
+    local playerCategory = playerText:CreateCategory()
+    local teleportButton = playerCategory:new("Button", "Teleport")
+    local appearanceText = playerCategory:new("Text", "Appearance")
+
+    local statsText = playerCategory:new("Text", "Stats")
+
+    local appearanceCategory = appearanceText:CreateCategory()
+    local statsCategory = statsText:CreateCategory()
+
+    for _, v in pairs(v.PlayerData.Appearance:GetChildren()) do
+        local valueText = appearanceCategory:new("Text", v.Name .. ": " ..v.Value)
+
+        v:GetPropertyChangedSignal("Value"):Connect(function()
+            valueText:Set(v.Name .. ": " ..v.Value)
         end)
-
-        playersTeleportObjects[v] = button
     end
+
+    for _, v in pairs(v.PlayerData.Stats:GetChildren()) do
+        local valueText = statsCategory:new("Text", v.Name .. ": " ..v.Value)
+
+        v:GetPropertyChangedSignal("Value"):Connect(function()
+            valueText:Set(v.Name .. ": " ..v.Value)
+        end)
+    end
+
+    teleportButton:OnPressed(function()
+        Character.HumanoidRootPart.CFrame = v.Character.HumanoidRootPart.CFrame
+    end)
+
+    playersUIObjects[v] = playerText
 end
 
 walkSpeedSpeedSlider:OnChanged(function()
@@ -300,20 +325,37 @@ Character.BattlerHealth:GetPropertyChangedSignal("Value"):Connect(function()
 end)
 
 Players.PlayerAdded:Connect(function(player)
-    local button = playersTeleportCategory:new("Button", player.Name)
+    local playerText = playersCategory:new("Text", player.Name)
 
-    button:OnPressed(function()
+    local playerCategory = playerText:CreateCategory()
+    local teleportButton = playerCategory:new("Button", "Teleport")
+    local appearanceText = playerCategory:new("Text", "Appearance")
+
+    local statsText = playerCategory:new("Text", "Stats")
+
+    local appearanceCategory = appearanceText:CreateCategory()
+    local statsCategory = statsText:CreateCategory()
+
+    for _, v in pairs(player.PlayerData.Appearance:GetChildren()) do
+        appearanceCategory:new("Text", v.Value)
+    end
+
+    for _, v in pairs(player.PlayerData.Stats:GetChildren()) do
+        statsCategory:new("Text", v.Value)
+    end
+
+    teleportButton:OnPressed(function()
         Character.HumanoidRootPart.CFrame = player.Character.HumanoidRootPart.CFrame
     end)
-
-    playersTeleportObjects[player] = button
+    
+    playersUIObjects[player] = playerText
 
     print(player, "Joined")
 end)
 
 Players.PlayerRemoving:Connect(function(player)
-    playersTeleportObjects[player]:Destroy()
-	playersTeleportObjects[player] = nil
+    playersUIObjects[player]:Destroy(true)
+	playersUIObjects[player] = nil
 
     print(player, "Left")
 end)
