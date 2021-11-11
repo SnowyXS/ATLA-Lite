@@ -137,7 +137,16 @@ local teleportPresets = {
     }
 }
 
+local playerDataExpectionNames = {
+    "Money1" = "Copper Pieces",
+    "Money2" = "Silver Pieces"
+    "Money3" = "Gold Pieces",
+    "Money4" = "Gold Ingots"
+}
+
 local playersUIObjects = {}
+
+
 
 local function CompleteQuest(quest)
     local currentNPC
@@ -226,18 +235,20 @@ for _, v in pairs(Players:GetPlayers()) do
     local playerData = v:WaitForChild("PlayerData")
 
     for _, v in pairs(playerData:WaitForChild("Appearance"):GetChildren()) do
-        local valueText = appearanceCategory:new("Text", v.Name .. ": " ..v.Value)
+        local dataName = playerDataExpectionNames[v.Name] or v.Name
+        local valueText = appearanceCategory:new("Text", dataName .. ": " ..v.Value)
 
         v:GetPropertyChangedSignal("Value"):Connect(function()
-            valueText:Set(v.Name .. ": " ..v.Value)
+            valueText:Set(dataName .. ": " ..v.Value)
         end)
     end
 
     for _, v in pairs(playerData:WaitForChild("Stats"):GetChildren()) do
-        local valueText = statsCategory:new("Text", v.Name .. ": " ..v.Value)
+        local dataName = playerDataExpectionNames[v.Name] or v.Name
+        local valueText = statsCategory:new("Text", dataName .. ": " ..v.Value)
 
         v:GetPropertyChangedSignal("Value"):Connect(function()
-            valueText:Set(v.Name .. ": " ..v.Value)
+            valueText:Set(dataName .. ": " ..v.Value)
         end)
     end
 
@@ -341,18 +352,20 @@ Players.PlayerAdded:Connect(function(player)
     local playerData = player:WaitForChild("PlayerData")
 
     for _, v in pairs(playerData:WaitForChild("Appearance"):GetChildren()) do
-        local valueText = appearanceCategory:new("Text", v.Name .. ": " ..v.Value)
+        local dataName = playerDataExpectionNames[v.Name] or v.Name
+        local valueText = appearanceCategory:new("Text", dataName .. ": " ..v.Value)
 
         v:GetPropertyChangedSignal("Value"):Connect(function()
-            valueText:Set(v.Name .. ": " ..v.Value)
+            valueText:Set(dataName .. ": " ..v.Value)
         end)
     end
 
     for _, v in pairs(playerData:WaitForChild("Stats"):GetChildren()) do
-        local valueText = statsCategory:new("Text", v.Name .. ": " ..v.Value)
+        local dataName = playerDataExpectionNames[v.Name] or v.Name
+        local valueText = statsCategory:new("Text", dataName .. ": " ..v.Value)
 
         v:GetPropertyChangedSignal("Value"):Connect(function()
-            valueText:Set(v.Name .. ": " ..v.Value)
+            valueText:Set(dataName .. ": " ..v.Value)
         end)
     end
 
