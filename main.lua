@@ -223,7 +223,9 @@ for _, v in pairs(Players:GetPlayers()) do
     local appearanceCategory = appearanceText:CreateCategory()
     local statsCategory = statsText:CreateCategory()
 
-    for _, v in pairs(v.PlayerData.Appearance:GetChildren()) do
+    local playerData = v:WaitForChild("PlayerData")
+
+    for _, v in pairs(playerData.Appearance:GetChildren()) do
         local valueText = appearanceCategory:new("Text", v.Name .. ": " ..v.Value)
 
         v:GetPropertyChangedSignal("Value"):Connect(function()
@@ -231,7 +233,7 @@ for _, v in pairs(Players:GetPlayers()) do
         end)
     end
 
-    for _, v in pairs(v.PlayerData.Stats:GetChildren()) do
+    for _, v in pairs(playerData.Stats:GetChildren()) do
         local valueText = statsCategory:new("Text", v.Name .. ": " ..v.Value)
 
         v:GetPropertyChangedSignal("Value"):Connect(function()
