@@ -556,11 +556,13 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
         if selectedObject:HasCategory() then
 			local newCategory = selectedObject:GetCategoryClass()
 			local _objects = newCategory._objects
-			
-			if _objects then
-				local newArrowPosition = (#_objects >= table.find(Category._objects, selectedObject) and arrow.Position.Y) or _objects[#_objects]._position.Y
+			local objectPlace = table.find(Category._objects, selectedObject) 
+
+			if objectPlace then
+				local newArrowPosition = (#_objects >= objectPlace and arrow.Position.Y) or _objects[#_objects]._position.Y
 
 				arrow.Position = Vector2.new(arrow.Position.X, newArrowPosition)
+
 				newCategory:OpenCategory()
 			end
 		end
@@ -568,9 +570,10 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
 		if Category.CloseCategory then
 			local previousCategory = Controller:GetPreviousCategory()
 			local _objects = previousCategory._objects
+			local objectPlace = table.find(Category._objects, selectedObject)
 
-			if _objects then
-				local newArrowPosition = (#_objects >= table.find(Category._objects, selectedObject) and arrow.Position.Y) or _objects[#_objects]._position.Y
+			if objectPlace then
+				local newArrowPosition = (#_objects >= objectPlace and arrow.Position.Y) or _objects[#_objects]._position.Y
 
 				arrow.Position = Vector2.new(arrow.Position.X, newArrowPosition)
 
