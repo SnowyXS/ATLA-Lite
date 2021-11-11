@@ -225,7 +225,7 @@ for _, v in pairs(Players:GetPlayers()) do
 
     local playerData = v:WaitForChild("PlayerData")
 
-    for _, v in pairs(playerData.Appearance:GetChildren()) do
+    for _, v in pairs(playerData:WaitForChild("Appearance"):GetChildren()) do
         local valueText = appearanceCategory:new("Text", v.Name .. ": " ..v.Value)
 
         v:GetPropertyChangedSignal("Value"):Connect(function()
@@ -233,7 +233,7 @@ for _, v in pairs(Players:GetPlayers()) do
         end)
     end
 
-    for _, v in pairs(playerData.Stats:GetChildren()) do
+    for _, v in pairs(playerData:WaitForChild("Stats"):GetChildren()) do
         local valueText = statsCategory:new("Text", v.Name .. ": " ..v.Value)
 
         v:GetPropertyChangedSignal("Value"):Connect(function()
@@ -341,11 +341,19 @@ Players.PlayerAdded:Connect(function(player)
     local playerData = player:WaitForChild("PlayerData")
 
     for _, v in pairs(playerData:WaitForChild("Appearance"):GetChildren()) do
-        appearanceCategory:new("Text", v.Value)
+        local valueText = appearanceCategory:new("Text", v.Name .. ": " ..v.Value)
+
+        v:GetPropertyChangedSignal("Value"):Connect(function()
+            valueText:Set(v.Name .. ": " ..v.Value)
+        end)
     end
 
     for _, v in pairs(playerData:WaitForChild("Stats"):GetChildren()) do
-        statsCategory:new("Text", v.Value)
+        local valueText = statsCategory:new("Text", v.Name .. ": " ..v.Value)
+
+        v:GetPropertyChangedSignal("Value"):Connect(function()
+            valueText:Set(v.Name .. ": " ..v.Value)
+        end)
     end
 
     teleportButton:OnPressed(function()
