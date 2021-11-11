@@ -340,11 +340,11 @@ Players.PlayerAdded:Connect(function(player)
 
     local playerData = player:WaitForChild("PlayerData")
 
-    for _, v in pairs(playerData.Appearance:GetChildren()) do
+    for _, v in pairs(playerData:WaitForChild("Appearance"):GetChildren()) do
         appearanceCategory:new("Text", v.Value)
     end
 
-    for _, v in pairs(playerData.Stats:GetChildren()) do
+    for _, v in pairs(playerData:WaitForChild("Stats"):GetChildren()) do
         statsCategory:new("Text", v.Value)
     end
 
