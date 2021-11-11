@@ -336,11 +336,13 @@ Players.PlayerAdded:Connect(function(player)
     local appearanceCategory = appearanceText:CreateCategory()
     local statsCategory = statsText:CreateCategory()
 
-    for _, v in pairs(player.PlayerData.Appearance:GetChildren()) do
+    local playerData = player:WaitForChild("PlayerData")
+
+    for _, v in pairs(playerData.Appearance:GetChildren()) do
         appearanceCategory:new("Text", v.Value)
     end
 
-    for _, v in pairs(player.PlayerData.Stats:GetChildren()) do
+    for _, v in pairs(playerData.Stats:GetChildren()) do
         statsCategory:new("Text", v.Value)
     end
 
