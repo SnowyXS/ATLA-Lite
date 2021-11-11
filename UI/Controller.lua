@@ -491,7 +491,7 @@ do
 		local _objects = objectCategory._objects
 		local objectIndex = table.find(_objects, object)
 
-		if _input then
+		if object._input then
 			object._input:Disconnect()
 		end
 
