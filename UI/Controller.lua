@@ -556,20 +556,26 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
         if selectedObject:HasCategory() then
 			local newCategory = selectedObject:GetCategoryClass()
 			local _objects = newCategory._objects
-			local newArrowPosition = (#_objects >= table.find(Category._objects, selectedObject) and arrow.Position.Y) or _objects[#_objects]._position.Y
+			
+			if _objects then
+				local newArrowPosition = (#_objects >= table.find(Category._objects, selectedObject) and arrow.Position.Y) or _objects[#_objects]._position.Y
 
-			arrow.Position = Vector2.new(arrow.Position.X, newArrowPosition)
-			newCategory:OpenCategory()
+				arrow.Position = Vector2.new(arrow.Position.X, newArrowPosition)
+				newCategory:OpenCategory()
+			end
 		end
 	elseif input.KeyCode == Enum.KeyCode.Backspace then
 		if Category.CloseCategory then
 			local previousCategory = Controller:GetPreviousCategory()
 			local _objects = previousCategory._objects
-			local newArrowPosition = (#_objects >= table.find(Category._objects, selectedObject) and arrow.Position.Y) or _objects[#_objects]._position.Y
 
-			arrow.Position = Vector2.new(arrow.Position.X, newArrowPosition)
+			if _objects then
+				local newArrowPosition = (#_objects >= table.find(Category._objects, selectedObject) and arrow.Position.Y) or _objects[#_objects]._position.Y
 
-			Category:CloseCategory()
+				arrow.Position = Vector2.new(arrow.Position.X, newArrowPosition)
+
+				Category:CloseCategory()
+			end
 		end
 	elseif input.keyCode == Enum.KeyCode.Delete then
 		arrow.Visible = not arrow.Visible
