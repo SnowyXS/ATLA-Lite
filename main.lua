@@ -138,10 +138,10 @@ local teleportPresets = {
 }
 
 local playerDataExpectionNames = {
-    "Money1" = "Copper Pieces",
-    "Money2" = "Silver Pieces",
-    "Money3" = "Gold Pieces",
-    "Money4" = "Gold Ingots"
+    Money1 = "Copper Pieces",
+    Money2 = "Silver Pieces",
+    Money3 = "Gold Pieces",
+    Money4 = "Gold Ingots"
 }
 
 local playersUIObjects = {}
