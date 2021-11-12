@@ -431,20 +431,16 @@ LocalPlayer.CharacterAdded:Connect(function(character)
     end
 
     local MainMenu = LocalPlayer.PlayerGui:WaitForChild("MainMenu")
+    local MenuControl = MainMenu:WaitForChild("MenuControl")
     local BattlerHealth = character:WaitForChild("BattlerHealth")
 
     Character = character
     Character.Humanoid.WalkSpeed = walkSpeedSpeedSlider:GetValue()
     Character.Humanoid.JumpPower = jumpPowerSlider:GetValue()
 
-    repeat task.wait() until getsenv(LocalPlayer.PlayerGui.MainMenu.MenuControl).DecreaseStamina
+    repeat task.wait() until getsenv(MenuControl).DecreaseStamina
 
-    for i,v in pairs(getgc(true)) do
-        if typeof(v) == "table" and rawget(v, "QuestModule") then
-            MainControl = v
-            break
-        end
-    end
+    MainControl = getsenv(LocalPlayer.PlayerGui.MainMenu.MenuControl)
 
     OldDecreaseStamina = rawget(MainControl, "DecreaseStamina")
     OldShakeCamera = rawget(MainControl, "ShakeCamera")
