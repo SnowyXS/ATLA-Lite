@@ -23,3 +23,5 @@ Run this script `loadstring(game:HttpGet("https://raw.githubusercontent.com/Snow
 - Enter: Will either toggle a Checkbox, press a Button, 
 - Left-Alt + Right-Arrow: will open the sub category if there is one
 - Backspace: Will close the sub category
+# Discord Server
+https://discord.com/invite/n2egDfZwgJ
