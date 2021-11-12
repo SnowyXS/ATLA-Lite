@@ -3,15 +3,15 @@ local UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/AT
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 
-local networkFolder = ReplicatedStorage.NetworkFolder
+local networkFolder = ReplicatedStorage:WaitForChild("NetworkFolder")
 local gameFunction = networkFolder.GameFunction
 local gameEvent = networkFolder.GameEvent
 
 local LocalPlayer = Players.LocalPlayer
 local Character = LocalPlayer.Character
 
-local playerData = LocalPlayer.PlayerData
-local appearance = playerData.Appearance
+local playerData = LocalPlayer:WaitForChild("PlayerData")
+local appearance = playerData:WaitForChild("Appearance")
 
 local specialAbility = appearance.Special
 local secondSpecialAbility = appearance.Special2
@@ -45,9 +45,17 @@ local jumpPowerSlider = characterModificationCategory:new("Slider", "JumpPower",
 local sprintSpeedSlider = characterModificationCategory:new("Slider", "Sprint Speed", 25, 25, 1000, 1)
 
 local miscCategory = miscText:CreateCategory()
+local flyCheckBox = miscCategory:new("Checkbox", "Fly")
 local godmodeCheckBox = miscCategory:new("Checkbox", "GodMode")
 local infiniteStaminaCheckBox = miscCategory:new("Checkbox", "Infinite Stamina")
-local disableDamageCheckBox = miscCategory:new("Checkbox", "Disable tornado and burn damage")
+local disablesText = miscCategory:new("Text", "Disables")
+
+local flyCategory = flyCheckBox:CreateCategory()
+local flySpeedSlider = flyCategory:new("Slider", "Fly Speed", 5, 5, 1000, 1)
+
+local disabledCategory = disablesText:CreateCategory()
+local disableCameraShakeCheckBox = disabledCategory:new("Checkbox", "Disable camera shake")
+local disableDamageCheckBox = disabledCategory:new("Checkbox", "Disable tornado and burn damage")
 
 local MainControl, BaseSelection
 
@@ -68,6 +76,7 @@ local questNPCs = MainControl.QuestNPCs
 
 local NPCList = getupvalue(Quests.RefreshNPCs, 3)
 local OldDecreaseStamina = rawget(MainControl, "DecreaseStamina")
+local OldShakeCamera = rawget(MainControl, "ShakeCamera")
 
 local specialElements = {
     Air = {"Flight"},
@@ -146,8 +155,6 @@ local playerDataExpectionNames = {
 
 local playersUIObjects = {}
 
-
-
 local function CompleteQuest(quest)
     local currentNPC
     
@@ -165,7 +172,7 @@ local function CompleteQuest(quest)
         end
     end
 
-    canCompleteQuest = (currentNPC and Character.Humanoid.Health > 0 and Character.Humanoid.WalkSpeed > 0) and not gameFunction:InvokeServer("GetQuestData").QuestName ~= "" and not Character:FindFirstChild("Down") and not (Character.HumanoidRootPart:FindFirstChild("DownTimer") and Character.HumanoidRootPart.DownTimer.TextLabel.Text ~= "") and not canCompleteQuest
+    canCompleteQuest = (currentNPC and Character.Humanoid.Health > 0 and Character.Humanoid.WalkSpeed > 0) and not Character:FindFirstChild("Down") and not (Character.HumanoidRootPart:FindFirstChild("DownTimer") and Character.HumanoidRootPart.DownTimer.TextLabel.Text ~= "") and not canCompleteQuest
 
     if canCompleteQuest then
         gameFunction:InvokeServer("Abandon")
@@ -296,6 +303,53 @@ specialSelector:OnChanged(function()
     secondSpecialSelector:ChangeList(secondSpecialElements[specialSelector:GetSelected()] or secondSpecialElements[elementSelector:GetSelected()] or {"None"})
 end)
 
+flyCheckBox:OnChanged(function()
+    local isFlyToggled = flyCheckBox:IsToggled()
+
+    setupvalue(MainControl.startRealFlying, 3, isFlyToggled)
+    setupvalue(MainControl.startRealFlying, 4, isFlyToggled)
+
+    if isFlyToggled then
+        setupvalue(MainControl.startRealFlying, 5, not isFlyToggled)
+        setupvalue(MainControl.startRealFlying, 6, not isFlyToggled)
+
+        return MainControl.startRealFlying(Character, 0)
+    end
+
+    setupvalue(MainControl.startRealFlying, 5, isFlyToggled)
+    setupvalue(MainControl.startRealFlying, 6, isFlyToggled)
+end)
+
+flySpeedSlider:OnChanged(function()
+    setconstant(MainControl.startRealFlying, 66, flySpeedSlider:GetValue())
+end)
+
+rawset(MainControl, "DecreaseStamina", function(...)
+    if infiniteStaminaCheckBox:IsToggled() then
+        return
+    end
+        
+    return OldDecreaseStamina(...)
+end)    
+
+rawset(MainControl, "ShakeCamera", function(...)
+    if disableCameraShakeCheckBox:IsToggled() then
+        return
+    end
+    
+    return OldShakeCamera(...)
+end)    
+
+Character.BattlerHealth:GetPropertyChangedSignal("Value"):Connect(function()
+    if godmodeCheckBox:IsToggled() then
+        gameEvent:FireServer("SpecialAbility", {
+            Ability = "TornadoPush", 
+            Damage = -2e9, 
+            Opponent = LocalPlayer
+        })
+    end
+end)
+
 OldNameCall = hookmetamethod(game, "__namecall", function(self, ...)
     local args = {...}
     local method = getnamecallmethod()
@@ -317,24 +371,6 @@ OldNewIndex = hookmetamethod(game, "__newindex", function(self, index, value)
     end
     
     return OldNewIndex(self, index, value)
-end)
-
-rawset(MainControl, "DecreaseStamina", function(...)
-    if infiniteStaminaCheckBox:IsToggled() and not checkcaller() then
-        return
-    end
-        
-    return OldDecreaseStamina(...)
-end)    
-
-Character.BattlerHealth:GetPropertyChangedSignal("Value"):Connect(function()
-    if godmodeCheckBox:IsToggled() then
-        gameEvent:FireServer("SpecialAbility", {
-            Ability = "TornadoPush", 
-            Damage = -2e9, 
-            Opponent = LocalPlayer
-        })
-    end
 end)
 
 Players.PlayerAdded:Connect(function(player)
@@ -394,9 +430,14 @@ LocalPlayer.CharacterAdded:Connect(function(character)
         character:WaitForChild("Humanoid").Health = 0
     end
 
+    local MainMenu = LocalPlayer.PlayerGui:WaitForChild("MainMenu")
     local BattlerHealth = character:WaitForChild("BattlerHealth")
 
-    repeat task.wait() until LocalPlayer.PlayerGui:FindFirstChild("MainMenu") and getsenv(LocalPlayer.PlayerGui.MainMenu.MenuControl).DecreaseStamina
+    Character = character
+    Character.Humanoid.WalkSpeed = walkSpeedSpeedSlider:GetValue()
+    Character.Humanoid.JumpPower = jumpPowerSlider:GetValue()
+
+    repeat task.wait() until getsenv(LocalPlayer.PlayerGui.MainMenu.MenuControl).DecreaseStamina
 
     for i,v in pairs(getgc(true)) do
         if typeof(v) == "table" and rawget(v, "QuestModule") then
@@ -406,13 +447,22 @@ LocalPlayer.CharacterAdded:Connect(function(character)
     end
 
     OldDecreaseStamina = rawget(MainControl, "DecreaseStamina")
+    OldShakeCamera = rawget(MainControl, "ShakeCamera")
 
     rawset(MainControl, "DecreaseStamina", function(...)
-        if infiniteStaminaCheckBox:IsToggled() and not checkcaller() then
+        if infiniteStaminaCheckBox:IsToggled() then
             return
         end
         
         return OldDecreaseStamina(...)
+    end)
+
+    rawset(MainControl, "ShakeCamera", function(...)
+        if disableCameraShakeCheckBox:IsToggled() then
+            return
+        end
+        
+        return OldShakeCamera(...)
     end)    
     
     BattlerHealth:GetPropertyChangedSignal("Value"):Connect(function()
@@ -424,9 +474,21 @@ LocalPlayer.CharacterAdded:Connect(function(character)
             })
         end
     end)
-    
-    character.Humanoid.WalkSpeed = walkSpeedSpeedSlider:GetValue()
-    character.Humanoid.JumpPower = jumpPowerSlider:GetValue()
 
-    Character = character
+    local isFlyToggled = flyCheckBox:IsToggled()
+
+    setupvalue(MainControl.startRealFlying, 3, isFlyToggled)
+    setupvalue(MainControl.startRealFlying, 4, isFlyToggled)
+
+    if isFlyToggled then
+        setupvalue(MainControl.startRealFlying, 5, not isFlyToggled)
+        setupvalue(MainControl.startRealFlying, 6, not isFlyToggled)
+
+        MainControl.startRealFlying(Character, 0)
+    else
+        setupvalue(MainControl.startRealFlying, 5, isFlyToggled)
+        setupvalue(MainControl.startRealFlying, 6, isFlyToggled)
+    end
+
+    setconstant(MainControl.startRealFlying, 66, flySpeedSlider:GetValue())
 end)
