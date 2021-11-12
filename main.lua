@@ -25,6 +25,7 @@ local miscText = UI:new("Text", "Misc")
 
 local autofarmCategory = autofarmCheckBox:CreateCategory()
 local minimumXpSlider = autofarmCategory:new("Slider", "Minimum XP", 0, 0, 3000, 100)
+local delayBeforeQuestSlider = autofarmCategory:new("Slider", "Delay Before Advance", 0.25, 0.25, 1, 0.05)
 
 local subChangerCategory = subChangerCheckBox:CreateCategory()
 local elementSelector = subChangerCategory:new("ListSelector", {"Air", "Water", "Fire", "Earth"})
@@ -176,7 +177,7 @@ local function CompleteQuest(quest)
 
         Character.PrimaryPart.CFrame = (expection[quest] or currentNPC.PrimaryPart.CFrame) + Vector3.new(0,5,0)
 
-        task.wait(0.25) 
+        task.wait(delayBeforeQuestSlider:GetValue()) 
 
         for step = 1, #Quests[quest].Steps + 1 do 
             local distance = (((expection[quest] and expection[quest].p) or currentNPC.PrimaryPart.CFrame.p) - Character.PrimaryPart.CFrame.p).Magnitude
