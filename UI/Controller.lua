@@ -478,7 +478,7 @@ do
         end
 
 		if openedIndex then
-            objectCategory:CloseCategory()
+            category:CloseCategory()
             table.remove(_openedCategories, openedIndex)
         end
 
