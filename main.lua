@@ -25,7 +25,6 @@ local miscText = UI:new("Text", "Misc")
 
 local autofarmCategory = autofarmCheckBox:CreateCategory()
 local minimumXpSlider = autofarmCategory:new("Slider", "Minimum XP", 0, 0, 3000, 100)
-local delaySlider = autofarmCategory:new("Slider", "Delay", 3, 3, 5, 1)
 
 local subChangerCategory = subChangerCheckBox:CreateCategory()
 local elementSelector = subChangerCategory:new("ListSelector", {"Air", "Water", "Fire", "Earth"})
@@ -158,7 +157,7 @@ local playersUIObjects = {}
 local function CompleteQuest(quest)
     local currentNPC
     
-    local expection = {RedLotus1 = CFrame.new(896.94488525391, 236.26509094238, -3067.7453613281)}
+    local expection = {RedLotus1 = CFrame.new(897.17260742188, 241.11676025391, -3069.0903320313)}
     local nameTagIcon = Character:FindFirstChild("Head"):FindFirstChild("Nametag").Icon
 
     assert(rawget(Quests, quest), "Quest not found.")
@@ -179,7 +178,7 @@ local function CompleteQuest(quest)
 
         Character.PrimaryPart.CFrame = (expection[quest] or currentNPC.PrimaryPart.CFrame) + Vector3.new(0,5,0)
 
-        task.wait(0.5)
+        task.wait(0.25) 
 
         for step = 1, #Quests[quest].Steps + 1 do 
             local distance = (((expection[quest] and expection[quest].p) or currentNPC.PrimaryPart.CFrame.p) - Character.PrimaryPart.CFrame.p).Magnitude
@@ -188,13 +187,13 @@ local function CompleteQuest(quest)
                 break
             end
 
-            gameFunction:InvokeServer("AdvanceStep", {
+            task.spawn(gameFunction.InvokeServer, gameFunction, "AdvanceStep", {
                 QuestName = quest,
                 Step = step
             })
         end
 
-        task.wait(delaySlider:GetValue())
+        task.wait(4.75)
 
         canCompleteQuest = false
     end
@@ -208,7 +207,7 @@ function ChangeElement()
 
     print(selectedSpecial, specialAbility.Value == selectedSpecial)
     print(selectedSecondSpecial, secondSpecialAbility.Value == selectedSecondSpecial)
-
+    
     return ((specialAbility.Value ~= selectedSpecial or secondSpecialAbility.Value ~= selectedSecondSpecial) and gameFunction:InvokeServer("NewGame", {Selections = BaseSelection})) or (specialAbility.Value == selectedSpecial and secondSpecialAbility.Value == selectedSecondSpecial and subChangerCheckBox:SetToggle(false)) 
 end
 
@@ -423,11 +422,16 @@ end)
 
 LocalPlayer.CharacterAdded:Connect(function(character)
     if subChangerCheckBox:IsToggled() then
-        ChangeElement()
+        local shouldContinue = ChangeElement()
 
-        task.wait()
+        if shouldContinue then
+            local humanoid = character:WaitForChild("Humanoid")
 
-        character:WaitForChild("Humanoid").Health = 0
+            if subChangerCheckBox:IsToggled() then
+                humanoid.Health = 0
+                return
+            end
+        end
     end
 
     local MainMenu = LocalPlayer.PlayerGui:WaitForChild("MainMenu")
