@@ -414,6 +414,8 @@ LocalPlayer.CharacterAdded:Connect(function(character)
     if subChangerCheckBox:IsToggled() then
         local shouldContinue = ChangeElement()
 
+        task.wait()
+
         if shouldContinue then
             local humanoid = character:WaitForChild("Humanoid")
 
