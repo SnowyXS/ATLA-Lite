@@ -476,11 +476,6 @@ do
                 object:Destroy()
             end
         end
-        
-        if openedIndex then
-            category:CloseCategory()
-            table.remove(_openedCategories, openedIndex)
-        end
 
         table.remove(_categories, categoriesIndex)
         table.clear(category)
@@ -488,8 +483,17 @@ do
 
 	function Controller.DestroyObject(object)
 		local objectCategory = Controller.GetCategoryFromObject(object)
+		local _openedCategories = Controller._openedCategories
+
 		local _objects = objectCategory._objects
 		local objectIndex = table.find(_objects, object)
+
+		local openedIndex = table.find(_openedCategories, objectCategory)
+
+		if openedIndex then
+            objectCategory:CloseCategory()
+            table.remove(_openedCategories, openedIndex)
+        end
 
 		if object._input then
 			object._input:Disconnect()
@@ -557,9 +561,10 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
 			local newCategory = selectedObject:GetCategoryClass()
 			local _objects = newCategory._objects
 			local objectPlace = table.find(Category._objects, selectedObject) 
+			local lastObject = _objects[#_objects]
 
-			if objectPlace then
-				local newArrowPosition = (#_objects >= objectPlace and arrow.Position.Y) or _objects[#_objects]._position.Y
+			if objectPlace and lastObject then
+				local newArrowPosition = (#_objects >= objectPlace and arrow.Position.Y) or lastObject._position.Y
 
 				arrow.Position = Vector2.new(arrow.Position.X, newArrowPosition)
 
@@ -571,9 +576,10 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
 			local previousCategory = Controller:GetPreviousCategory()
 			local _objects = previousCategory._objects
 			local objectPlace = table.find(Category._objects, selectedObject)
-
-			if objectPlace then
-				local newArrowPosition = (#_objects >= objectPlace and arrow.Position.Y) or _objects[#_objects]._position.Y
+			local lastObject = _objects[#_objects]
+			
+			if objectPlace and lastObject then
+				local newArrowPosition = (#_objects >= objectPlace and arrow.Position.Y) or lastObject._position.Y
 
 				arrow.Position = Vector2.new(arrow.Position.X, newArrowPosition)
 
