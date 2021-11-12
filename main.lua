@@ -53,7 +53,6 @@ local flyCategory = flyCheckBox:CreateCategory()
 local flySpeedSlider = flyCategory:new("Slider", "Fly Speed", 5, 5, 1000, 1)
 
 local disabledCategory = disablesText:CreateCategory()
-local disableCameraShakeCheckBox = disabledCategory:new("Checkbox", "Disable camera shake")
 local disableDamageCheckBox = disabledCategory:new("Checkbox", "Disable tornado and burn damage")
 
 local MainControl, BaseSelection
@@ -75,7 +74,6 @@ local questNPCs = MainControl.QuestNPCs
 
 local NPCList = getupvalue(Quests.RefreshNPCs, 3)
 local OldDecreaseStamina = rawget(MainControl, "DecreaseStamina")
-local OldShakeCamera = rawget(MainControl, "ShakeCamera")
 
 local specialElements = {
     Air = {"Flight"},
@@ -331,14 +329,6 @@ rawset(MainControl, "DecreaseStamina", function(...)
     return OldDecreaseStamina(...)
 end)    
 
-rawset(MainControl, "ShakeCamera", function(...)
-    if disableCameraShakeCheckBox:IsToggled() then
-        return
-    end
-    
-    return OldShakeCamera(...)
-end)    
-
 Character.BattlerHealth:GetPropertyChangedSignal("Value"):Connect(function()
     if godmodeCheckBox:IsToggled() then
         gameEvent:FireServer("SpecialAbility", {
@@ -447,7 +437,6 @@ LocalPlayer.CharacterAdded:Connect(function(character)
     MainControl = getsenv(LocalPlayer.PlayerGui.MainMenu.MenuControl)
 
     OldDecreaseStamina = rawget(MainControl, "DecreaseStamina")
-    OldShakeCamera = rawget(MainControl, "ShakeCamera")
 
     rawset(MainControl, "DecreaseStamina", function(...)
         if infiniteStaminaCheckBox:IsToggled() then
@@ -456,14 +445,6 @@ LocalPlayer.CharacterAdded:Connect(function(character)
         
         return OldDecreaseStamina(...)
     end)
-
-    rawset(MainControl, "ShakeCamera", function(...)
-        if disableCameraShakeCheckBox:IsToggled() then
-            return
-        end
-        
-        return OldShakeCamera(...)
-    end)    
     
     BattlerHealth:GetPropertyChangedSignal("Value"):Connect(function()
         if godmodeCheckBox:IsToggled() then
