@@ -477,6 +477,11 @@ do
             end
         end
 
+		if openedIndex then
+            objectCategory:CloseCategory()
+            table.remove(_openedCategories, openedIndex)
+        end
+
         table.remove(_categories, categoriesIndex)
         table.clear(category)
     end
@@ -487,13 +492,6 @@ do
 
 		local _objects = objectCategory._objects
 		local objectIndex = table.find(_objects, object)
-
-		local openedIndex = table.find(_openedCategories, objectCategory)
-
-		if openedIndex then
-            objectCategory:CloseCategory()
-            table.remove(_openedCategories, openedIndex)
-        end
 
 		if object._input then
 			object._input:Disconnect()
