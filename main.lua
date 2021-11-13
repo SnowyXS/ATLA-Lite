@@ -197,7 +197,7 @@ local function CompleteQuest(quest)
     end
 end
 
-function ChangeElement()
+local function ChangeElement()
     local selectedSpecial = specialSelector:GetSelected()
     local selectedSecondSpecial = secondSpecialSelector:GetSelected()
     
@@ -207,6 +207,23 @@ function ChangeElement()
     print(selectedSecondSpecial, secondSpecialAbility.Value == selectedSecondSpecial)
     
     return ((specialAbility.Value ~= selectedSpecial or secondSpecialAbility.Value ~= selectedSecondSpecial) and gameFunction:InvokeServer("NewGame", {Selections = BaseSelection})) or (specialAbility.Value == selectedSpecial and secondSpecialAbility.Value == selectedSecondSpecial and subChangerCheckBox:SetToggle(false)) 
+end
+
+local function ToggleFlight()
+    local isFlyToggled = flyCheckBox:IsToggled()
+
+    setupvalue(MainControl.startRealFlying, 3, isFlyToggled)
+    setupvalue(MainControl.startRealFlying, 4, isFlyToggled)
+
+    if isFlyToggled then
+        setupvalue(MainControl.startRealFlying, 5, not isFlyToggled)
+        setupvalue(MainControl.startRealFlying, 6, not isFlyToggled)
+
+        MainControl.startRealFlying(Character, 0)
+    else
+        setupvalue(MainControl.startRealFlying, 5, isFlyToggled)
+        setupvalue(MainControl.startRealFlying, 6, isFlyToggled)
+    end
 end
 
 for i, v in ipairs(teleportPresets) do
@@ -301,20 +318,7 @@ specialSelector:OnChanged(function()
 end)
 
 flyCheckBox:OnChanged(function()
-    local isFlyToggled = flyCheckBox:IsToggled()
-
-    setupvalue(MainControl.startRealFlying, 3, isFlyToggled)
-    setupvalue(MainControl.startRealFlying, 4, isFlyToggled)
-
-    if isFlyToggled then
-        setupvalue(MainControl.startRealFlying, 5, not isFlyToggled)
-        setupvalue(MainControl.startRealFlying, 6, not isFlyToggled)
-
-        return MainControl.startRealFlying(Character, 0)
-    end
-
-    setupvalue(MainControl.startRealFlying, 5, isFlyToggled)
-    setupvalue(MainControl.startRealFlying, 6, isFlyToggled)
+    ToggleFlight()
 end)
 
 flySpeedSlider:OnChanged(function()
@@ -337,6 +341,8 @@ Character.BattlerHealth:GetPropertyChangedSignal("Value"):Connect(function()
             Opponent = LocalPlayer
         })
     end
+
+    ToggleFlight()
 end)
 
 OldNameCall = hookmetamethod(game, "__namecall", function(self, ...)
@@ -456,22 +462,11 @@ LocalPlayer.CharacterAdded:Connect(function(character)
                 Opponent = LocalPlayer
             })
         end
+
+        ToggleFlight()
     end)
 
-    local isFlyToggled = flyCheckBox:IsToggled()
-
-    setupvalue(MainControl.startRealFlying, 3, isFlyToggled)
-    setupvalue(MainControl.startRealFlying, 4, isFlyToggled)
-
-    if isFlyToggled then
-        setupvalue(MainControl.startRealFlying, 5, not isFlyToggled)
-        setupvalue(MainControl.startRealFlying, 6, not isFlyToggled)
-
-        MainControl.startRealFlying(Character, 0)
-    else
-        setupvalue(MainControl.startRealFlying, 5, isFlyToggled)
-        setupvalue(MainControl.startRealFlying, 6, isFlyToggled)
-    end
+    ToggleFlight()
 
     setconstant(MainControl.startRealFlying, 66, flySpeedSlider:GetValue())
 end)
