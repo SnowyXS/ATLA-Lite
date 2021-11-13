@@ -191,7 +191,7 @@ local function CompleteQuest(quest)
             })
         end
 
-        task.wait(4.35)
+        task.wait(4.4)
 
         canCompleteQuest = false
     end
