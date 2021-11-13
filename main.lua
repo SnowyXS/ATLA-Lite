@@ -83,8 +83,8 @@ local specialElements = {
 }
 
 local secondSpecialElements = {
-    Ice = {"None", "Ice Healing"},
-    Plant = {"None", "Plant Healing"},
+    Ice = {"None", "Healing"},
+    Plant = {"None", "Healing"},
     Lava = {"None", "Lava Seismic"},
     Metal = {"None", "Metal Seismic"},
     Sand = {"None", "Sand Seismic"},
