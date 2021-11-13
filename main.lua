@@ -46,6 +46,7 @@ local sprintSpeedSlider = characterModificationCategory:new("Slider", "Sprint Sp
 local miscCategory = miscText:CreateCategory()
 local flyCheckBox = miscCategory:new("Checkbox", "Fly")
 local godmodeCheckBox = miscCategory:new("Checkbox", "GodMode")
+local killAuraCheckBox = miscCategory:new("Checkbox", "KillAura")
 local infiniteStaminaCheckBox = miscCategory:new("Checkbox", "Infinite Stamina")
 local disablesText = miscCategory:new("Text", "Disables")
 
@@ -319,6 +320,14 @@ end)
 
 flyCheckBox:OnChanged(function()
     ToggleFlight()
+end)
+
+killAuraCheckBox:OnChanged(function()
+    while killAuraCheckBox:IsToggled() and task.wait() do
+        task.spawn(gameFunction.InvokeServer, gameFunction, "ProcessKey", {
+            Key = "Q"
+        })
+    end
 end)
 
 flySpeedSlider:OnChanged(function()
