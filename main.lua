@@ -45,8 +45,8 @@ local sprintSpeedSlider = characterModificationCategory:new("Slider", "Sprint Sp
 
 local miscCategory = miscText:CreateCategory()
 local flyCheckBox = miscCategory:new("Checkbox", "Fly")
-local godmodeCheckBox = miscCategory:new("Checkbox", "GodMode")
 local killAuraCheckBox = miscCategory:new("Checkbox", "KillAura")
+local godmodeCheckBox = miscCategory:new("Checkbox", "GodMode")
 local infiniteStaminaCheckBox = miscCategory:new("Checkbox", "Infinite Stamina")
 local disablesText = miscCategory:new("Text", "Disables")
 
