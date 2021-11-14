@@ -217,13 +217,7 @@ local function ToggleFlight()
     setupvalue(MainControl.startRealFlying, 4, isFlyToggled)
 
     if isFlyToggled then
-        setupvalue(MainControl.startRealFlying, 5, not isFlyToggled)
-        setupvalue(MainControl.startRealFlying, 6, not isFlyToggled)
-
         MainControl.startRealFlying(Character, 0)
-    else
-        setupvalue(MainControl.startRealFlying, 5, isFlyToggled)
-        setupvalue(MainControl.startRealFlying, 6, isFlyToggled)
     end
 end
 
