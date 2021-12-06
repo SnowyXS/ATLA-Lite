@@ -176,7 +176,7 @@ end
 
 local function CompleteQuest(quest)
     local npc = GetQuestNPC(quest)
-    local oldXP, oldLevel = playerData.Stats.Experience.Value, playerData.Stats.Level.Value
+    local oldCopper, oldSilver, oldGoldPieces, oldGoldIngots = playerData.Stats.Money1.Value, playerData.Stats.Money2.Value, playerData.Stats.Money3.Value, playerData.Stats.Money4.Value
 
     canCompleteQuest = (npc and humanoid.Health > 0 and humanoid.WalkSpeed > 0) and not Character:FindFirstChild("Down") and not (humanoidRootPart:FindFirstChild("DownTimer") and humanoidRootPart.DownTimer.TextLabel.Text ~= "") and not canCompleteQuest
 
@@ -185,7 +185,7 @@ local function CompleteQuest(quest)
 
         task.wait(GetPing() * 1.1)
 
-        while playerData.Stats.Level.Value == oldLevel and playerData.Stats.Experience.Value == oldXP and autofarmCheckBox:IsToggled() do
+        while playerData.Stats.Money1.Value == oldCopper and playerData.Stats.Money2.Value == oldSilver and playerData.Stats.Money3.Value == oldGoldPieces and playerData.Stats.Money4.Value == oldGoldIngots and autofarmCheckBox:IsToggled() do
             task.wait(GetPing())
 
             for step = 1, #Quests[quest].Steps + 1 do 
@@ -202,7 +202,9 @@ local function CompleteQuest(quest)
             end
         end
 
-        lastQuest = quest
+        if playerData.Stats.Money1.Value ~= oldCopper or playerData.Stats.Money2.Value ~= oldSilver or playerData.Stats.Money3.Value ~= oldGoldPieces or playerData.Stats.Money4.Value ~= oldGoldIngots then
+            lastQuest = quest
+        end
 
         canCompleteQuest = false
     end
