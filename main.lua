@@ -33,6 +33,7 @@ local subChangerCategory = subChangerCheckBox:CreateCategory()
 local elementSelector = subChangerCategory:new("ListSelector", {"Air", "Water", "Fire", "Earth"})
 local specialSelector = subChangerCategory:new("ListSelector", {"Flight"})
 local secondSpecialSelector = subChangerCategory:new("ListSelector", {"None"})
+local farmAfterSubCheckBox = subChangerCategory:new("Checkbox", "Auto-Toggle AutoFarm")
 
 local playersCategory = playersText:CreateCategory()
 
@@ -244,7 +245,6 @@ for i, v in ipairs(teleportPresets) do
     end
 end
 
-
 for _, v in pairs(Players:GetPlayers()) do
     local playerText = playersCategory:new("Text", v.Name)
     playerText:SetColor((v == LocalPlayer and Color3.fromRGB(184, 255, 184)) or Color3.fromRGB(211,211,211))
@@ -302,7 +302,12 @@ end)
 autofarmCheckBox:OnChanged(function()
     while autofarmCheckBox:IsToggled() and task.wait() do
         for i,v in pairs(Quests) do
-            if not autofarmCheckBox:IsToggled() or not playerData.PlayerSettings.Continuable.Value or getupvalue(MainControl.SpawnCharacter, 2) < 2 then
+            if autofarmCheckBox:IsToggled() and playerData.PlayerSettings.Continuable.Value and getupvalue(MainControl.SpawnCharacter, 2) < 2  then
+                MainControl.MainFrame:TweenPosition(UDim2.new(0.5, -150, 1.5, -150), "Out", "Quad", 1, true)
+                MainControl.SpawnFrame:TweenPosition(UDim2.new(2, -10, 1, -10), "Out", "Quad", 2, true)
+        
+                MainControl.SpawnCharacter()
+            elseif not autofarmCheckBox:IsToggled() or not playerData.PlayerSettings.Continuable.Value or getupvalue(MainControl.SpawnCharacter, 2) < 2 then
                 break
             end
 
@@ -444,6 +449,8 @@ LocalPlayer.CharacterAdded:Connect(function(character)
                 humanoid.Health = 0
                 return
             end
+        elseif farmAfterSubCheckBox:IsToggled() then
+            autofarmCheckBox:SetToggle(true)
         end
     end
 
@@ -488,6 +495,13 @@ LocalPlayer.CharacterAdded:Connect(function(character)
     ToggleFlight()
 
     setconstant(MainControl.startRealFlying, 66, flySpeedSlider:GetValue())
+
+    if autofarmCheckBox:IsToggled() and playerData.PlayerSettings.Continuable.Value and getupvalue(MainControl.SpawnCharacter, 2) < 2 then
+        MainControl.MainFrame.Visible = false
+		MainControl.SpawnFrame.Visible = false
+
+        MainControl.SpawnCharacter()
+    end
 
     canCompleteQuest = false
 end)
