@@ -156,7 +156,7 @@ local playerDataExpectionNames = {
 }
 
 local playersUIObjects = {}
-local canCompleteQuest
+local canCompleteQuest, lastQuest
 
 local function GetPing()
     local clientTick = tick()
@@ -166,44 +166,43 @@ local function GetPing()
     return tick() - clientTick
 end
 
-local function CompleteQuest(quest)
-    local currentNPC
-    
-    local expection = {RedLotus1 = CFrame.new(897.17260742188, 241.11676025391, -3069.0903320313)}
-    local nameTagIcon = Character:FindFirstChild("Head"):FindFirstChild("Nametag"):FindFirstChild("Icon")
-
-    assert(rawget(Quests, quest), "Quest not found.")
-    
-    quest = nameTagIcon and (quest == "RedLotus1" and nameTagIcon.Image == "" and "WhiteLotus1") or (quest == "WhiteLotus1" and nameTagIcon.Image == "rbxassetid://87177558" and "RedLotus1") or (quest == "RedLotus1" and nameTagIcon.Image == "rbxassetid://869158044" and "WhiteLotus1") or quest
-
+local function GetQuestNPC(quest)
     for NPCName, v in pairs(NPCList) do
         if table.find(v, quest) and Quests[v[1]].Rewards.Experience >= minimumXpSlider:GetValue() then
-            currentNPC = questNPCs:FindFirstChild(NPCName)
-            break 
+            return questNPCs:FindFirstChild(NPCName)
         end
     end
+end
 
-    canCompleteQuest = (currentNPC and humanoid.Health > 0 and humanoid.WalkSpeed > 0) and not Character:FindFirstChild("Down") and not (humanoidRootPart:FindFirstChild("DownTimer") and humanoidRootPart.DownTimer.TextLabel.Text ~= "") and not canCompleteQuest
+local function CompleteQuest(quest)
+    local npc = GetQuestNPC(quest)
+    local oldXP, oldLevel = playerData.Stats.Experience.Value, playerData.Stats.Level.Value
+
+    canCompleteQuest = (npc and humanoid.Health > 0 and humanoid.WalkSpeed > 0) and not Character:FindFirstChild("Down") and not (humanoidRootPart:FindFirstChild("DownTimer") and humanoidRootPart.DownTimer.TextLabel.Text ~= "") and not canCompleteQuest
 
     if canCompleteQuest then
-        Character.PrimaryPart.CFrame = (expection[quest] or currentNPC.PrimaryPart.CFrame) + Vector3.new(0,5,0)
+        Character.PrimaryPart.CFrame = npc.PrimaryPart.CFrame * CFrame.new(0,-5.25,0) * CFrame.Angles(math.rad(90), 0, 0)
 
         task.wait(GetPing() * 1.1)
 
-        for step = 1, #Quests[quest].Steps + 1 do 
-            local distance = (((expection[quest] and expection[quest].p) or currentNPC.PrimaryPart.CFrame.p) - Character.PrimaryPart.CFrame.p).Magnitude
+        while playerData.Stats.Level.Value == oldLevel and playerData.Stats.Experience.Value == oldXP and autofarmCheckBox:IsToggled() do
+            task.wait(GetPing())
 
-            if distance > 25 or humanoid.Health <= 0 or humanoid.WalkSpeed <= 0  or Character.BattlerHealth.Value <= 0 then
-                break
+            for step = 1, #Quests[quest].Steps + 1 do 
+                local distance = (npc.PrimaryPart.CFrame.p - Character.PrimaryPart.CFrame.p).Magnitude
+
+                if distance > 25 or humanoid.Health <= 0 or humanoid.WalkSpeed <= 0  or Character.BattlerHealth.Value <= 0 then
+                    break
+                end
+
+                task.spawn(gameFunction.InvokeServer, gameFunction, "AdvanceStep", {
+                    QuestName = quest,
+                    Step = step
+                })
             end
-
-            task.spawn(gameFunction.InvokeServer, gameFunction, "AdvanceStep", {
-                QuestName = quest,
-                Step = step
-            })
         end
 
-        task.wait(4.9)
+        lastQuest = quest
 
         canCompleteQuest = false
     end
@@ -300,20 +299,34 @@ subChangerCheckBox:OnChanged(function()
 end)
 
 autofarmCheckBox:OnChanged(function()
-    while autofarmCheckBox:IsToggled() and task.wait() do
-        for i,v in pairs(Quests) do
-            if autofarmCheckBox:IsToggled() and playerData.PlayerSettings.Continuable.Value and getupvalue(MainControl.SpawnCharacter, 2) < 2  then
-                MainControl.MainFrame:TweenPosition(UDim2.new(0.5, -150, 1.5, -150), "Out", "Quad", 1, true)
-                MainControl.SpawnFrame:TweenPosition(UDim2.new(2, -10, 1, -10), "Out", "Quad", 2, true)
-        
-                MainControl.SpawnCharacter()
-            elseif not autofarmCheckBox:IsToggled() or not playerData.PlayerSettings.Continuable.Value or getupvalue(MainControl.SpawnCharacter, 2) < 2 then
-                break
-            end
+    local npc
 
-            if not canCompleteQuest then
-                CompleteQuest(i) 
+    while autofarmCheckBox:IsToggled() and task.wait() do
+        task.spawn(function()
+            for quest, _ in pairs(Quests) do
+                if autofarmCheckBox:IsToggled() and playerData.PlayerSettings.Continuable.Value and getupvalue(MainControl.SpawnCharacter, 2) < 2  then
+                    MainControl.MainFrame:TweenPosition(UDim2.new(0.5, -150, 1.5, -150), "Out", "Quad", 1, true)
+                    MainControl.SpawnFrame:TweenPosition(UDim2.new(2, -10, 1, -10), "Out", "Quad", 2, true)
+                    
+                    MainControl.SpawnCharacter()
+                elseif not autofarmCheckBox:IsToggled() or not playerData.PlayerSettings.Continuable.Value or  getupvalue(MainControl.SpawnCharacter, 2) < 2 then
+                    break
+                end
+    
+                if not canCompleteQuest and lastQuest ~= quest then
+                    local nameTagIcon = Character:FindFirstChild("Head"):FindFirstChild("Nametag"):FindFirstChild("Icon")
+    
+                    quest = nameTagIcon and (quest == "RedLotus1" and nameTagIcon.Image == "" and "WhiteLotus1") or (quest == "WhiteLotus1" and nameTagIcon.Image == "rbxassetid://87177558" and "RedLotus1") or (quest == "RedLotus1" and nameTagIcon.Image == "rbxassetid://869158044" and "WhiteLotus1") or quest
+                                
+                    npc = GetQuestNPC(quest)
+    
+                    CompleteQuest(quest)
+                end
             end
+        end)
+
+        if npc then
+            Character.PrimaryPart.CFrame = npc.PrimaryPart.CFrame * CFrame.new(0,-5.25,0) * CFrame.Angles(math.rad(90), 0, 0)
         end
     end
 end)
@@ -344,7 +357,7 @@ flySpeedSlider:OnChanged(function()
 end)
 
 rawset(MainControl, "DecreaseStamina", function(...)
-    if infiniteStaminaCheckBox:IsToggled() then
+    if infiniteStaminaCheckBox:IsToggled() or autofarmCheckBox:IsToggled() then
         return
     end
         
@@ -473,7 +486,7 @@ LocalPlayer.CharacterAdded:Connect(function(character)
     OldDecreaseStamina = rawget(MainControl, "DecreaseStamina")
 
     rawset(MainControl, "DecreaseStamina", function(...)
-        if infiniteStaminaCheckBox:IsToggled() then
+        if infiniteStaminaCheckBox:IsToggled() or autofarmCheckBox:IsToggled() then
             return
         end
         
