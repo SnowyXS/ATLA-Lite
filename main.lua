@@ -10,6 +10,9 @@ local gameEvent = networkFolder.GameEvent
 local LocalPlayer = Players.LocalPlayer
 local Character = LocalPlayer.Character
 
+local humanoidRootPart = Character.HumanoidRootPart
+local humanoid = Character.Humanoid
+
 local playerData = LocalPlayer:WaitForChild("PlayerData")
 local appearance = playerData:WaitForChild("Appearance")
 
@@ -152,6 +155,7 @@ local playerDataExpectionNames = {
 }
 
 local playersUIObjects = {}
+local canCompleteQuest
 
 local function GetPing()
     local clientTick = tick()
@@ -165,11 +169,11 @@ local function CompleteQuest(quest)
     local currentNPC
     
     local expection = {RedLotus1 = CFrame.new(897.17260742188, 241.11676025391, -3069.0903320313)}
-    local nameTagIcon = Character:FindFirstChild("Head"):FindFirstChild("Nametag").Icon
+    local nameTagIcon = Character:FindFirstChild("Head"):FindFirstChild("Nametag"):FindFirstChild("Icon")
 
     assert(rawget(Quests, quest), "Quest not found.")
     
-    quest = (quest == "RedLotus1" and nameTagIcon.Image == "" and "WhiteLotus1") or (quest == "WhiteLotus1" and nameTagIcon.Image == "rbxassetid://87177558" and "RedLotus1") or (quest == "RedLotus1" and nameTagIcon.Image == "rbxassetid://869158044" and "WhiteLotus1") or quest
+    quest = nameTagIcon and (quest == "RedLotus1" and nameTagIcon.Image == "" and "WhiteLotus1") or (quest == "WhiteLotus1" and nameTagIcon.Image == "rbxassetid://87177558" and "RedLotus1") or (quest == "RedLotus1" and nameTagIcon.Image == "rbxassetid://869158044" and "WhiteLotus1") or quest
 
     for NPCName, v in pairs(NPCList) do
         if table.find(v, quest) and Quests[v[1]].Rewards.Experience >= minimumXpSlider:GetValue() then
@@ -178,17 +182,17 @@ local function CompleteQuest(quest)
         end
     end
 
-    canCompleteQuest = (currentNPC and Character.Humanoid.Health > 0 and Character.Humanoid.WalkSpeed > 0) and not Character:FindFirstChild("Down") and not (Character.HumanoidRootPart:FindFirstChild("DownTimer") and Character.HumanoidRootPart.DownTimer.TextLabel.Text ~= "") and not canCompleteQuest
+    canCompleteQuest = (currentNPC and humanoid.Health > 0 and humanoid.WalkSpeed > 0) and not Character:FindFirstChild("Down") and not (humanoidRootPart:FindFirstChild("DownTimer") and humanoidRootPart.DownTimer.TextLabel.Text ~= "") and not canCompleteQuest
 
     if canCompleteQuest then
         Character.PrimaryPart.CFrame = (expection[quest] or currentNPC.PrimaryPart.CFrame) + Vector3.new(0,5,0)
 
-        task.wait(GetPing() * 2)
+        task.wait(GetPing())
 
         for step = 1, #Quests[quest].Steps + 1 do 
             local distance = (((expection[quest] and expection[quest].p) or currentNPC.PrimaryPart.CFrame.p) - Character.PrimaryPart.CFrame.p).Magnitude
 
-            if distance > 25 or Character.Humanoid.Health <= 0 or Character.Humanoid.WalkSpeed <= 0  or Character.BattlerHealth.Value <= 0 then
+            if distance > 25 or humanoid.Health <= 0 or humanoid.WalkSpeed <= 0  or Character.BattlerHealth.Value <= 0 then
                 break
             end
 
@@ -198,7 +202,7 @@ local function CompleteQuest(quest)
             })
         end
 
-        task.wait(4.5)
+        task.wait(4.9)
 
         canCompleteQuest = false
     end
@@ -212,7 +216,7 @@ local function ChangeElement()
 
     print(selectedSpecial, specialAbility.Value == selectedSpecial)
     print(selectedSecondSpecial, secondSpecialAbility.Value == selectedSecondSpecial)
-    
+
     return ((specialAbility.Value ~= selectedSpecial or secondSpecialAbility.Value ~= selectedSecondSpecial) and gameFunction:InvokeServer("NewGame", {Selections = BaseSelection})) or (specialAbility.Value == selectedSpecial and secondSpecialAbility.Value == selectedSecondSpecial and subChangerCheckBox:SetToggle(false)) 
 end
 
@@ -235,7 +239,7 @@ for i, v in ipairs(teleportPresets) do
         local button = category:new("Button", name)
 
         button:OnPressed(function()
-            Character.HumanoidRootPart.CFrame = position
+            humanoidRootPart.CFrame = position
         end)
     end
 end
@@ -275,36 +279,36 @@ for _, v in pairs(Players:GetPlayers()) do
     end
 
     teleportButton:OnPressed(function()
-        Character.HumanoidRootPart.CFrame = v.Character.HumanoidRootPart.CFrame
+        humanoidRootPart.CFrame = v.Character.HumanoidRootPart.CFrame
     end)
 
     playersUIObjects[v] = playerText
 end
 
 walkSpeedSpeedSlider:OnChanged(function()
-    Character.Humanoid.WalkSpeed = walkSpeedSpeedSlider:GetValue()
+    humanoid.WalkSpeed = walkSpeedSpeedSlider:GetValue()
 end)
 
 jumpPowerSlider:OnChanged(function()
-    Character.Humanoid.JumpPower = jumpPowerSlider:GetValue()
+    humanoid.JumpPower = jumpPowerSlider:GetValue()
 end)
 
 subChangerCheckBox:OnChanged(function()
     if subChangerCheckBox:IsToggled() then
-        Character.Humanoid.Health = 0
+        humanoid.Health = 0
     end
 end)
 
 autofarmCheckBox:OnChanged(function()
-    while autofarmCheckBox:IsToggled() do
+    while autofarmCheckBox:IsToggled() and task.wait() do
         for i,v in pairs(Quests) do
-            if not autofarmCheckBox:IsToggled() then
+            if not autofarmCheckBox:IsToggled() or not playerData.PlayerSettings.Continuable.Value or getupvalue(MainControl.SpawnCharacter, 2) < 2 then
                 break
             end
-            
-            CompleteQuest(i) 
-            
-            task.wait()
+
+            if not canCompleteQuest then
+                CompleteQuest(i) 
+            end
         end
     end
 end)
@@ -410,7 +414,7 @@ Players.PlayerAdded:Connect(function(player)
     end
 
     teleportButton:OnPressed(function()
-        Character.HumanoidRootPart.CFrame = player.Character.HumanoidRootPart.CFrame
+        humanoidRootPart.CFrame = player.Character.HumanoidRootPart.CFrame
     end)
     
     playersUIObjects[player] = playerText
@@ -426,6 +430,8 @@ Players.PlayerRemoving:Connect(function(player)
 end)
 
 LocalPlayer.CharacterAdded:Connect(function(character)
+    canCompleteQuest = true 
+
     if subChangerCheckBox:IsToggled() then
         local shouldContinue = ChangeElement()
 
@@ -446,8 +452,12 @@ LocalPlayer.CharacterAdded:Connect(function(character)
     local BattlerHealth = character:WaitForChild("BattlerHealth")
 
     Character = character
-    Character.Humanoid.WalkSpeed = walkSpeedSpeedSlider:GetValue()
-    Character.Humanoid.JumpPower = jumpPowerSlider:GetValue()
+
+    humanoidRootPart = character.HumanoidRootPart
+    humanoid = character.Humanoid
+
+    humanoid.WalkSpeed = walkSpeedSpeedSlider:GetValue()
+    humanoid.JumpPower = jumpPowerSlider:GetValue()
 
     repeat task.wait() until getsenv(MenuControl).DecreaseStamina
 
@@ -478,4 +488,6 @@ LocalPlayer.CharacterAdded:Connect(function(character)
     ToggleFlight()
 
     setconstant(MainControl.startRealFlying, 66, flySpeedSlider:GetValue())
+
+    canCompleteQuest = false
 end)
