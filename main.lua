@@ -391,11 +391,11 @@ end)
 
 OldNewIndex = hookmetamethod(game, "__newindex", function(self, index, value)
     if not checkcaller() and index == "WalkSpeed" then
-        if value == 25 then
+        if value == 25 and sprintSpeedSlider:GetValue() > 25 then
             return OldNewIndex(self, index, sprintSpeedSlider:GetValue()) 
+        elseif walkSpeedSpeedSlider:GetValue() > 16 then
+            return OldNewIndex(self, index, walkSpeedSpeedSlider:GetValue()) 
         end
-
-        return OldNewIndex(self, index, walkSpeedSpeedSlider:GetValue()) 
     end
     
     return OldNewIndex(self, index, value)
