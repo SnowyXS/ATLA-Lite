@@ -153,6 +153,14 @@ local playerDataExpectionNames = {
 
 local playersUIObjects = {}
 
+local function GetPing()
+    local clientTick = tick()
+
+    gameFunction:InvokeServer("GetQuestData")
+    
+    return tick() - clientTick
+end
+
 local function CompleteQuest(quest)
     local currentNPC
     
@@ -173,11 +181,9 @@ local function CompleteQuest(quest)
     canCompleteQuest = (currentNPC and Character.Humanoid.Health > 0 and Character.Humanoid.WalkSpeed > 0) and not Character:FindFirstChild("Down") and not (Character.HumanoidRootPart:FindFirstChild("DownTimer") and Character.HumanoidRootPart.DownTimer.TextLabel.Text ~= "") and not canCompleteQuest
 
     if canCompleteQuest then
-        gameFunction:InvokeServer("Abandon")
-
         Character.PrimaryPart.CFrame = (expection[quest] or currentNPC.PrimaryPart.CFrame) + Vector3.new(0,5,0)
 
-        task.wait(0.5) 
+        task.wait(GetPing() * 2)
 
         for step = 1, #Quests[quest].Steps + 1 do 
             local distance = (((expection[quest] and expection[quest].p) or currentNPC.PrimaryPart.CFrame.p) - Character.PrimaryPart.CFrame.p).Magnitude
