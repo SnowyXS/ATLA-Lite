@@ -188,7 +188,7 @@ local function CompleteQuest(quest)
     if canCompleteQuest then
         Character.PrimaryPart.CFrame = (expection[quest] or currentNPC.PrimaryPart.CFrame) + Vector3.new(0,5,0)
 
-        task.wait(GetPing())
+        task.wait(GetPing() * 1.05)
 
         for step = 1, #Quests[quest].Steps + 1 do 
             local distance = (((expection[quest] and expection[quest].p) or currentNPC.PrimaryPart.CFrame.p) - Character.PrimaryPart.CFrame.p).Magnitude
