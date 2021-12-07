@@ -165,7 +165,9 @@ local function GetPing()
 
     gameFunction:InvokeServer("GetQuestData")
     
-    return tick() - clientTick
+    local ping = tick() - clientTick
+
+    return (ping < 0.1 and ping * 2) or ping * 1.1
 end
 
 local function GetQuestNPC(quest)
@@ -198,7 +200,7 @@ local function CompleteQuest(quest)
     if canCompleteQuest then
         Character.PrimaryPart.CFrame = npc.PrimaryPart.CFrame * CFrame.new(0,-5.25,0) * CFrame.Angles(math.rad(90), 0, 0)
 
-        repeat task.wait(GetPing() * 1.1)
+        repeat task.wait(GetPing())
             for step = 1, #Quests[quest].Steps + 1 do 
                 local distance = (npc.PrimaryPart.CFrame.p - Character.PrimaryPart.CFrame.p).Magnitude
 
