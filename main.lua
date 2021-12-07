@@ -184,29 +184,48 @@ local function CompleteQuest(quest)
           oldGoldPieces, 
           oldGoldIngots = playerData.Stats.Money1.Value, playerData.Stats.Money2.Value, playerData.Stats.Money3.Value, playerData.Stats.Money4.Value
 
-    canCompleteQuest = (npc and humanoid.Health > 0 and humanoid.WalkSpeed > 0) and not Character:FindFirstChild("Down") and not (humanoidRootPart:FindFirstChild("DownTimer") and humanoidRootPart.DownTimer.TextLabel.Text ~= "") and not canCompleteQuest
+    canCompleteQuest =  npc and humanoid.Health > 0 
+                        and humanoid.WalkSpeed > 0
+                        and not Character:FindFirstChild("Down") 
+                        and not (humanoidRootPart:FindFirstChild("DownTimer") 
+                        and humanoidRootPart.DownTimer.TextLabel.Text ~= "") 
+                        and not canCompleteQuest
+                        and not MainControl.Transitioning
+                        and getupvalue(MainControl.SpawnCharacter, 2) == 2
+
+    local hasChanged
 
     if canCompleteQuest then
         Character.PrimaryPart.CFrame = npc.PrimaryPart.CFrame * CFrame.new(0,-5.25,0) * CFrame.Angles(math.rad(90), 0, 0)
-        
-        task.wait(GetPing() * 1.1)
 
-        while playerData.Stats.Money1.Value == oldCopper and playerData.Stats.Money2.Value == oldSilver and playerData.Stats.Money3.Value == oldGoldPieces and playerData.Stats.Money4.Value == oldGoldIngots and autofarmCheckBox:IsToggled() and task.wait(GetPing() * 1.1) do
+        repeat task.wait(GetPing())
             for step = 1, #Quests[quest].Steps + 1 do 
                 local distance = (npc.PrimaryPart.CFrame.p - Character.PrimaryPart.CFrame.p).Magnitude
 
-                if distance > 25 or humanoid.Health <= 0 or humanoid.WalkSpeed <= 0  or Character.BattlerHealth.Value <= 0 then
+                if distance > 25 and humanoid.Health <= 0 or humanoid.WalkSpeed <= 0  or Character.BattlerHealth.Value <= 0 then
                     break
                 end
 
-                task.spawn(gameFunction.InvokeServer, gameFunction, "AdvanceStep", {
-                    QuestName = quest,
-                    Step = step
-                })
-            end
-        end
+                task.spawn(function()
+                    local distance = (npc.PrimaryPart.CFrame.p - Character.PrimaryPart.CFrame.p).Magnitude
 
-        if playerData.Stats.Money1.Value ~= oldCopper or playerData.Stats.Money2.Value ~= oldSilver or playerData.Stats.Money3.Value ~= oldGoldPieces or playerData.Stats.Money4.Value ~= oldGoldIngots then
+                    if distance < 25 then
+                        gameFunction:InvokeServer("AdvanceStep", {
+                            QuestName = quest,
+                            Step = step
+                        })
+                    end
+                end)
+            end
+
+            hasChanged = playerData.Stats.Money1.Value ~= oldCopper 
+                         or playerData.Stats.Money2.Value ~= oldSilver 
+                         or playerData.Stats.Money3.Value ~= oldGoldPieces 
+                         or playerData.Stats.Money4.Value ~= oldGoldIngots
+
+        until hasChanged or not autofarmCheckBox:IsToggled()
+
+        if hasChanged then
             lastQuest = quest
         end
 
@@ -322,10 +341,13 @@ autofarmCheckBox:OnChanged(function()
                     break
                 end
 
-                if not canCompleteQuest and lastQuest ~= quest and menuStatus == 2 and not MainControl.Transitioning then
+                if not canCompleteQuest and lastQuest ~= quest then
                     local nameTagIcon = Character:FindFirstChild("Head"):FindFirstChild("Nametag"):FindFirstChild("Icon")
-    
-                    quest = nameTagIcon and (quest == "RedLotus1" and nameTagIcon.Image == "" and "WhiteLotus1") or (quest == "WhiteLotus1" and nameTagIcon.Image == "rbxassetid://87177558" and "RedLotus1") or (quest == "RedLotus1" and nameTagIcon.Image == "rbxassetid://869158044" and "WhiteLotus1") or quest
+                    quest = nameTagIcon 
+                            and (quest == "RedLotus1" and nameTagIcon.Image == "" and "WhiteLotus1") 
+                            or (quest == "WhiteLotus1" and nameTagIcon.Image == "rbxassetid://87177558" and "RedLotus1") 
+                            or (quest == "RedLotus1" and nameTagIcon.Image == "rbxassetid://869158044" and "WhiteLotus1") 
+                            or quest
                                 
                     npc = GetQuestNPC(quest)
 
