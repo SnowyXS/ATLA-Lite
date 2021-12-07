@@ -167,7 +167,7 @@ local function GetPing()
     
     local ping = tick() - clientTick
 
-    return (ping < 0.1 and 0.12) or ping * 1.1
+    return ping * 1.1
 end
 
 local function GetQuestNPC(quest)
@@ -199,6 +199,8 @@ local function CompleteQuest(quest)
 
     if canCompleteQuest then
         Character.PrimaryPart.CFrame = npc.PrimaryPart.CFrame * CFrame.new(0,-5.25,0) * CFrame.Angles(math.rad(90), 0, 0)
+        
+        gameFunction:InvokeServer("Abandon")
 
         repeat task.wait(GetPing())
             for step = 1, #Quests[quest].Steps + 1 do 
