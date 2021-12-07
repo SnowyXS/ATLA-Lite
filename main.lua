@@ -167,7 +167,7 @@ local function GetPing()
     
     local ping = tick() - clientTick
 
-    return (ping < 0.1 and ping * 2) or ping * 1.1
+    return (ping < 0.1 and 0.12) or ping * 1.1
 end
 
 local function GetQuestNPC(quest)
