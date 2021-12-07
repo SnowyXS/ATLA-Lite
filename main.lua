@@ -3,6 +3,8 @@ local UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/AT
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 
+local Camera = workspace.CurrentCamera
+
 local networkFolder = ReplicatedStorage:WaitForChild("NetworkFolder")
 local gameFunction = networkFolder.GameFunction
 local gameEvent = networkFolder.GameEvent
@@ -176,18 +178,20 @@ end
 
 local function CompleteQuest(quest)
     local npc = GetQuestNPC(quest)
-    local oldCopper, oldSilver, oldGoldPieces, oldGoldIngots = playerData.Stats.Money1.Value, playerData.Stats.Money2.Value, playerData.Stats.Money3.Value, playerData.Stats.Money4.Value
+    
+    local oldCopper, 
+          oldSilver, 
+          oldGoldPieces, 
+          oldGoldIngots = playerData.Stats.Money1.Value, playerData.Stats.Money2.Value, playerData.Stats.Money3.Value, playerData.Stats.Money4.Value
 
     canCompleteQuest = (npc and humanoid.Health > 0 and humanoid.WalkSpeed > 0) and not Character:FindFirstChild("Down") and not (humanoidRootPart:FindFirstChild("DownTimer") and humanoidRootPart.DownTimer.TextLabel.Text ~= "") and not canCompleteQuest
 
     if canCompleteQuest then
         Character.PrimaryPart.CFrame = npc.PrimaryPart.CFrame * CFrame.new(0,-5.25,0) * CFrame.Angles(math.rad(90), 0, 0)
-
+        
         task.wait(GetPing() * 1.1)
 
-        while playerData.Stats.Money1.Value == oldCopper and playerData.Stats.Money2.Value == oldSilver and playerData.Stats.Money3.Value == oldGoldPieces and playerData.Stats.Money4.Value == oldGoldIngots and autofarmCheckBox:IsToggled() do
-            task.wait(GetPing())
-
+        while playerData.Stats.Money1.Value == oldCopper and playerData.Stats.Money2.Value == oldSilver and playerData.Stats.Money3.Value == oldGoldPieces and playerData.Stats.Money4.Value == oldGoldIngots and autofarmCheckBox:IsToggled() and task.wait(GetPing() * 1.1) do
             for step = 1, #Quests[quest].Steps + 1 do 
                 local distance = (npc.PrimaryPart.CFrame.p - Character.PrimaryPart.CFrame.p).Magnitude
 
@@ -304,30 +308,33 @@ autofarmCheckBox:OnChanged(function()
     local npc
 
     while autofarmCheckBox:IsToggled() and task.wait() do
+        local isContinuable = playerData.PlayerSettings.Continuable.Value
+        local menuStatus = getupvalue(MainControl.SpawnCharacter, 2)
+
         task.spawn(function()
             for quest, _ in pairs(Quests) do
-                if autofarmCheckBox:IsToggled() and playerData.PlayerSettings.Continuable.Value and getupvalue(MainControl.SpawnCharacter, 2) < 2  then
+                if autofarmCheckBox:IsToggled() and isContinuable and menuStatus < 2 and MainControl.Fade.BackgroundTransparency == 1 then
                     MainControl.MainFrame:TweenPosition(UDim2.new(0.5, -150, 1.5, -150), "Out", "Quad", 1, true)
                     MainControl.SpawnFrame:TweenPosition(UDim2.new(2, -10, 1, -10), "Out", "Quad", 2, true)
-                    
+
                     MainControl.SpawnCharacter()
-                elseif not autofarmCheckBox:IsToggled() or not playerData.PlayerSettings.Continuable.Value or  getupvalue(MainControl.SpawnCharacter, 2) < 2 then
+                elseif not autofarmCheckBox:IsToggled() or not isContinuable or menuStatus < 2 or MainControl.Transitioning then
                     break
                 end
-    
-                if not canCompleteQuest and lastQuest ~= quest then
+
+                if not canCompleteQuest and lastQuest ~= quest and menuStatus == 2 and not MainControl.Transitioning then
                     local nameTagIcon = Character:FindFirstChild("Head"):FindFirstChild("Nametag"):FindFirstChild("Icon")
     
                     quest = nameTagIcon and (quest == "RedLotus1" and nameTagIcon.Image == "" and "WhiteLotus1") or (quest == "WhiteLotus1" and nameTagIcon.Image == "rbxassetid://87177558" and "RedLotus1") or (quest == "RedLotus1" and nameTagIcon.Image == "rbxassetid://869158044" and "WhiteLotus1") or quest
                                 
                     npc = GetQuestNPC(quest)
-    
+
                     CompleteQuest(quest)
                 end
             end
         end)
 
-        if npc then
+        if npc and not MainControl.Transitioning and isContinuable and menuStatus == 2 then
             Character.PrimaryPart.CFrame = npc.PrimaryPart.CFrame * CFrame.new(0,-5.25,0) * CFrame.Angles(math.rad(90), 0, 0)
         end
     end
@@ -511,9 +518,12 @@ LocalPlayer.CharacterAdded:Connect(function(character)
 
     setconstant(MainControl.startRealFlying, 66, flySpeedSlider:GetValue())
 
-    if autofarmCheckBox:IsToggled() and playerData.PlayerSettings.Continuable.Value and getupvalue(MainControl.SpawnCharacter, 2) < 2 then
+    local isContinuable = playerData.PlayerSettings.Continuable.Value
+    local menuStatus = getupvalue(MainControl.SpawnCharacter, 2)
+
+    if autofarmCheckBox:IsToggled() and isContinuable then
         MainControl.MainFrame.Visible = false
-		MainControl.SpawnFrame.Visible = false
+        MainControl.SpawnFrame.Visible = false
 
         MainControl.SpawnCharacter()
     end
