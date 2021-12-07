@@ -198,7 +198,7 @@ local function CompleteQuest(quest)
     if canCompleteQuest then
         Character.PrimaryPart.CFrame = npc.PrimaryPart.CFrame * CFrame.new(0,-5.25,0) * CFrame.Angles(math.rad(90), 0, 0)
 
-        repeat task.wait(GetPing())
+        repeat task.wait(GetPing() * 1.1)
             for step = 1, #Quests[quest].Steps + 1 do 
                 local distance = (npc.PrimaryPart.CFrame.p - Character.PrimaryPart.CFrame.p).Magnitude
 
