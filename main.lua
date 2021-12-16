@@ -159,6 +159,7 @@ local playerDataExpectionNames = {
 
 local playersUIObjects = {}
 local canCompleteQuest, lastQuest
+local shouldStopFarm = false
 
 local function GetPing()
     local clientTick = tick()
@@ -193,27 +194,28 @@ local function CompleteQuest(quest)
                         and humanoidRootPart.DownTimer.TextLabel.Text ~= "") 
                         and not canCompleteQuest
                         and not MainControl.Transitioning
-                        and getupvalue(MainControl.SpawnCharacter, 2) == 2
+                        and getupvalue(MainControl.SpawnCharacter, 2) == 2 
+                        and not shouldStopFarm
 
     local hasChanged
 
     if canCompleteQuest then
-        Character.PrimaryPart.CFrame = npc.PrimaryPart.CFrame * CFrame.new(0,-5.25,0) * CFrame.Angles(math.rad(90), 0, 0)
+        humanoidRootPart.CFrame = npc.PrimaryPart.CFrame * CFrame.new(0,-5.25,0) * CFrame.Angles(math.rad(90), 0, 0)
         
         gameFunction:InvokeServer("Abandon")
 
         repeat task.wait(GetPing())
             for step = 1, #Quests[quest].Steps + 1 do 
-                local distance = (npc.PrimaryPart.CFrame.p - Character.PrimaryPart.CFrame.p).Magnitude
+                local distance = (npc.PrimaryPart.CFrame.p - humanoidRootPart.CFrame.p).Magnitude
 
                 if distance > 25 and humanoid.Health <= 0 or humanoid.WalkSpeed <= 0  or Character.BattlerHealth.Value <= 0 then
                     break
                 end
 
                 task.spawn(function()
-                    local distance = (npc.PrimaryPart.CFrame.p - Character.PrimaryPart.CFrame.p).Magnitude
+                    local distance = (npc.PrimaryPart.CFrame.p - humanoidRootPart.CFrame.p).Magnitude
 
-                    if distance < 25 then
+                    if distance < 25 and not shouldStopFarm then
                         gameFunction:InvokeServer("AdvanceStep", {
                             QuestName = quest,
                             Step = step
@@ -482,6 +484,10 @@ Players.PlayerRemoving:Connect(function(player)
     print(player, "Left")
 end)
 
+humanoid.Died:Connect(function()
+    shouldStopFarm = true
+end)
+
 LocalPlayer.CharacterAdded:Connect(function(character)
     canCompleteQuest = true 
 
@@ -540,6 +546,10 @@ LocalPlayer.CharacterAdded:Connect(function(character)
         ToggleFlight()
     end)
 
+    humanoid.Died:Connect(function()
+        shouldStopFarm = true
+    end)
+
     ToggleFlight()
 
     setconstant(MainControl.startRealFlying, 66, flySpeedSlider:GetValue())
@@ -555,4 +565,5 @@ LocalPlayer.CharacterAdded:Connect(function(character)
     end
 
     canCompleteQuest = false
+    shouldStopFarm = false
 end)
