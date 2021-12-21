@@ -168,7 +168,7 @@ local function GetPing()
     
     local ping = tick() - clientTick
 
-    return ping * 1.1
+    return math.clamp(ping, 100, math.huge) / 1000
 end
 
 local function GetQuestNPC(quest)
@@ -201,10 +201,10 @@ local function CompleteQuest(quest)
 
     if canCompleteQuest then
         humanoidRootPart.CFrame = npc.PrimaryPart.CFrame * CFrame.new(0,-5.25,0) * CFrame.Angles(math.rad(90), 0, 0)
-        
-        gameFunction:InvokeServer("Abandon")
 
         repeat task.wait(GetPing())
+            gameFunction:InvokeServer("Abandon")
+
             for step = 1, #Quests[quest].Steps + 1 do 
                 local distance = (npc.PrimaryPart.CFrame.p - humanoidRootPart.CFrame.p).Magnitude
 
@@ -228,7 +228,6 @@ local function CompleteQuest(quest)
                          or playerData.Stats.Money2.Value ~= oldSilver 
                          or playerData.Stats.Money3.Value ~= oldGoldPieces 
                          or playerData.Stats.Money4.Value ~= oldGoldIngots
-
         until hasChanged or not autofarmCheckBox:IsToggled()
 
         if hasChanged then
