@@ -168,7 +168,7 @@ local function GetPing()
     
     local ping = tick() - clientTick
 
-    return math.clamp(ping, 100, math.huge) / 1000
+    return math.clamp(ping, 120, math.huge) / 1000
 end
 
 local function GetQuestNPC(quest)
