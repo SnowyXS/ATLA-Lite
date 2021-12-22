@@ -161,14 +161,14 @@ local playersUIObjects = {}
 local canCompleteQuest, lastQuest
 local shouldStopFarm = false
 
-local function GetPing()
+local function GetDelay()
     local clientTick = tick()
 
     gameFunction:InvokeServer("GetQuestData")
     
     local ping = tick() - clientTick
 
-    return math.clamp(ping, 120, math.huge) / 1000
+    return math.clamp(ping, 150, math.huge) / 1000
 end
 
 local function GetQuestNPC(quest)
@@ -202,7 +202,7 @@ local function CompleteQuest(quest)
     if canCompleteQuest then
         humanoidRootPart.CFrame = npc.PrimaryPart.CFrame * CFrame.new(0,-5.25,0) * CFrame.Angles(math.rad(90), 0, 0)
 
-        repeat task.wait(GetPing())
+        repeat task.wait(GetDelay())
             gameFunction:InvokeServer("Abandon")
 
             for step = 1, #Quests[quest].Steps + 1 do 
