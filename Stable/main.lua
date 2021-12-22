@@ -161,14 +161,14 @@ local playersUIObjects = {}
 local canCompleteQuest, lastQuest
 local shouldStopFarm = false
 
-local function GetPing()
+local function GetDelay()
     local clientTick = tick()
 
     gameFunction:InvokeServer("GetQuestData")
     
     local ping = tick() - clientTick
 
-    return math.clamp(ping, 100, math.huge) / 1000
+    return math.clamp(ping, 150, math.huge) / 1000
 end
 
 local function GetQuestNPC(quest)
@@ -182,6 +182,8 @@ end
 local function CompleteQuest(quest)
     local npc = GetQuestNPC(quest)
     
+    local hasChanged
+
     local oldCopper, 
           oldSilver, 
           oldGoldPieces, 
@@ -197,12 +199,10 @@ local function CompleteQuest(quest)
                         and getupvalue(MainControl.SpawnCharacter, 2) == 2 
                         and not shouldStopFarm
 
-    local hasChanged
-
     if canCompleteQuest then
         humanoidRootPart.CFrame = npc.PrimaryPart.CFrame * CFrame.new(0,-5.25,0) * CFrame.Angles(math.rad(90), 0, 0)
 
-        repeat task.wait(GetPing())
+        repeat task.wait(GetDelay())
             gameFunction:InvokeServer("Abandon")
 
             for step = 1, #Quests[quest].Steps + 1 do 
@@ -347,9 +347,9 @@ autofarmCheckBox:OnChanged(function()
                 end
 
                 if not canCompleteQuest and lastQuest ~= quest then
-                    local nameTagIcon = Character:FindFirstChild("Head"):FindFirstChild("Nametag"):FindFirstChild("Icon")
-                    quest = nameTagIcon 
-                            and (quest == "RedLotus1" and nameTagIcon.Image == "" and "WhiteLotus1") 
+                    local nameTagIcon = Character.Head.Nametag.Icon
+
+                    quest = nameTagIcon and (quest == "RedLotus1" and nameTagIcon.Image == "" and "WhiteLotus1") 
                             or (quest == "WhiteLotus1" and nameTagIcon.Image == "rbxassetid://87177558" and "RedLotus1") 
                             or (quest == "RedLotus1" and nameTagIcon.Image == "rbxassetid://869158044" and "WhiteLotus1") 
                             or quest
