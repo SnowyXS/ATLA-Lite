@@ -198,8 +198,6 @@ local function CompleteQuest(quest)
                         and not shouldStopFarm
 
     if canCompleteQuest then
-        humanoidRootPart.CFrame = npc.PrimaryPart.CFrame * CFrame.new(0,-5.25,0) * CFrame.Angles(math.rad(90), 0, 0)
-
         repeat task.wait(GetDelay())
             gameFunction:InvokeServer("Abandon")
 
@@ -336,8 +334,6 @@ autofarmCheckBox:OnChanged(function()
         if npc and not MainControl.Transitioning and isContinuable and menuStatus == 2 then
             humanoidRootPart.CFrame = npc.PrimaryPart.CFrame * CFrame.new(0,-5.25,0) * CFrame.Angles(math.rad(90), 0, 0)
         end
-
-        task.wait(GetDelay())
 
         task.spawn(function()
             for quest, _ in pairs(Quests) do
