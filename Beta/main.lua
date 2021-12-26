@@ -201,7 +201,7 @@ local function CompleteQuest(quest)
         humanoidRootPart.CFrame = npc.PrimaryPart.CFrame * CFrame.new(0,-5.25,0) * CFrame.Angles(math.rad(90), 0, 0)
 
         repeat task.wait(GetDelay())
-            gameFunction:InvokeServer("GetQuestData")
+            gameFunction:InvokeServer("Abandon")
 
             for step = 1, #Quests[quest].Steps + 1 do 
                 local distance = (npc.PrimaryPart.CFrame.p - humanoidRootPart.CFrame.p).Magnitude
@@ -334,8 +334,10 @@ autofarmCheckBox:OnChanged(function()
         local menuStatus = getupvalue(MainControl.SpawnCharacter, 2)
 
         if npc and not MainControl.Transitioning and isContinuable and menuStatus == 2 then
-            Character.PrimaryPart.CFrame = npc.PrimaryPart.CFrame * CFrame.new(0,-5.25,0) * CFrame.Angles(math.rad(90), 0, 0)
+            humanoidRootPart.CFrame = npc.PrimaryPart.CFrame * CFrame.new(0,-5.25,0) * CFrame.Angles(math.rad(90), 0, 0)
         end
+
+        task.wait(GetDelay())
 
         task.spawn(function()
             for quest, _ in pairs(Quests) do
