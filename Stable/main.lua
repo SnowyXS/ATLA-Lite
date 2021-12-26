@@ -166,9 +166,7 @@ local function GetDelay()
 
     gameFunction:InvokeServer("GetQuestData")
     
-    local ping = tick() - clientTick
-
-    return math.clamp(ping, 150, math.huge) / 1000
+    return (tick() - clientTick) / 1000 
 end
 
 local function GetQuestNPC(quest)
@@ -200,8 +198,6 @@ local function CompleteQuest(quest)
                         and not shouldStopFarm
 
     if canCompleteQuest then
-        humanoidRootPart.CFrame = npc.PrimaryPart.CFrame * CFrame.new(0,-5.25,0) * CFrame.Angles(math.rad(90), 0, 0)
-
         repeat task.wait(GetDelay())
             gameFunction:InvokeServer("Abandon")
 
@@ -335,6 +331,10 @@ autofarmCheckBox:OnChanged(function()
         local isContinuable = playerData.PlayerSettings.Continuable.Value
         local menuStatus = getupvalue(MainControl.SpawnCharacter, 2)
 
+        if npc and not MainControl.Transitioning and isContinuable and menuStatus == 2 then
+            humanoidRootPart.CFrame = npc.PrimaryPart.CFrame * CFrame.new(0,-5.25,0) * CFrame.Angles(math.rad(90), 0, 0)
+        end
+
         task.spawn(function()
             for quest, _ in pairs(Quests) do
                 if autofarmCheckBox:IsToggled() and isContinuable and menuStatus < 2 and MainControl.Fade.BackgroundTransparency == 1 then
@@ -360,10 +360,6 @@ autofarmCheckBox:OnChanged(function()
                 end
             end
         end)
-
-        if npc and not MainControl.Transitioning and isContinuable and menuStatus == 2 then
-            Character.PrimaryPart.CFrame = npc.PrimaryPart.CFrame * CFrame.new(0,-5.25,0) * CFrame.Angles(math.rad(90), 0, 0)
-        end
     end
 end)
 
