@@ -192,10 +192,10 @@ local function GetDelay()
 
     gameFunction:InvokeServer("GetQuestData")
     
-    local ping = math.clamp(tick() - clientTick, 100, math.huge)
+    local ping = math.clamp(tick() - clientTick, 120, math.huge)
     local pingInMilliseconds = ping / 1000
 
-    return (FPS < 50 and pingInMilliseconds + ((ping + 60) / FPS) / 1000) or pingInMilliseconds
+    return (FPS < 50 and pingInMilliseconds + ((ping + 120) / FPS) / 1000) or pingInMilliseconds
 end
 
 local function GetQuestNPC(quest)
@@ -361,6 +361,7 @@ autofarmCheckBox:OnChanged(function()
         local menuStatus = getupvalue(MainControl.SpawnCharacter, 2)
 
         if npc and not MainControl.Transitioning and isContinuable and menuStatus == 2 then
+            humanoidRootPart.Velocity = Vector3.new(0, 0, 0)
             humanoidRootPart.CFrame = npc.PrimaryPart.CFrame * CFrame.new(0,-5.25,0) * CFrame.Angles(math.rad(90), 0, 0)
         end
 
