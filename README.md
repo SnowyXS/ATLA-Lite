@@ -12,8 +12,6 @@ https://www.roblox.com/games/749703080/Avatar-The-Last-Airbender
 # Supported executors
 - Synapse X 
 - Most of them should work but untested
-# Status
-- Undetected
 # FAQ
 - Will I get banned? 
 > Probably not but still use at your own risk!
