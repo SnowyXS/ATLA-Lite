@@ -2,6 +2,7 @@ local UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/AT
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
 
 local Camera = workspace.CurrentCamera
 
@@ -161,12 +162,39 @@ local playersUIObjects = {}
 local canCompleteQuest, lastQuest
 local shouldStopFarm = false
 
+local FPS
+local tempTime = 0
+local beatCount = 0
+local totalFrames = 0
+
+RunService.Heartbeat:Connect(function(deltaTime)
+	tempTime = tempTime + deltaTime
+	beatCount = beatCount + 1
+	totalFrames = totalFrames + (1 / deltaTime)
+
+	if not FPS or tempTime >= 1 then
+		local fps = (totalFrames / beatCount) - (tempTime / beatCount)
+		
+		if fps > 60 then
+			fps = 60
+		end
+
+		FPS = fps
+		
+		tempTime = 0
+		beatCount = 0
+		totalFrames = 0
+	end
+end)
+
 local function GetDelay()
     local clientTick = tick()
 
     gameFunction:InvokeServer("GetQuestData")
     
-    return (tick() - clientTick) / 1000
+    local pingInMilliseconds = (tick() - clientTick) / 1000
+    
+    return (FPS < 50 and pingInMilliseconds + (60 / FPS) / 1000) or pingInMilliseconds
 end
 
 local function GetQuestNPC(quest)
