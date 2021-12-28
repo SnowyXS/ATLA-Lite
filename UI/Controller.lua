@@ -88,7 +88,7 @@ local Button do
 		table.insert(self._objects, button)
 
 		button._input = UserInputService.InputBegan:Connect(function(input, gameProcessed)
-			if input.KeyCode == Enum.KeyCode.Return and buttonObject.Visible and arrow.Position.Y == buttonObject.Position.Y then
+			if (input.KeyCode == Enum.KeyCode.Return or input.KeyCode == Enum.KeyCode.KeypadFive) and buttonObject.Visible and arrow.Position.Y == buttonObject.Position.Y then
                 if button._callback then
                     task.spawn(button._callback)
                 end
@@ -139,7 +139,7 @@ local Checkbox do
 		table.insert(self._objects, checkbox)
 
 		checkbox._input = UserInputService.InputBegan:Connect(function(input, gameProcessed)
-			if input.KeyCode == Enum.KeyCode.Return and checkboxObject.Visible and arrow.Position.Y == checkboxObject.Position.Y then
+			if (input.KeyCode == Enum.KeyCode.Return or input.KeyCode == Enum.KeyCode.KeypadFive) and checkboxObject.Visible and arrow.Position.Y == checkboxObject.Position.Y then
 				checkbox:SetToggle(not checkbox._isToggled)
 			end
 		end)
@@ -147,12 +147,12 @@ local Checkbox do
 		return checkbox
 	end
 
-	function Checkbox:SetToggle(bool)
+	function Checkbox:SetToggle(bool, shouldSkipCallBack)
 		self._isToggled = bool
 
 		self._instance.Color = (self._isToggled and Color3.fromRGB(0, 255, 0)) or Color3.fromRGB(255, 0, 0)
 
-		return self._isToggled, self._callback and task.spawn(self._callback)
+		return self._isToggled, self._callback and not shouldSkipCallBack and task.spawn(self._callback)
 	end
 
 	function Checkbox:IsToggled()
@@ -199,7 +199,7 @@ local Slider do
             if sliderObject.Visible and arrow.Position.Y == sliderObject.Position.Y then
                 local count = 0.1
 
-                while not UserInputService:IsKeyDown(Enum.KeyCode.LeftAlt) and (UserInputService:IsKeyDown(Enum.KeyCode.Right) and slider:SetValue(slider._value + (jumps or 1))) or (UserInputService:IsKeyDown(Enum.KeyCode.Left) and slider:SetValue(slider._value - (jumps or 1))) do
+                while not UserInputService:IsKeyDown(Enum.KeyCode.LeftAlt) and ((UserInputService:IsKeyDown(Enum.KeyCode.Right) or UserInputService:IsKeyDown(Enum.KeyCode.KeypadSix)) and slider:SetValue(slider._value + (jumps or 1))) or ((UserInputService:IsKeyDown(Enum.KeyCode.Left) or UserInputService:IsKeyDown(Enum.KeyCode.KeypadFour)) and slider:SetValue(slider._value - (jumps or 1))) do
                     task.wait(count)
                     count = math.clamp(count - 0.005, 0, 0.1)
                 end
@@ -252,7 +252,7 @@ local ListSelector do
 		listObject.Size = 24
 		listObject.Color = Color3.fromRGB(255,255,255)
 		listObject.Position = Vector2.new(arrow.Position.X + arrow.TextBounds.X + 3, position)
-		listObject.Visible = Controller:GetOpenedCategory()._objects == _objects
+		listObject.Visible = Controller:GetOpenedCategory()._objects == _objects 
 	
 		local listSelector = setmetatable({
             _list = list,
@@ -267,7 +267,7 @@ local ListSelector do
             if listObject.Visible and arrow.Position.Y == listObject.Position.Y then
                 local count = 0.25
 
-                while not UserInputService:IsKeyDown(Enum.KeyCode.LeftAlt) and (UserInputService:IsKeyDown(Enum.KeyCode.Right) and listSelector:SetSelected(listSelector._selected + 1)) or (UserInputService:IsKeyDown(Enum.KeyCode.Left) and listSelector:SetSelected(listSelector._selected - 1)) do
+                while not UserInputService:IsKeyDown(Enum.KeyCode.LeftAlt) and ((UserInputService:IsKeyDown(Enum.KeyCode.Right) or UserInputService:IsKeyDown(Enum.KeyCode.KeypadSix)) and listSelector:SetSelected(listSelector._selected + 1)) or ((UserInputService:IsKeyDown(Enum.KeyCode.Left) or UserInputService:IsKeyDown(Enum.KeyCode.KeypadFour)) and listSelector:SetSelected(listSelector._selected - 1)) do
                     task.wait(count)
                     count = math.clamp(count - 0.005, 0, 0.25)
                 end
@@ -482,6 +482,8 @@ do
             table.remove(_openedCategories, openedIndex)
         end
 
+		object:Destroy()
+
         table.remove(_categories, categoriesIndex)
         table.clear(category)
     end
@@ -496,8 +498,10 @@ do
 		if object._input then
 			object._input:Disconnect()
 		end
-
-		object._instance:Remove()
+		
+		if object._instance then
+			object._instance:Remove()
+		end
 
 		table.remove(_objects, objectIndex)
 		table.clear(object)
@@ -550,11 +554,11 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
 	local Category = Controller:GetOpenedCategory()
 	local selectedObject = Category:GetSelectedObject()
 
-	if input.KeyCode == Enum.KeyCode.Up then
+	if input.KeyCode == Enum.KeyCode.Up or input.KeyCode == Enum.KeyCode.KeypadEight then
 		Category:SelectPreviousObject()
-	elseif input.KeyCode == Enum.KeyCode.Down then
+	elseif input.KeyCode == Enum.KeyCode.Down or input.KeyCode == Enum.KeyCode.KeypadTwo then
 		Category:SelectNextObject()
-	elseif (UserInputService:IsKeyDown(Enum.KeyCode.LeftAlt) and UserInputService:IsKeyDown(Enum.KeyCode.Right)) or (UserInputService:IsKeyDown(Enum.KeyCode.Right) and UserInputService:IsKeyDown(Enum.KeyCode.LeftAlt)) then
+	elseif UserInputService:IsKeyDown(Enum.KeyCode.LeftAlt) and (UserInputService:IsKeyDown(Enum.KeyCode.Right) or UserInputService:IsKeyDown(Enum.KeyCode.KeypadSix)) then
         if selectedObject:HasCategory() then
 			local newCategory = selectedObject:GetCategoryClass()
 			local _objects = newCategory._objects
