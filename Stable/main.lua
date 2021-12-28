@@ -2,6 +2,7 @@ local UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/AT
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
 
 local Camera = workspace.CurrentCamera
 
@@ -161,12 +162,36 @@ local playersUIObjects = {}
 local canCompleteQuest, lastQuest
 local shouldStopFarm = false
 
+local FPS
+local tempTime = 0
+local beatCount = 0
+local totalFrames = 0
+
+RunService.Heartbeat:Connect(function(deltaTime)
+	tempTime = tempTime + deltaTime
+	beatCount = beatCount + 1
+	totalFrames = totalFrames + (1 / deltaTime)
+
+	if not FPS or tempTime >= 1 then
+		local fps = (totalFrames / beatCount) - (tempTime / beatCount)
+	
+		FPS = (fps > 60 and 60) or fps
+		
+		tempTime = 0
+		beatCount = 0
+		totalFrames = 0
+	end
+end)
+
 local function GetDelay()
     local clientTick = tick()
 
     gameFunction:InvokeServer("GetQuestData")
     
-    return (tick() - clientTick) / 1000 
+    local ping = math.clamp(tick() - clientTick, 125, math.huge)
+    local pingInMilliseconds = ping / 1000
+
+    return (FPS < 50 and pingInMilliseconds + ((60 / FPS) * 2) / 1000) or pingInMilliseconds
 end
 
 local function GetQuestNPC(quest)
@@ -332,6 +357,7 @@ autofarmCheckBox:OnChanged(function()
         local menuStatus = getupvalue(MainControl.SpawnCharacter, 2)
 
         if npc and not MainControl.Transitioning and isContinuable and menuStatus == 2 then
+            humanoidRootPart.Velocity = Vector3.new(0, 0, 0)
             humanoidRootPart.CFrame = npc.PrimaryPart.CFrame * CFrame.new(0,-5.25,0) * CFrame.Angles(math.rad(90), 0, 0)
         end
 
@@ -473,10 +499,10 @@ Players.PlayerAdded:Connect(function(player)
 end)
 
 Players.PlayerRemoving:Connect(function(player)
+    print(player, "Left")
+
     playersUIObjects[player]:Destroy(true)
 	playersUIObjects[player] = nil
-
-    print(player, "Left")
 end)
 
 humanoid.Died:Connect(function()
