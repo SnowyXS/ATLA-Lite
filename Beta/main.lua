@@ -175,7 +175,7 @@ RunService.Heartbeat:Connect(function(deltaTime)
 	if not FPS or tempTime >= 1 then
 		local fps = (totalFrames / beatCount) - (tempTime / beatCount)
 	
-		FPS = (fps > 60 and fps) or fps
+		FPS = (fps > 60 and 60) or fps
 		
 		tempTime = 0
 		beatCount = 0
