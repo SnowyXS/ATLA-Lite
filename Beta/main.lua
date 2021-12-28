@@ -192,9 +192,10 @@ local function GetDelay()
 
     gameFunction:InvokeServer("GetQuestData")
     
-    local pingInMilliseconds = (tick() - clientTick) / 1000
-    
-    return (FPS < 50 and pingInMilliseconds + (60 / FPS) / 1000) or pingInMilliseconds
+    local ping = math.clamp(tick() - clientTick, 100, math.huge)
+    local pingInMilliseconds = ping / 1000
+
+    return (FPS < 50 and pingInMilliseconds + ((ping + 60) / FPS) / 1000) or pingInMilliseconds
 end
 
 local function GetQuestNPC(quest)
@@ -501,10 +502,10 @@ Players.PlayerAdded:Connect(function(player)
 end)
 
 Players.PlayerRemoving:Connect(function(player)
+    print(player, "Left")
+
     playersUIObjects[player]:Destroy(true)
 	playersUIObjects[player] = nil
-
-    print(player, "Left")
 end)
 
 humanoid.Died:Connect(function()
