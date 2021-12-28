@@ -174,12 +174,8 @@ RunService.Heartbeat:Connect(function(deltaTime)
 
 	if not FPS or tempTime >= 1 then
 		local fps = (totalFrames / beatCount) - (tempTime / beatCount)
-		
-		if fps > 60 then
-			fps = 60
-		end
-
-		FPS = fps
+	
+		FPS = (fps > 60 and fps) or fps
 		
 		tempTime = 0
 		beatCount = 0
@@ -192,10 +188,10 @@ local function GetDelay()
 
     gameFunction:InvokeServer("GetQuestData")
     
-    local ping = math.clamp(tick() - clientTick, 120, math.huge)
+    local ping = math.clamp(tick() - clientTick, 125, math.huge)
     local pingInMilliseconds = ping / 1000
 
-    return (FPS < 50 and pingInMilliseconds + ((ping + 120) / FPS) / 1000) or pingInMilliseconds
+    return (FPS < 50 and pingInMilliseconds + ((60 / FPS) * 2) / 1000) or pingInMilliseconds
 end
 
 local function GetQuestNPC(quest)
