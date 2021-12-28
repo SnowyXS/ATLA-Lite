@@ -508,7 +508,7 @@ do
 
 		local lastObject = _objects[#_objects]
 
-		if lastObject then
+		if lastObject and lastObject._instance then
 			local currentCategory = Controller:GetOpenedCategory()
 
 			Controller.FixPosition(_objects, false)
