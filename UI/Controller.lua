@@ -489,6 +489,8 @@ do
     end
 
 	function Controller.DestroyObject(object)
+		assert(object._instance, "Object instance nil")
+
 		local objectCategory = Controller.GetCategoryFromObject(object)
 		local _openedCategories = Controller._openedCategories
 
@@ -499,16 +501,14 @@ do
 			object._input:Disconnect()
 		end
 		
-		if object._instance then
-			object._instance:Remove()
-		end
+		object._instance:Remove()
 
 		table.remove(_objects, objectIndex)
 		table.clear(object)
 
 		local lastObject = _objects[#_objects]
 
-		if lastObject and lastObject._instance then
+		if lastObject then
 			local currentCategory = Controller:GetOpenedCategory()
 
 			Controller.FixPosition(_objects, false)
