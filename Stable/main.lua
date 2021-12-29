@@ -202,6 +202,19 @@ local function GetQuestNPC(quest)
     end
 end
 
+local function TeleportToNPC(npc)
+    local isContinuable = playerData.PlayerSettings.Continuable.Value
+    local menuStatus = getupvalue(MainControl.SpawnCharacter, 2)
+
+    task.spawn(function()
+        while autofarmCheckBox:IsToggled() and canCompleteQuest and task.wait() do
+            if npc and not MainControl.Transitioning and isContinuable and menuStatus == 2 then
+                humanoidRootPart.CFrame = npc.PrimaryPart.CFrame * CFrame.new(0,-5.25,0) * CFrame.Angles(math.rad(90), 0, 0)
+            end
+        end
+    end)
+end
+
 local function CompleteQuest(quest)
     local npc = GetQuestNPC(quest)
     
@@ -223,6 +236,8 @@ local function CompleteQuest(quest)
                         and not shouldStopFarm
 
     if canCompleteQuest then
+        TeleportToNPC(npc)
+
         repeat task.wait(GetDelay())
             gameFunction:InvokeServer("Abandon")
 
@@ -349,47 +364,32 @@ subChangerCheckBox:OnChanged(function()
     end
 end)
 
-autofarmCheckBox:OnChanged(function()
-    local npc
 
+autofarmCheckBox:OnChanged(function()
     while autofarmCheckBox:IsToggled() and task.wait() do
         local isContinuable = playerData.PlayerSettings.Continuable.Value
         local menuStatus = getupvalue(MainControl.SpawnCharacter, 2)
 
-        if npc and not MainControl.Transitioning and isContinuable and menuStatus == 2 then
-            humanoidRootPart.CFrame = npc.PrimaryPart.CFrame * CFrame.new(0,-5.25,0) * CFrame.Angles(math.rad(90), 0, 0)
-        end
-
-        task.spawn(function()
-
-            for quest, _ in pairs(Quests) do
-                if autofarmCheckBox:IsToggled() and isContinuable and menuStatus < 2 and MainControl.Fade.BackgroundTransparency == 1 then
-                    MainControl.MainFrame:TweenPosition(UDim2.new(0.5, -150, 1.5, -150), "Out", "Quad", 1, true)
-                    MainControl.SpawnFrame:TweenPosition(UDim2.new(2, -10, 1, -10), "Out", "Quad", 2, true)
-
-                    MainControl.SpawnCharacter()
-                elseif not autofarmCheckBox:IsToggled() or not isContinuable or menuStatus < 2 or MainControl.Transitioning then
-                    break
-                end
-
-                if not canCompleteQuest and lastQuest ~= quest then
-                    local nameTagIcon = Character.Head.Nametag.Icon
-
-                    quest = nameTagIcon and (quest == "RedLotus1" and nameTagIcon.Image == "" and "WhiteLotus1") 
-                            or (quest == "WhiteLotus1" and nameTagIcon.Image == "rbxassetid://87177558" and "RedLotus1") 
-                            or (quest == "RedLotus1" and nameTagIcon.Image == "rbxassetid://869158044" and "WhiteLotus1") 
-                            or quest
-                                
-                    npc = GetQuestNPC(quest)
-                    
-                    if npc then
-                        humanoidRootPart.CFrame = npc.PrimaryPart.CFrame * CFrame.new(0,-5.25,0) * CFrame.Angles(math.rad(90), 0, 0)
-
-                        CompleteQuest(quest)
-                    end
-                end
+        for quest, _ in pairs(Quests) do
+            if autofarmCheckBox:IsToggled() and isContinuable and menuStatus < 2 and MainControl.Fade.BackgroundTransparency == 1 then
+                MainControl.MainFrame:TweenPosition(UDim2.new(0.5, -150, 1.5, -150), "Out", "Quad", 1, true)
+                MainControl.SpawnFrame:TweenPosition(UDim2.new(2, -10, 1, -10), "Out", "Quad", 2, true)
+                MainControl.SpawnCharacter()
+            elseif not autofarmCheckBox:IsToggled() or not isContinuable or menuStatus < 2 or MainControl.Transitioning then
+                break
             end
-        end)
+
+            if not canCompleteQuest and lastQuest ~= quest then
+                local nameTagIcon = Character.Head.Nametag.Icon
+
+                quest = nameTagIcon and (quest == "RedLotus1" and nameTagIcon.Image == "" and "WhiteLotus1") 
+                        or (quest == "WhiteLotus1" and nameTagIcon.Image == "rbxassetid://87177558" and "RedLotus1") 
+                        or (quest == "RedLotus1" and nameTagIcon.Image == "rbxassetid://869158044" and "WhiteLotus1") 
+                        or quest
+
+                CompleteQuest(quest)
+            end
+        end
     end
 end)
 
