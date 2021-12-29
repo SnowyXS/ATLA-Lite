@@ -191,7 +191,7 @@ local function GetDelay()
     local ping = tick() - previousTick
     local pingInMilliseconds = ping / 1000
 
-    return pingInMilliseconds + 60 / FPS * 2 / 1000
+    return pingInMilliseconds + 90 / FPS * 2 / 1000
 end
 
 local function GetQuestNPC(quest)
@@ -357,11 +357,11 @@ autofarmCheckBox:OnChanged(function()
         local menuStatus = getupvalue(MainControl.SpawnCharacter, 2)
 
         if npc and not MainControl.Transitioning and isContinuable and menuStatus == 2 then
-            humanoidRootPart.Velocity = Vector3.new(0, 0, 0)
             humanoidRootPart.CFrame = npc.PrimaryPart.CFrame * CFrame.new(0,-5.25,0) * CFrame.Angles(math.rad(90), 0, 0)
         end
 
         task.spawn(function()
+
             for quest, _ in pairs(Quests) do
                 if autofarmCheckBox:IsToggled() and isContinuable and menuStatus < 2 and MainControl.Fade.BackgroundTransparency == 1 then
                     MainControl.MainFrame:TweenPosition(UDim2.new(0.5, -150, 1.5, -150), "Out", "Quad", 1, true)
@@ -381,8 +381,12 @@ autofarmCheckBox:OnChanged(function()
                             or quest
                                 
                     npc = GetQuestNPC(quest)
+                    
+                    if npc then
+                        humanoidRootPart.CFrame = npc.PrimaryPart.CFrame * CFrame.new(0,-5.25,0) * CFrame.Angles(math.rad(90), 0, 0)
 
-                    CompleteQuest(quest)
+                        CompleteQuest(quest)
+                    end
                 end
             end
         end)
