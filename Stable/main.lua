@@ -184,11 +184,11 @@ RunService.Heartbeat:Connect(function(deltaTime)
 end)
 
 local function GetDelay()
-    local clientTick = tick()
+    local previousTick = tick()
 
     gameFunction:InvokeServer("GetQuestData")
     
-    local ping = math.clamp(tick() - clientTick, 125, math.huge)
+    local ping = math.clamp(tick() - previousTick, 140, math.huge)
     local pingInMilliseconds = ping / 1000
 
     return (FPS < 50 and pingInMilliseconds + ((60 / FPS) * 2) / 1000) or pingInMilliseconds
