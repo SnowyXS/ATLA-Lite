@@ -188,10 +188,10 @@ local function GetDelay()
 
     gameFunction:InvokeServer("GetQuestData")
     
-    local ping = math.clamp(tick() - previousTick, 140, math.huge)
+    local ping = tick() - previousTick
     local pingInMilliseconds = ping / 1000
 
-    return (FPS < 50 and pingInMilliseconds + ((60 / FPS) * 2) / 1000) or pingInMilliseconds
+    return pingInMilliseconds + 60 / FPS * 2 / 1000
 end
 
 local function GetQuestNPC(quest)
