@@ -1,3 +1,5 @@
+
+
 local UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/ATLA-Lite/main/UI/Controller.lua"))()
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -238,16 +240,12 @@ local function CompleteQuest(quest)
     if canCompleteQuest then
         LockToNPC(npc)
 
-        repeat task.wait(GetDelay())
+        task.wait(GetDelay())
+        
+        repeat task.wait()
             gameFunction:InvokeServer("Abandon")
 
             for step = 1, #Quests[quest].Steps + 1 do 
-                local distance = (npc.PrimaryPart.CFrame.p - humanoidRootPart.CFrame.p).Magnitude
-
-                if distance > 25 and humanoid.Health <= 0 or humanoid.WalkSpeed <= 0  or Character.BattlerHealth.Value <= 0 then
-                    break
-                end
-
                 task.spawn(function()
                     local distance = (npc.PrimaryPart.CFrame.p - humanoidRootPart.CFrame.p).Magnitude
 
