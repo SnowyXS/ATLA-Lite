@@ -1,5 +1,3 @@
-
-
 local UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/ATLA-Lite/main/UI/Controller.lua"))()
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -208,13 +206,15 @@ local function LockToNPC(npc)
     local isContinuable = playerData.PlayerSettings.Continuable.Value
     local menuStatus = getupvalue(MainControl.SpawnCharacter, 2)
 
-    task.spawn(function()
+    local teleportCoroutine = coroutine.create(function()
         while autofarmCheckBox:IsToggled() and canCompleteQuest and not MainControl.Transitioning and isContinuable and menuStatus == 2 do
             humanoidRootPart.CFrame = npc.PrimaryPart.CFrame * CFrame.new(0,-5.25,0) * CFrame.Angles(math.rad(90), 0, 0)
 
             task.wait() 
         end
     end)
+
+    coroutine.resume(teleportCoroutine)
 end
 
 local function CompleteQuest(quest)
@@ -239,10 +239,8 @@ local function CompleteQuest(quest)
 
     if canCompleteQuest then
         LockToNPC(npc)
-
-        task.wait(GetDelay())
         
-        repeat task.wait()
+        repeat task.wait(GetDelay())
             gameFunction:InvokeServer("Abandon")
 
             for step = 1, #Quests[quest].Steps + 1 do 
