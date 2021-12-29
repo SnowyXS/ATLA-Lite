@@ -1,3 +1,5 @@
+
+
 local UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/ATLA-Lite/main/UI/Controller.lua"))()
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -202,7 +204,7 @@ local function GetQuestNPC(quest)
     end
 end
 
-local function TeleportToNPC(npc)
+local function LockToNPC(npc)
     local isContinuable = playerData.PlayerSettings.Continuable.Value
     local menuStatus = getupvalue(MainControl.SpawnCharacter, 2)
 
@@ -236,7 +238,9 @@ local function CompleteQuest(quest)
                         and not shouldStopFarm
 
     if canCompleteQuest then
-        TeleportToNPC(npc)
+        LockToNPC(npc)
+
+        task.wait(GetDelay())
 
         repeat task.wait(GetDelay())
             gameFunction:InvokeServer("Abandon")
