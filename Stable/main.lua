@@ -1,5 +1,3 @@
-
-
 local UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/ATLA-Lite/main/UI/Controller.lua"))()
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -209,10 +207,10 @@ local function LockToNPC(npc)
     local menuStatus = getupvalue(MainControl.SpawnCharacter, 2)
 
     task.spawn(function()
-        while autofarmCheckBox:IsToggled() and canCompleteQuest and task.wait() do
-            if npc and not MainControl.Transitioning and isContinuable and menuStatus == 2 then
-                humanoidRootPart.CFrame = npc.PrimaryPart.CFrame * CFrame.new(0,-5.25,0) * CFrame.Angles(math.rad(90), 0, 0)
-            end
+        while autofarmCheckBox:IsToggled() and canCompleteQuest and not MainControl.Transitioning and isContinuable and menuStatus == 2 do
+            humanoidRootPart.CFrame = npc.PrimaryPart.CFrame * CFrame.new(0,-5.25,0) * CFrame.Angles(math.rad(90), 0, 0)
+
+            task.wait() 
         end
     end)
 end
