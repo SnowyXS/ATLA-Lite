@@ -193,7 +193,7 @@ local function GetDelay()
     local ping = tick() - previousTick
     local pingInMilliseconds = ping / 1000
 
-    return pingInMilliseconds + 90 / FPS * 2 / 1000
+    return pingInMilliseconds + 60 / FPS * 2 / 1000
 end
 
 local function GetQuestNPC(quest)
@@ -239,8 +239,6 @@ local function CompleteQuest(quest)
 
     if canCompleteQuest then
         LockToNPC(npc)
-
-        task.wait(GetDelay())
 
         repeat task.wait(GetDelay())
             gameFunction:InvokeServer("Abandon")
