@@ -1,3 +1,5 @@
+
+
 local UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/ATLA-Lite/main/UI/Controller.lua"))()
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -188,7 +190,7 @@ local function GetDelay()
 
     gameFunction:InvokeServer("GetQuestData")
     
-    local ping = tick() - previousTick
+    local ping = math.clamp(tick() - previousTick, 100, math.huge)
     local pingInMilliseconds = ping / 1000
 
     return pingInMilliseconds + 60 / FPS * 2 / 1000
