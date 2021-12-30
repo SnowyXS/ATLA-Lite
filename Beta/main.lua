@@ -1,4 +1,4 @@
-
+assert(not libLoaded, "ATLA-Lite has already been executed once.")
 
 local UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/ATLA-Lite/main/UI/Controller.lua"))()
 
