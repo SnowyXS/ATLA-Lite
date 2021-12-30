@@ -1,3 +1,5 @@
+
+
 local UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/ATLA-Lite/main/UI/Controller.lua"))()
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -191,7 +193,7 @@ local function GetDelay()
     local ping = tick() - previousTick
     local pingInMilliseconds = ping / 1000
 
-    return pingInMilliseconds + 90 / FPS * 2 / 1000
+    return pingInMilliseconds + 60 / FPS * 2 / 1000
 end
 
 local function GetQuestNPC(quest)
@@ -200,6 +202,21 @@ local function GetQuestNPC(quest)
             return questNPCs:FindFirstChild(NPCName)
         end
     end
+end
+
+local function LockToNPC(npc)
+    local isContinuable = playerData.PlayerSettings.Continuable.Value
+    local menuStatus = getupvalue(MainControl.SpawnCharacter, 2)
+
+    local teleportCoroutine = coroutine.create(function()
+        while autofarmCheckBox:IsToggled() and canCompleteQuest and not MainControl.Transitioning and isContinuable and menuStatus == 2 do
+            humanoidRootPart.CFrame = npc.PrimaryPart.CFrame * CFrame.new(0,-5.25,0) * CFrame.Angles(math.rad(90), 0, 0)
+
+            task.wait() 
+        end
+    end)
+
+    coroutine.resume(teleportCoroutine)
 end
 
 local function CompleteQuest(quest)
@@ -223,16 +240,12 @@ local function CompleteQuest(quest)
                         and not shouldStopFarm
 
     if canCompleteQuest then
-        repeat task.wait(GetDelay())
-            gameFunction:InvokeServer("Abandon")
+        LockToNPC(npc)
+        
+        task.wait(GetDelay())
 
+        while autofarmCheckBox:IsToggled() and not hasChanged do
             for step = 1, #Quests[quest].Steps + 1 do 
-                local distance = (npc.PrimaryPart.CFrame.p - humanoidRootPart.CFrame.p).Magnitude
-
-                if distance > 25 and humanoid.Health <= 0 or humanoid.WalkSpeed <= 0  or Character.BattlerHealth.Value <= 0 then
-                    break
-                end
-
                 task.spawn(function()
                     local distance = (npc.PrimaryPart.CFrame.p - humanoidRootPart.CFrame.p).Magnitude
 
@@ -249,7 +262,9 @@ local function CompleteQuest(quest)
                          or playerData.Stats.Money2.Value ~= oldSilver 
                          or playerData.Stats.Money3.Value ~= oldGoldPieces 
                          or playerData.Stats.Money4.Value ~= oldGoldIngots
-        until hasChanged or not autofarmCheckBox:IsToggled()
+
+            task.wait()
+        end
 
         if hasChanged then
             lastQuest = quest
@@ -349,47 +364,32 @@ subChangerCheckBox:OnChanged(function()
     end
 end)
 
-autofarmCheckBox:OnChanged(function()
-    local npc
 
+autofarmCheckBox:OnChanged(function()
     while autofarmCheckBox:IsToggled() and task.wait() do
         local isContinuable = playerData.PlayerSettings.Continuable.Value
         local menuStatus = getupvalue(MainControl.SpawnCharacter, 2)
 
-        if npc and not MainControl.Transitioning and isContinuable and menuStatus == 2 then
-            humanoidRootPart.CFrame = npc.PrimaryPart.CFrame * CFrame.new(0,-5.25,0) * CFrame.Angles(math.rad(90), 0, 0)
-        end
-
-        task.spawn(function()
-
-            for quest, _ in pairs(Quests) do
-                if autofarmCheckBox:IsToggled() and isContinuable and menuStatus < 2 and MainControl.Fade.BackgroundTransparency == 1 then
-                    MainControl.MainFrame:TweenPosition(UDim2.new(0.5, -150, 1.5, -150), "Out", "Quad", 1, true)
-                    MainControl.SpawnFrame:TweenPosition(UDim2.new(2, -10, 1, -10), "Out", "Quad", 2, true)
-
-                    MainControl.SpawnCharacter()
-                elseif not autofarmCheckBox:IsToggled() or not isContinuable or menuStatus < 2 or MainControl.Transitioning then
-                    break
-                end
-
-                if not canCompleteQuest and lastQuest ~= quest then
-                    local nameTagIcon = Character.Head.Nametag.Icon
-
-                    quest = nameTagIcon and (quest == "RedLotus1" and nameTagIcon.Image == "" and "WhiteLotus1") 
-                            or (quest == "WhiteLotus1" and nameTagIcon.Image == "rbxassetid://87177558" and "RedLotus1") 
-                            or (quest == "RedLotus1" and nameTagIcon.Image == "rbxassetid://869158044" and "WhiteLotus1") 
-                            or quest
-                                
-                    npc = GetQuestNPC(quest)
-                    
-                    if npc then
-                        humanoidRootPart.CFrame = npc.PrimaryPart.CFrame * CFrame.new(0,-5.25,0) * CFrame.Angles(math.rad(90), 0, 0)
-
-                        CompleteQuest(quest)
-                    end
-                end
+        for quest, _ in pairs(Quests) do
+            if autofarmCheckBox:IsToggled() and isContinuable and menuStatus < 2 and MainControl.Fade.BackgroundTransparency == 1 then
+                MainControl.MainFrame:TweenPosition(UDim2.new(0.5, -150, 1.5, -150), "Out", "Quad", 1, true)
+                MainControl.SpawnFrame:TweenPosition(UDim2.new(2, -10, 1, -10), "Out", "Quad", 2, true)
+                MainControl.SpawnCharacter()
+            elseif not autofarmCheckBox:IsToggled() or not isContinuable or menuStatus < 2 or MainControl.Transitioning then
+                break
             end
-        end)
+
+            if not canCompleteQuest and lastQuest ~= quest then
+                local nameTagIcon = Character.Head.Nametag.Icon
+
+                quest = nameTagIcon and (quest == "RedLotus1" and nameTagIcon.Image == "" and "WhiteLotus1") 
+                        or (quest == "WhiteLotus1" and nameTagIcon.Image == "rbxassetid://87177558" and "RedLotus1") 
+                        or (quest == "RedLotus1" and nameTagIcon.Image == "rbxassetid://869158044" and "WhiteLotus1") 
+                        or quest
+
+                CompleteQuest(quest)
+            end
+        end
     end
 end)
 
