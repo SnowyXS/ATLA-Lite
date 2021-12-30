@@ -208,6 +208,8 @@ local function LockToNPC(npc)
     local isContinuable = playerData.PlayerSettings.Continuable.Value
     local menuStatus = getupvalue(MainControl.SpawnCharacter, 2)
 
+    humanoidRootPart.CFrame = npc.PrimaryPart.CFrame * CFrame.new(0,-5.25,0) * CFrame.Angles(math.rad(90), 0, 0)
+
     local teleportCoroutine = coroutine.create(function()
         while autofarmCheckBox:IsToggled() and canCompleteQuest and not MainControl.Transitioning and isContinuable and menuStatus == 2 do
             humanoidRootPart.CFrame = npc.PrimaryPart.CFrame * CFrame.new(0,-5.25,0) * CFrame.Angles(math.rad(90), 0, 0)
@@ -242,11 +244,11 @@ local function CompleteQuest(quest)
     if canCompleteQuest then
         LockToNPC(npc)
         
-        wait(GetDelay())
+        task.wait(GetDelay())
 
         while autofarmCheckBox:IsToggled() and not hasChanged do
             for step = 1, #Quests[quest].Steps + 1 do 
-                local advanceCoroutine = coroutine.create(function()
+                task.spawn(function()
                     local distance = (npc.PrimaryPart.CFrame.p - humanoidRootPart.CFrame.p).Magnitude
 
                     if distance < 25 and not shouldStopFarm then
@@ -256,8 +258,6 @@ local function CompleteQuest(quest)
                         })
                     end
                 end)
-                
-                coroutine.resume(advanceCoroutine)
             end
 
             hasChanged = playerData.Stats.Money1.Value ~= oldCopper 
