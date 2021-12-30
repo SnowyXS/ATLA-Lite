@@ -193,7 +193,7 @@ local function GetDelay()
     local ping = tick() - previousTick
     local pingInMilliseconds = ping / 1000
 
-    return pingInMilliseconds + 60 / FPS * 2 / 1000
+    return pingInMilliseconds + (120 / FPS) / 1000
 end
 
 local function GetQuestNPC(quest)
@@ -242,11 +242,11 @@ local function CompleteQuest(quest)
     if canCompleteQuest then
         LockToNPC(npc)
         
-        task.wait(GetDelay())
+        wait(GetDelay())
 
         while autofarmCheckBox:IsToggled() and not hasChanged do
             for step = 1, #Quests[quest].Steps + 1 do 
-                task.spawn(function()
+                local advanceCoroutine = coroutine.create(function()
                     local distance = (npc.PrimaryPart.CFrame.p - humanoidRootPart.CFrame.p).Magnitude
 
                     if distance < 25 and not shouldStopFarm then
@@ -256,6 +256,8 @@ local function CompleteQuest(quest)
                         })
                     end
                 end)
+                
+                coroutine.resume(advanceCoroutine)
             end
 
             hasChanged = playerData.Stats.Money1.Value ~= oldCopper 
