@@ -489,31 +489,33 @@ do
     end
 
 	function Controller.DestroyObject(object)
-		assert(object._instance, "Object instance nil")
+		local instance = object._instance
 
-		local objectCategory = Controller.GetCategoryFromObject(object)
-		local _openedCategories = Controller._openedCategories
+		if instance then
+			local objectCategory = Controller.GetCategoryFromObject(object)
+			local _openedCategories = Controller._openedCategories
 
-		local _objects = objectCategory._objects
-		local objectIndex = table.find(_objects, object)
+			local _objects = objectCategory._objects
+			local objectIndex = table.find(_objects, object)
+			
+			if object._input then
+				object._input:Disconnect()
+			end
 
-		if object._input then
-			object._input:Disconnect()
-		end
-		
-		object._instance:Remove()
+			object._instance:Remove()
 
-		table.remove(_objects, objectIndex)
-		table.clear(object)
+			table.remove(_objects, objectIndex)
+			table.clear(object)
 
-		local lastObject = _objects[#_objects]
+			local lastObject = _objects[#_objects]
 
-		if lastObject then
-			local currentCategory = Controller:GetOpenedCategory()
+			if lastObject then
+				local currentCategory = Controller:GetOpenedCategory()
 
-			Controller.FixPosition(_objects, false)
+				Controller.FixPosition(_objects, false)
 
-			arrow.Position = (lastObject._instance.Visible and not currentCategory:GetSelectedObject()) and Vector2.new(arrow.Position.X, lastObject._position.Y) or arrow.Position
+				arrow.Position = (lastObject._instance.Visible and not currentCategory:GetSelectedObject()) and Vector2.new(arrow.Position.X, lastObject._position.Y) or arrow.Position
+			end
 		end
 	end
 
@@ -590,8 +592,11 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
 		end
 	elseif input.keyCode == Enum.KeyCode.Delete then
 		arrow.Visible = not arrow.Visible
+
 		Category:SetVisible(arrow.Visible)
 	end
 end)
+
+getgenv().libLoaded = true
 
 return Controller
