@@ -193,7 +193,7 @@ local function GetDelay()
     local ping = tick() - previousTick
     local pingInMilliseconds = ping / 1000
 
-    return pingInMilliseconds + (120 / FPS) / 1000
+    return pingInMilliseconds + (60 / FPS) / 1000
 end
 
 local function GetQuestNPC(quest)
@@ -208,8 +208,6 @@ local function LockToNPC(npc)
     local isContinuable = playerData.PlayerSettings.Continuable.Value
     local menuStatus = getupvalue(MainControl.SpawnCharacter, 2)
 
-    humanoidRootPart.CFrame = npc.PrimaryPart.CFrame * CFrame.new(0,-5.25,0) * CFrame.Angles(math.rad(90), 0, 0)
-
     local teleportCoroutine = coroutine.create(function()
         while autofarmCheckBox:IsToggled() and canCompleteQuest and not MainControl.Transitioning and isContinuable and menuStatus == 2 do
             humanoidRootPart.CFrame = npc.PrimaryPart.CFrame * CFrame.new(0,-5.25,0) * CFrame.Angles(math.rad(90), 0, 0)
@@ -219,6 +217,8 @@ local function LockToNPC(npc)
     end)
 
     coroutine.resume(teleportCoroutine)
+
+    return task.wait(GetDelay())
 end
 
 local function CompleteQuest(quest)
@@ -243,10 +243,10 @@ local function CompleteQuest(quest)
 
     if canCompleteQuest then
         LockToNPC(npc)
-        
-        task.wait(GetDelay())
 
         while autofarmCheckBox:IsToggled() and not hasChanged do
+            task.wait(GetDelay())
+
             for step = 1, #Quests[quest].Steps + 1 do 
                 task.spawn(function()
                     local distance = (npc.PrimaryPart.CFrame.p - humanoidRootPart.CFrame.p).Magnitude
@@ -264,8 +264,6 @@ local function CompleteQuest(quest)
                          or playerData.Stats.Money2.Value ~= oldSilver 
                          or playerData.Stats.Money3.Value ~= oldGoldPieces 
                          or playerData.Stats.Money4.Value ~= oldGoldIngots
-
-            task.wait()
         end
 
         if hasChanged then
