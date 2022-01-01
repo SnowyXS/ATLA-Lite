@@ -164,36 +164,12 @@ local playersUIObjects = {}
 local canCompleteQuest, lastQuest
 local shouldStopFarm = false
 
-local FPS
-local tempTime = 0
-local beatCount = 0
-local totalFrames = 0
-
-RunService.Heartbeat:Connect(function(deltaTime)
-	tempTime = tempTime + deltaTime
-	beatCount = beatCount + 1
-	totalFrames = totalFrames + (1 / deltaTime)
-
-	if not FPS or tempTime >= 1 then
-		local fps = (totalFrames / beatCount) - (tempTime / beatCount)
-	
-		FPS = (fps > 60 and 60) or fps
-		
-		tempTime = 0
-		beatCount = 0
-		totalFrames = 0
-	end
-end)
-
-local function GetDelay()
+local function GetPingDelay()
     local previousTick = tick()
-
-    gameFunction:InvokeServer("GetQuestData")
     
-    local ping = tick() - previousTick
-    local pingInMilliseconds = ping / 1000
-
-    return pingInMilliseconds + (60 / FPS) / 1000
+    gameFunction:InvokeServer("GetQuestData")
+        
+    return tick() - previousTick
 end
 
 local function GetQuestNPC(quest)
@@ -216,9 +192,7 @@ local function LockToNPC(npc)
         end
     end)
 
-    coroutine.resume(teleportCoroutine)
-
-    return task.wait(GetDelay())
+    return coroutine.resume(teleportCoroutine) and task.wait(GetPingDelay())
 end
 
 local function CompleteQuest(quest)
@@ -245,8 +219,6 @@ local function CompleteQuest(quest)
         LockToNPC(npc)
 
         while autofarmCheckBox:IsToggled() and not hasChanged do
-            task.wait(GetDelay())
-
             for step = 1, #Quests[quest].Steps + 1 do 
                 task.spawn(function()
                     local distance = (npc.PrimaryPart.CFrame.p - humanoidRootPart.CFrame.p).Magnitude
@@ -264,6 +236,8 @@ local function CompleteQuest(quest)
                          or playerData.Stats.Money2.Value ~= oldSilver 
                          or playerData.Stats.Money3.Value ~= oldGoldPieces 
                          or playerData.Stats.Money4.Value ~= oldGoldIngots
+
+            task.wait()
         end
 
         if hasChanged then
