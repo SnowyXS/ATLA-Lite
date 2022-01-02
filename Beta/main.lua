@@ -192,7 +192,7 @@ local function LockToNPC(npc)
         end
     end)
 
-    return coroutine.resume(teleportCoroutine) and task.wait(GetPingDelay())
+    return coroutine.resume(teleportCoroutine)
 end
 
 local function CompleteQuest(quest)
@@ -217,6 +217,8 @@ local function CompleteQuest(quest)
 
     if canCompleteQuest then
         LockToNPC(npc)
+        
+        task.wait(GetPingDelay())
 
         while autofarmCheckBox:IsToggled() and not hasChanged do
             for step = 1, #Quests[quest].Steps + 1 do 
