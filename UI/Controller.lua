@@ -178,15 +178,17 @@ local Slider do
 		local preivousObject = _objects[#_objects]
 		local position = (preivousObject and preivousObject._position.Y + preivousObject._instance.TextBounds.Y / 2 + 4) or (0.5 * CurrentCamera.ViewportSize.Y)
 
+		value = math.floor(tonumber(value)) or minimumValue or 0
+
 		local sliderObject = Drawing.new("Text")
-		sliderObject.Text = name .. ": " .. math.clamp(tonumber(value) or 0, minimumValue, maxValue)
+		sliderObject.Text = name .. ": " .. math.clamp(value, minimumValue, maxValue)
 		sliderObject.Size = 24
 		sliderObject.Color = Color3.fromRGB(255,255,255)
 		sliderObject.Position = Vector2.new(arrow.Position.X + arrow.TextBounds.X + 3, position)
 		sliderObject.Visible = Controller:GetOpenedCategory()._objects == _objects
 	
 		local slider = setmetatable({
-            _value = math.clamp(tonumber(value) or 0, minimumValue, maxValue),
+            _value = math.clamp(value, minimumValue, maxValue),
             _maxValue = tonumber(maxValue) or 10,
             _minimumValue = tonumber(minimumValue) or 0,
 			_instance = sliderObject,
