@@ -178,7 +178,7 @@ local Slider do
 		local preivousObject = _objects[#_objects]
 		local position = (preivousObject and preivousObject._position.Y + preivousObject._instance.TextBounds.Y / 2 + 4) or (0.5 * CurrentCamera.ViewportSize.Y)
 
-		value = math.floor(tonumber(value)) or minimumValue or 0
+		value = tonumber(value) or minimumValue or 0
 
 		local sliderObject = Drawing.new("Text")
 		sliderObject.Text = name .. ": " .. math.clamp(value, minimumValue, maxValue)
