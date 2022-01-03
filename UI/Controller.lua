@@ -181,7 +181,7 @@ local Slider do
 		value = tonumber(value) or minimumValue or 0
 
 		local sliderObject = Drawing.new("Text")
-		sliderObject.Text = name .. ": " .. math.clamp(value, minimumValue, maxValue) .. extension
+		sliderObject.Text = name .. ": " .. math.clamp(value, minimumValue, maxValue) .. (extension or "")
 		sliderObject.Size = 24
 		sliderObject.Color = Color3.fromRGB(255,255,255)
 		sliderObject.Position = Vector2.new(arrow.Position.X + arrow.TextBounds.X + 3, position)
