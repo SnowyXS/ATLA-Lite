@@ -172,7 +172,7 @@ local Slider do
 	Slider = {}
 	Slider.__index = Slider
 
-	function Slider:_new(name, value, minimumValue, maxValue, jumps)
+	function Slider:_new(name, value, minimumValue, maxValue, jumps, extension)
 		local _objects = self._objects
 
 		local preivousObject = _objects[#_objects]
@@ -181,7 +181,7 @@ local Slider do
 		value = tonumber(value) or minimumValue or 0
 
 		local sliderObject = Drawing.new("Text")
-		sliderObject.Text = name .. ": " .. math.clamp(value, minimumValue, maxValue)
+		sliderObject.Text = name .. ": " .. math.clamp(value, minimumValue, maxValue) .. extension
 		sliderObject.Size = 24
 		sliderObject.Color = Color3.fromRGB(255,255,255)
 		sliderObject.Position = Vector2.new(arrow.Position.X + arrow.TextBounds.X + 3, position)
