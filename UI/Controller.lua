@@ -117,7 +117,7 @@ local Checkbox do
 	Checkbox = {}
 	Checkbox.__index = Checkbox
 
-	function Checkbox:_new(name)
+	function Checkbox:_new(name, toggle)
 		local _objects = self._objects
 
 		local preivousObject = _objects[#_objects]
@@ -126,12 +126,12 @@ local Checkbox do
 		local checkboxObject = Drawing.new("Text")
 		checkboxObject.Text = name
 		checkboxObject.Size = 24
-		checkboxObject.Color = Color3.fromRGB(255,0,0)
+		checkboxObject.Color = toggle and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
 		checkboxObject.Position = Vector2.new(arrow.Position.X + arrow.TextBounds.X + 3, position)
 		checkboxObject.Visible = Controller:GetOpenedCategory()._objects == _objects
 	
 		local checkbox = setmetatable({
-			_isToggled = false,
+			_isToggled = toggle or false,
 			_instance = checkboxObject,
 			_position = checkboxObject.Position
 		}, self)
