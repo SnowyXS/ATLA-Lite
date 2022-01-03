@@ -210,7 +210,7 @@ local Slider do
 	end
 
     function Slider:GetValue()
-        return self._value
+        return tonumber(self._value)
     end
 
     function Slider:SetValue(value)
