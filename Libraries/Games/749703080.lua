@@ -17,7 +17,7 @@ local Collector = Garbage.new()
 
 repeat
     MenuControl, BaseSelection, ValueNames = Collector:FetchGarbageSearch("QuestModule", "Elements", "Money4")
-until task.wait(0.25) and (MenuControl and BaseSelection and ValueNames and MenuControl.DecreaseStamina)
+until task.wait() and (MenuControl and BaseSelection and ValueNames and MenuControl.DecreaseStamina)
 
 local Settings = SettingsModule.new()
 
