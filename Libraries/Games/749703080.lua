@@ -1,5 +1,5 @@
-local Garbage = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/main/Libraries/Dependencies/Garbage.lua"))()
-local SettingsModule = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/main/Libraries/Dependencies/Settings.lua"))()
+local Garbage = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/main/Libraries/Dependencies/Garbage.lua", true))()
+local SettingsModule = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/main/Libraries/Dependencies/Settings.lua", true))()
 
 local Players = game:GetService("Players")
 
