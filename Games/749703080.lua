@@ -227,16 +227,6 @@ do -- fly
     end)
 end
 
-do -- Auto Attack
-    autoAttackCheckBox:OnChanged(function()
-        while autoAttackCheckBox:IsToggled() do
-            task.spawn(ATLA.Attack)
-
-            task.wait()
-        end
-    end)
-end
-
 do -- Auto Stamina Refill (WIP)
 
 end
