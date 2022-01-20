@@ -66,6 +66,7 @@ local miscText = UI:new("Text", "Misc")
 
 local autofarmCategory = autofarmCheckBox:CreateCategory()
 local minimumXpSlider = autofarmCategory:new("Slider", "Minimum XP", 0, 0, 3000, 100)
+local extraDelaySlider = autofarmCategory:new("Slider", "Extra Delay", 0.5, 0, 1, 0.25)
 
 local subChangerCategory = subChangerCheckBox:CreateCategory()
 local elementSelector = subChangerCategory:new("ListSelector", {"Air", "Water", "Fire", "Earth"})
@@ -106,6 +107,8 @@ local Settings = ATLA.GetSettings()
 local Quests = ATLA:GetQuests()
 
 do -- AutoFarm 
+    Settings:Set("extraDelay", extraDelaySlider:GetValue())
+
     autofarmCheckBox:OnChanged(function()
         while autofarmCheckBox:IsToggled() and task.wait() do
             for quest, questData in pairs(Quests) do
@@ -125,6 +128,10 @@ do -- AutoFarm
         end
         
         ATLA:StopQuest()
+    end)
+
+    extraDelaySlider:OnChanged(function()
+        Settings:Set("extraDelay", extraDelaySlider:GetValue())
     end)
 end
 
