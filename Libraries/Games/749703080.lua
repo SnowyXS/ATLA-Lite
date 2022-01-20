@@ -286,4 +286,4 @@ MenuControl.DecreaseStamina = function(...)
     return OldDecreaseStamina(...)
 end
 
-getgenv().ATLA = ATLA
+return ATLA
