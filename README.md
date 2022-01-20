@@ -1,14 +1,5 @@
-# What is ATLA-Lite?
-Just a simple script for a game on roblox called ATLA,
-https://www.roblox.com/games/749703080/Avatar-The-Last-Airbender
 # How to use
-**Stable**
-
-`loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/ATLA-Lite/main/Stable/main.lua"))()`
-
-**Beta**
-
-`loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/ATLA-Lite/main/Beta/main.lua"))()`
+`loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/main/Stable/main.lua"))()`
 # Supported executors
 - Synapse X 
 - Most of them should work but untested
