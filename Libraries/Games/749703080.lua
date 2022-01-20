@@ -130,9 +130,7 @@ function ATLA:CompleteQuest(quest)
                                                 and self:GetLastQuest() ~= quest 
 
     if canCompleteQuest then
-        print(quest)
-
-        self:LockToNPC(npc)
+        print("Completing " .. quest .. ".\n" .. "Ping: " .. self:GetPingDelay() .. "\nPing + Extra Delay: " .. self:GetPingDelay() + (Settings:Get("extraDelay") or 0))
 
         local hasChanged = false
         local moneyPropertyChanged = PropertyChanged.new(playerData.Stats.Money1,               
@@ -144,8 +142,10 @@ function ATLA:CompleteQuest(quest)
         moneyPropertyChanged:ConnectAll(function()
             hasChanged = true
         end)
+        
+        self:LockToNPC(npc)
 
-        task.wait(self:GetPingDelay())
+        task.wait(self:GetPingDelay() + (Settings:Get("extraDelay") or 0))
 
         while not hasChanged and not Settings:Get("shouldStopFarm") do
             for step = 1, #Quests[quest].Steps + 1 do 
