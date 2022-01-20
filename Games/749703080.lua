@@ -1,5 +1,7 @@
 assert(not libLoaded, "SLite was already loaded.")
 
+local ATLA = game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/main/Libraries/Games/749703080.lua") 
+
 local Players = game:GetService("Players")
 
 local LocalPlayer = Players.LocalPlayer
