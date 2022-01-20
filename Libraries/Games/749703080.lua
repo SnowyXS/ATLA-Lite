@@ -57,7 +57,7 @@ function ATLA:GetPingDelay()
     
     gameFunction:InvokeServer("GetQuestData")
         
-    return (tick() - previousTick) * 1.35
+    return (tick() - previousTick)
 end
 
 function ATLA.GetNpcByQuest(quest)
@@ -79,6 +79,8 @@ function ATLA:LockToNPC(npc)
             task.wait() 
         end
     end)
+
+    task.wait() 
 
     return coroutine.resume(teleportCoroutine)
 end
@@ -143,20 +145,20 @@ function ATLA:CompleteQuest(quest)
 
         task.wait(self:GetPingDelay())
 
-        while not hasChanged and not Settings:Get("shouldStopFarm") and task.wait(self:GetPingDelay()) do
-            for step = 1, #Quests[quest].Steps + 1 do 
-                task.spawn(function()
-                    local distance = (npc.PrimaryPart.CFrame.p - humanoidRootPart.CFrame.p).Magnitude
+        for step = 1, #Quests[quest].Steps + 1 do 
+            task.spawn(function()
+                local distance = (npc.PrimaryPart.CFrame.p - humanoidRootPart.CFrame.p).Magnitude
 
-                    if distance < 25 and not Settings:Get("shouldStopFarm") then
-                        gameFunction:InvokeServer("AdvanceStep", {
-                            QuestName = quest,
-                            Step = step
-                        })
-                    end
-                end)
-            end
+                if distance < 25 and not Settings:Get("shouldStopFarm") then
+                    gameFunction:InvokeServer("AdvanceStep", {
+                        QuestName = quest,
+                        Step = step
+                    })
+                end
+            end)
         end
+
+        task.wait(1.5)
 
         if hasChanged then
             Settings:Set("lastQuest", quest)
