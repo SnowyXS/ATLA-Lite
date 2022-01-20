@@ -66,4 +66,4 @@ function PropertyChanged:DisconnectAll()
     end
 end
 
-getgenv().PropertyChanged = PropertyChanged
+return PropertyChanged
