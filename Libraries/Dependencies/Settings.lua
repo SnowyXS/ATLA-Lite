@@ -17,4 +17,4 @@ function Settings:Get(name)
     return self._settings[name]
 end
 
-getgenv().Settings = Settings
+return Settings
