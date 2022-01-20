@@ -3,13 +3,6 @@
 # Supported executors
 - Synapse X 
 - Most of them should work but untested
-# FAQ
-- Will I get banned? 
-> Probably not but still use at your own risk!
-- How do I use the ui?
-> **Use your keyboard arrows!**
-- How much should I put in the Minimum XP?
-> I recommend 3000, if you wanna max out your level in 20 - 30 mins.
 # UI Controls
 - Numpad8 or Arrow-UP: Will move up
 - Numpad2 or Arrow-Down: Will move down
