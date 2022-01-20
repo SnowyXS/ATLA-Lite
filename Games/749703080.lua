@@ -1,6 +1,6 @@
 assert(not libLoaded, "SLite was already loaded.")
 
-local ATLA = game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/main/Libraries/Games/749703080.lua") 
+local ATLA = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/main/Libraries/Games/749703080.lua"))()
 
 local Players = game:GetService("Players")
 
@@ -29,7 +29,7 @@ do -- Loading
 
     while not (ATLA and LocalPlayer:FindFirstChild("PlayerData")) and task.wait(0.25) do
         loadingText.Color = Color3.fromRGB(255, 0, 0)
-        loadingText.Text = ((not LocalPlayer:FindFirstChild("PlayerData") and "Waiting for modules") or (not ATLA and "Waiting for SLite") or "") .. string.rep(".", count) 
+        loadingText.Text = ((not LocalPlayer:FindFirstChild("PlayerData") and "Waiting for modules") or (not ATLA and "Waiting for SLite module") or "") .. string.rep(".", count) 
 
         loadingSquare.Size = loadingText.TextBounds + Vector2.new(3, 0)
 
