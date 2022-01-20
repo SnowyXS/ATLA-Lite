@@ -1,5 +1,5 @@
 local Garbage = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/main/Libraries/Dependencies/Garbage.lua"))()
-local Settings = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/main/Libraries/Dependencies/Settings.lua"))()
+local SettingsModule = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/main/Libraries/Dependencies/Settings.lua"))()
 
 local Players = game:GetService("Players")
 
@@ -19,7 +19,7 @@ repeat
     MenuControl, BaseSelection, ValueNames = Collector:FetchGarbageSearch("QuestModule", "Elements", "Money4")
 until task.wait(0.25) and (MenuControl and BaseSelection and ValueNames and MenuControl.DecreaseStamina)
 
-local Settings = Settings.new()
+local Settings = SettingsModule.new()
 
 local gameEvent, gameFunction = MenuControl.GameEvent, MenuControl.GameFunction
 
