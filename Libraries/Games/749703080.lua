@@ -1,6 +1,5 @@
 local Garbage = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/main/Libraries/Dependencies/Garbage.lua", true))()
-local Settings = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/main/Libraries/Dependencies/Settings.lua", true))()
-local PropertyChanged = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/main/Libraries/Dependencies/PropertyChanged.lua", true))()
+local SettingsModule = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/main/Libraries/Dependencies/Settings.lua", true))()
 
 local Players = game:GetService("Players")
 
@@ -20,7 +19,7 @@ repeat
     MenuControl, BaseSelection, ValueNames = Collector:FetchGarbageSearch("QuestModule", "Elements", "Money4")
 until task.wait() and (MenuControl and BaseSelection and ValueNames and MenuControl.DecreaseStamina)
 
-local Settings = Settings.new()
+local Settings = SettingsModule.new()
 
 local gameEvent, gameFunction = MenuControl.GameEvent, MenuControl.GameFunction
 
@@ -57,7 +56,7 @@ function ATLA:GetPingDelay()
     
     gameFunction:InvokeServer("GetQuestData")
         
-    return (tick() - previousTick) * 1.125
+    return (tick() - previousTick) * 1.325
 end
 
 function ATLA.GetNpcByQuest(quest)
