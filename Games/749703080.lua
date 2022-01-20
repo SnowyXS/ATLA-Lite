@@ -66,7 +66,7 @@ local miscText = UI:new("Text", "Misc")
 
 local autofarmCategory = autofarmCheckBox:CreateCategory()
 local minimumXpSlider = autofarmCategory:new("Slider", "Minimum XP", 0, 0, 3000, 100)
-local extraDelaySlider = autofarmCategory:new("Slider", "Extra Delay", 0.5, 0, 1, 0.25)
+local extraDelaySlider = autofarmCategory:new("Slider", "Extra Delay", 1, 0, 1, 0.25)
 
 local subChangerCategory = subChangerCheckBox:CreateCategory()
 local elementSelector = subChangerCategory:new("ListSelector", {"Air", "Water", "Fire", "Earth"})
