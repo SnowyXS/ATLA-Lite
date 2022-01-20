@@ -3,7 +3,7 @@ assert(not libLoaded, "SLite was already loaded.")
 local ATLA
 
 task.spawn(function()
-    ATLA = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/main/Libraries/Games/749703080.lua", true))()
+    ATLA = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/main/Libraries/Games/749703080.lua"))()
 end)
 
 local Players = game:GetService("Players")
@@ -55,7 +55,7 @@ local nameTag = head:WaitForChild("Nametag")
 
 local playerData = LocalPlayer:WaitForChild("PlayerData")
 
-local UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/main/Libraries/UI/Controller.lua", true))()
+local UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/main/Libraries/UI/Controller.lua"))()
 
 local autofarmCheckBox = UI:new("Checkbox", "AutoFarm")
 local subChangerCheckBox = UI:new("Checkbox", "Sub Changer")
@@ -125,8 +125,6 @@ do -- AutoFarm
         end
         
         ATLA:StopQuest()
-
-        Character.PrimaryPart.CFrame *= CFrame.new(0, 12.5, 0)
     end)
 end
 
