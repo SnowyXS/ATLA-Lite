@@ -1,3 +1,6 @@
+local Garbage = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/main/Libraries/Dependencies/Garbage.lua"))()
+local Settings = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/main/Libraries/Dependencies/Settings.lua"))()
+
 local Players = game:GetService("Players")
 
 local LocalPlayer = Players.LocalPlayer
@@ -286,4 +289,4 @@ MenuControl.DecreaseStamina = function(...)
     return OldDecreaseStamina(...)
 end
 
-return ATLA
+getgenv().ATLA = ATLA
