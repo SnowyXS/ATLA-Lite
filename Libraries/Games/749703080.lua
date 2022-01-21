@@ -131,8 +131,6 @@ function ATLA:CompleteQuest(quest)
                                                 and not Settings:Get("shouldStopFarm")) 
                                                 and self:GetLastQuest() ~= quest 
 
-    task.wait(self:GetPingDelay())
-
     if canCompleteQuest then
         local hasChanged = false
         local moneyPropertyChanged = PropertyChanged.new(playerData.Stats.Money1,               
@@ -167,6 +165,8 @@ function ATLA:CompleteQuest(quest)
         if hasChanged then
             Settings:Set("lastQuest", quest)
         end
+
+        task.wait(self:GetPingDelay())
 
         Settings:Set("canCompleteQuest", false)
 
