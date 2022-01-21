@@ -30,7 +30,9 @@ local RefreshNPCs = Quests.RefreshNPCs
 local NpcList = debug.getupvalue(RefreshNPCs, 3)
 local NpcModel = MenuControl.QuestNPCs
 
-local ATLA = {}
+local ATLA = {
+    version = "v1.01"
+}
 
 function ATLA.GetGameModule()
     return MenuControl
@@ -80,7 +82,7 @@ function ATLA:LockToNPC(npc)
         end
     end)
 
-    task.wait() 
+    task.wait(self:GetPingDelay())
 
     return coroutine.resume(teleportCoroutine)
 end
@@ -129,9 +131,9 @@ function ATLA:CompleteQuest(quest)
                                                 and not Settings:Get("shouldStopFarm")) 
                                                 and self:GetLastQuest() ~= quest 
 
-    if canCompleteQuest then
-        print("Completing " .. quest .. ".\n" .. "Ping: " .. self:GetPingDelay() .. "\nPing + Extra Delay: " .. self:GetPingDelay() + (Settings:Get("extraDelay") or 0))
+    task.wait(self:GetPingDelay())
 
+    if canCompleteQuest then
         local hasChanged = false
         local moneyPropertyChanged = PropertyChanged.new(playerData.Stats.Money1,               
                                                          playerData.Stats.Money2,         
@@ -145,9 +147,9 @@ function ATLA:CompleteQuest(quest)
         
         self:LockToNPC(npc)
 
-        task.wait(self:GetPingDelay() + (Settings:Get("extraDelay") or 0))
+        task.wait(self:GetPingDelay())
 
-        while not hasChanged and not Settings:Get("shouldStopFarm") do
+        while not hasChanged and not Settings:Get("shouldStopFarm") and task.wait() do
             for step = 1, #Quests[quest].Steps + 1 do 
                 task.spawn(function()
                     local distance = (npc.PrimaryPart.CFrame.p - humanoidRootPart.CFrame.p).Magnitude
@@ -160,8 +162,6 @@ function ATLA:CompleteQuest(quest)
                     end
                 end)
             end
-
-            task.wait()
         end
 
         if hasChanged then
