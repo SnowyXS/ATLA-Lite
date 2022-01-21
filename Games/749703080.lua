@@ -41,7 +41,7 @@ do -- Loading
     end
 
     loadingText.Color = Color3.fromRGB(0, 255, 0)
-    loadingText.Text = "SLite loaded."
+    loadingText.Text = "SLite loaded version " .. ATLA.version .. "."
 
     loadingSquare.Size = loadingText.TextBounds + Vector2.new(3, 0)
 
@@ -66,7 +66,7 @@ local miscText = UI:new("Text", "Misc")
 
 local autofarmCategory = autofarmCheckBox:CreateCategory()
 local minimumXpSlider = autofarmCategory:new("Slider", "Minimum XP", 0, 0, 3000, 100)
-local extraDelaySlider = autofarmCategory:new("Slider", "Extra Delay", 1, 0, 5, 0.25)
+local extraDelaySlider = autofarmCategory:new("Slider", "Extra Delay", 1, 0, 1, 0.25)
 
 local subChangerCategory = subChangerCheckBox:CreateCategory()
 local elementSelector = subChangerCategory:new("ListSelector", {"Air", "Water", "Fire", "Earth"})
