@@ -41,7 +41,7 @@ do -- Loading
     end
 
     loadingText.Color = Color3.fromRGB(0, 255, 0)
-    loadingText.Text = "SLite loaded version " .. ATLA.version .. "."
+    loadingText.Text = "SLite loaded \nversion " .. ATLA.version .. "."
 
     loadingSquare.Size = loadingText.TextBounds + Vector2.new(3, 0)
 
@@ -66,7 +66,6 @@ local miscText = UI:new("Text", "Misc")
 
 local autofarmCategory = autofarmCheckBox:CreateCategory()
 local minimumXpSlider = autofarmCategory:new("Slider", "Minimum XP", 0, 0, 3000, 100)
-local extraDelaySlider = autofarmCategory:new("Slider", "Extra Delay", 1, 0, 1, 0.25)
 
 local subChangerCategory = subChangerCheckBox:CreateCategory()
 local elementSelector = subChangerCategory:new("ListSelector", {"Air", "Water", "Fire", "Earth"})
@@ -107,20 +106,18 @@ local Settings = ATLA.GetSettings()
 local Quests = ATLA:GetQuests()
 
 do -- AutoFarm 
-    Settings:Set("extraDelay", extraDelaySlider:GetValue())
-
     autofarmCheckBox:OnChanged(function()
         while autofarmCheckBox:IsToggled() and task.wait() do
             for quest, questData in pairs(Quests) do
                 local lastQuest = ATLA:GetLastQuest()
                 local minimumXP = minimumXpSlider:GetValue()
                 
-                if not Settings:Get("shouldStopFarm") and typeof(questData) == "table" and quest ~= lastQuest and questData.Rewards.Experience >= minimumXP then
+                if not Settings:Get("shouldStopFarm") and not Settings:Get("canCompleteQuest") and typeof(questData) == "table" and quest ~= lastQuest and questData.Rewards.Experience >= minimumXP then
                     local icon = nameTag.Icon.Image
 
                     quest = minimumXP < 2000 and quest
-                            or icon == "rbxassetid://87177558" and "RedLotus1"
                             or (icon == "" or icon == "rbxassetid://869158044") and "WhiteLotus1"
+                            or icon == "rbxassetid://87177558" and "RedLotus1"
 
                     ATLA:CompleteQuest(quest)
                 end
@@ -128,10 +125,6 @@ do -- AutoFarm
         end
         
         ATLA:StopQuest()
-    end)
-
-    extraDelaySlider:OnChanged(function()
-        Settings:Set("extraDelay", extraDelaySlider:GetValue())
     end)
 end
 
@@ -363,8 +356,10 @@ do -- Players
     Players.PlayerRemoving:Connect(function(player)
         local UIObject = players[player]
 
-        UIObject:Destroy(true)
-        UIObject = nil
+        if UIObject then
+            pcall(UIObject.Destroy, UIObject, true)
+            UIObject = nil
+        end
 
         print("\n--- Player List ---",
         "\nStatus: Player Left", 
