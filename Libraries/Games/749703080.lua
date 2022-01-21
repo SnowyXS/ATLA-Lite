@@ -31,7 +31,7 @@ local NpcList = debug.getupvalue(RefreshNPCs, 3)
 local NpcModel = MenuControl.QuestNPCs
 
 local ATLA = {
-    version = "v1.01"
+    version = "v1.02"
 }
 
 function ATLA.GetGameModule()
@@ -54,12 +54,12 @@ function ATLA:GetLastQuest()
     return self.lastQuest
 end
 
-function ATLA:GetPingDelay()
+function ATLA.GetDelay()
     local previousTick = tick() 
     
     gameFunction:InvokeServer("GetQuestData")
         
-    return (tick() - previousTick)
+    return math.clamp(tick() - previousTick, 0.200, math.huge)
 end
 
 function ATLA.GetNpcByQuest(quest)
@@ -76,13 +76,11 @@ function ATLA:LockToNPC(npc)
 
     local teleportCoroutine = coroutine.create(function()
         while Settings:Get("canCompleteQuest") and not MenuControl.Transitioning and isContinuable and menuStatus == 2 and humanoidRootPart do
-            humanoidRootPart.CFrame = npc.PrimaryPart.CFrame * CFrame.new(0,-12.5,0) * CFrame.Angles(math.rad(90), 0, 0)
+            humanoidRootPart.CFrame = npc.PrimaryPart.CFrame * CFrame.new(0,-8.25,0) * CFrame.Angles(math.rad(90), 0, 0)
 
             task.wait() 
         end
     end)
-
-    task.wait(self:GetPingDelay())
 
     return coroutine.resume(teleportCoroutine)
 end
@@ -103,6 +101,7 @@ function ATLA.SpawnCharacter()
 end
 
 function ATLA:StopQuest()
+    Settings:Set("lockedNpc", false)
     Settings:Set("shouldStopFarm", true)
     Settings:Set("canCompleteQuest", false)
 
@@ -129,9 +128,12 @@ function ATLA:CompleteQuest(quest)
                                                 and isContinuable
                                                 and not isTransitioning
                                                 and not Settings:Get("shouldStopFarm")) 
-                                                and self:GetLastQuest() ~= quest 
 
     if canCompleteQuest then
+        self:LockToNPC(npc)
+
+        task.wait(self.GetDelay())
+
         local hasChanged = false
         local moneyPropertyChanged = PropertyChanged.new(playerData.Stats.Money1,               
                                                          playerData.Stats.Money2,         
@@ -142,17 +144,11 @@ function ATLA:CompleteQuest(quest)
         moneyPropertyChanged:ConnectAll(function()
             hasChanged = true
         end)
-        
-        self:LockToNPC(npc)
 
-        task.wait(self:GetPingDelay())
-
-        while not hasChanged and not Settings:Get("shouldStopFarm") and task.wait() do
+        while not hasChanged and not Settings:Get("shouldStopFarm") do
             for step = 1, #Quests[quest].Steps + 1 do 
                 task.spawn(function()
-                    local distance = (npc.PrimaryPart.CFrame.p - humanoidRootPart.CFrame.p).Magnitude
-
-                    if distance < 25 and not Settings:Get("shouldStopFarm") then
+                    if (npc.PrimaryPart.CFrame.p - humanoidRootPart.CFrame.p).Magnitude < 15 and not Settings:Get("shouldStopFarm") and not hasChanged then
                         gameFunction:InvokeServer("AdvanceStep", {
                             QuestName = quest,
                             Step = step
@@ -160,13 +156,15 @@ function ATLA:CompleteQuest(quest)
                     end
                 end)
             end
+
+            task.wait()
         end
+
+        task.wait(self.GetDelay())
 
         if hasChanged then
             Settings:Set("lastQuest", quest)
         end
-
-        task.wait(self:GetPingDelay())
 
         Settings:Set("canCompleteQuest", false)
 
