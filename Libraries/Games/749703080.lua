@@ -51,7 +51,7 @@ function ATLA.GetValueNames()
 end
 
 function ATLA:GetLastQuest()
-    return self.lastQuest
+    return Settings:Get("lastQuest")
 end
 
 function ATLA.GetDelay()
@@ -59,7 +59,7 @@ function ATLA.GetDelay()
     
     gameFunction:InvokeServer("GetQuestData")
         
-    return math.clamp(tick() - previousTick, 0.200, math.huge)
+    return tick() - previousTick
 end
 
 function ATLA.GetNpcByQuest(quest)
@@ -130,10 +130,6 @@ function ATLA:CompleteQuest(quest)
                                                 and not Settings:Get("shouldStopFarm")) 
 
     if canCompleteQuest then
-        self:LockToNPC(npc)
-
-        task.wait(self.GetDelay())
-
         local hasChanged = false
         local moneyPropertyChanged = PropertyChanged.new(playerData.Stats.Money1,               
                                                          playerData.Stats.Money2,         
@@ -145,22 +141,22 @@ function ATLA:CompleteQuest(quest)
             hasChanged = true
         end)
 
-        while not hasChanged and not Settings:Get("shouldStopFarm") do
-            for step = 1, #Quests[quest].Steps + 1 do 
-                task.spawn(function()
-                    if (npc.PrimaryPart.CFrame.p - humanoidRootPart.CFrame.p).Magnitude < 15 and not Settings:Get("shouldStopFarm") and not hasChanged then
-                        gameFunction:InvokeServer("AdvanceStep", {
-                            QuestName = quest,
-                            Step = step
-                        })
-                    end
-                end)
-            end
-
-            task.wait()
-        end
+        self:LockToNPC(npc)
 
         task.wait(self.GetDelay())
+
+        for step = 1, #Quests[quest].Steps + 1 do 
+            task.spawn(function()
+                if (npc.PrimaryPart.CFrame.p - humanoidRootPart.CFrame.p).Magnitude < 15 and not Settings:Get("shouldStopFarm") and not hasChanged then
+                    gameFunction:InvokeServer("AdvanceStep", {
+                        QuestName = quest,
+                        Step = step
+                    })
+                end
+            end)
+        end
+
+        task.wait(4.9)
 
         if hasChanged then
             Settings:Set("lastQuest", quest)
