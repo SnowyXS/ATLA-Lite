@@ -31,7 +31,7 @@ local NpcList = debug.getupvalue(RefreshNPCs, 3)
 local NpcModel = MenuControl.QuestNPCs
 
 local ATLA = {
-    version = "v1.025"
+    version = "v1.03"
 }
 
 function ATLA.GetGameModule()
@@ -142,7 +142,7 @@ function ATLA:CompleteQuest(quest)
         end)
 
         self:LockToNPC(npc)
-        
+
         task.wait(self.GetDelay())
 
         for step = 1, #Quests[quest].Steps + 1 do 
@@ -156,7 +156,7 @@ function ATLA:CompleteQuest(quest)
             end)
         end
 
-        task.wait(4.9 - self.GetDelay())
+        task.wait(4.9)
 
         if hasChanged then
             Settings:Set("lastQuest", quest)
