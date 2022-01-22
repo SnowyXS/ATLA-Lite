@@ -31,7 +31,7 @@ local NpcList = debug.getupvalue(RefreshNPCs, 3)
 local NpcModel = MenuControl.QuestNPCs
 
 local ATLA = {
-    version = "v1.02"
+    version = "v1.025"
 }
 
 function ATLA.GetGameModule()
