@@ -59,7 +59,7 @@ function ATLA.GetDelay()
     
     gameFunction:InvokeServer("GetQuestData")
         
-    return tick() - previousTick
+    return math.clamp(tick() - previousTick, 0.15, math.huge) * 1.5
 end
 
 function ATLA.GetNpcByQuest(quest)
@@ -142,7 +142,7 @@ function ATLA:CompleteQuest(quest)
         end)
 
         self:LockToNPC(npc)
-
+        
         task.wait(self.GetDelay())
 
         for step = 1, #Quests[quest].Steps + 1 do 
@@ -156,7 +156,7 @@ function ATLA:CompleteQuest(quest)
             end)
         end
 
-        task.wait(4.9)
+        task.wait(4.9 - self.GetDelay())
 
         if hasChanged then
             Settings:Set("lastQuest", quest)
