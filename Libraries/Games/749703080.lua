@@ -294,8 +294,10 @@ OldNameCall = hookmetamethod(game, "__namecall", function(self, ...)
     local args = {...}
     local method = getnamecallmethod()
     
-    if not checkcaller() and (method == "Kick" or (method == "InvokeServer" and args[1] == "Kick")) then
-        return
+    if not checkcaller() then
+        if (method == "Kick" or (method == "InvokeServer" and args[1] == "Kick")) then
+            return
+        end
     end
 
     return OldNameCall(self, ...) 
