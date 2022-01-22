@@ -31,7 +31,7 @@ local NpcList = debug.getupvalue(RefreshNPCs, 3)
 local NpcModel = MenuControl.QuestNPCs
 
 local ATLA = {
-    version = "v1.035"
+    version = "v1.03"
 }
 
 function ATLA.GetGameModule()
@@ -294,7 +294,7 @@ OldNameCall = hookmetamethod(game, "__namecall", function(self, ...)
     local args = {...}
     local method = getnamecallmethod()
     
-    if not checkcaller() and (method == "Kick" or method == "InvokeServer" and args[1] == "Kick") then
+    if not checkcaller() and (method == "Kick" or (method == "InvokeServer" and args[1] == "Kick")) then
         return
     end
 
