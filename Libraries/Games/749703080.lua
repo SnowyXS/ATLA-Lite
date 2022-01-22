@@ -295,7 +295,7 @@ do -- Kick fix for stamina
         local args = {...}
         local method = getnamecallmethod()
         
-        if not checkcaller() and (method == "Kick" or (method == "InvokeServer" and args[1] == "Kick")) then
+        if (method == "Kick" or (method == "InvokeServer" and args[1] == "Kick")) then
             return
         end
     
