@@ -290,17 +290,4 @@ MenuControl.DecreaseStamina = function(...)
     return OldDecreaseStamina(...)
 end
 
-do -- Kick fix for stamina
-    OldNameCall = hookmetamethod(game, "__namecall", function(self, ...)
-        local args = {...}
-        local method = getnamecallmethod()
-        
-        if (method == "Kick" or (method == "InvokeServer" and args[1] == "Kick")) then
-            return
-        end
-    
-        return OldNameCall(self, ...) 
-    end)    
-end
-
 return ATLA
