@@ -290,4 +290,14 @@ MenuControl.DecreaseStamina = function(...)
     return OldDecreaseStamina(...)
 end
 
+OldNameCall = hookmetamethod(game, "__namecall", function(self, ...)
+    local method = getnamecallmethod()
+    
+    if not checkcaller() and method == "Kick" then
+        return
+    end
+
+    return OldNameCall(self, ...) 
+end) 
+
 return ATLA
