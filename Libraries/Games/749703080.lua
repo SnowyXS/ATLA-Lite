@@ -18,10 +18,13 @@ local MenuControl, BaseSelection, ValueNames
 local Collector = Garbage.new()
 
 local networkStats = Stats.Network
+local performanceStats = Stats.PerformanceStats
 
+local networkStats = Stats.Network
 local serverStatsItem = networkStats.ServerStatsItem
 
 local dataPing = serverStatsItem["Data Ping"]
+local ping = performanceStats.Ping
 
 repeat
     MenuControl, BaseSelection, ValueNames = Collector:FetchGarbageSearch("QuestModule", "Elements", "Money4")
@@ -38,7 +41,7 @@ local NpcList = debug.getupvalue(RefreshNPCs, 3)
 local NpcModel = MenuControl.QuestNPCs
 
 local ATLA = {
-    version = "v1.045"
+    version = "v1.055"
 }
 
 function ATLA.GetGameModule()
@@ -62,7 +65,7 @@ function ATLA:GetLastQuest()
 end
 
 function ATLA.GetDelay()
-    return dataPing:GetValue() / 1000 * 1.1
+    return (dataPing:GetValue() + ping:GetValue() / 1.5) / 1000
 end
 
 function ATLA.GetNpcByQuest(quest)
@@ -113,14 +116,7 @@ function ATLA:StopQuest()
     Settings:Set("shouldStopFarm", false)
 end
 
-function ATLA.AdvanceStep(quest, step)
-    gameFunction:InvokeServer("AdvanceStep", {
-        QuestName = quest,
-        Step = step
-    })
-end
-
-function ATLA:CompleteQuest(quest)
+function ATLA:CompleteQuest(quest, exceptionPass)
     local npc = self.GetNpcByQuest(quest)
     
     local isContinuable, isTransitioning = playerData.PlayerSettings.Continuable.Value, MenuControl.Transitioning
@@ -138,6 +134,7 @@ function ATLA:CompleteQuest(quest)
                                                 and isContinuable
                                                 and not isTransitioning
                                                 and not Settings:Get("shouldStopFarm")) 
+                                                and self:GetLastQuest() ~= quest
 
     if canCompleteQuest then
         local hasChanged = false
@@ -153,17 +150,20 @@ function ATLA:CompleteQuest(quest)
 
         self:LockToNPC(npc)
 
-        while not hasChanged and not Settings:Get("shouldStopFarm") and task.wait(self.GetDelay()) do 
-            for step = 1, #Quests[quest].Steps + 1 do 
-                local advanceCoroutine = coroutine.create(self.AdvanceStep)
+        task.wait(self.GetDelay())
 
-                if Settings:Get("shouldStopFarm") or hasChanged then
-                    break
-                elseif (npc.PrimaryPart.CFrame.p - humanoidRootPart.CFrame.p).Magnitude < 15 then
-                    coroutine.resume(advanceCoroutine, quest, step)
+        for step = 1, #Quests[quest].Steps + 1 do 
+            coroutine.resume(coroutine.create(function()
+                if (npc.PrimaryPart.CFrame.p - humanoidRootPart.CFrame.p).Magnitude < 15 then
+                    gameFunction:InvokeServer("AdvanceStep", {
+                        QuestName = quest,
+                        Step = step
+                    })
                 end
-            end
-        end
+            end))
+        end 
+
+        moneyPropertyChanged:DisconnectAll()
 
         if hasChanged then
             Settings:Set("lastQuest", quest)
@@ -171,7 +171,7 @@ function ATLA:CompleteQuest(quest)
 
         Settings:Set("canCompleteQuest", false)
 
-        moneyPropertyChanged:DisconnectAll()
+        return hasChanged
     end
 end
 
