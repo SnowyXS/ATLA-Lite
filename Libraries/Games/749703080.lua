@@ -38,7 +38,7 @@ local NpcList = debug.getupvalue(RefreshNPCs, 3)
 local NpcModel = MenuControl.QuestNPCs
 
 local ATLA = {
-    version = "v1.04"
+    version = "v1.045"
 }
 
 function ATLA.GetGameModule()
@@ -153,13 +153,15 @@ function ATLA:CompleteQuest(quest)
 
         self:LockToNPC(npc)
 
-        task.wait(self.GetDelay())
+        while not hasChanged and not Settings:Get("shouldStopFarm") and task.wait(self.GetDelay()) do 
+            for step = 1, #Quests[quest].Steps + 1 do 
+                local advanceCoroutine = coroutine.create(self.AdvanceStep)
 
-        for step = 1, #Quests[quest].Steps + 1 do 
-            local advanceCoroutine = coroutine.create(self.AdvanceStep)
-
-            if (npc.PrimaryPart.CFrame.p - humanoidRootPart.CFrame.p).Magnitude < 15 and not Settings:Get("shouldStopFarm") and not hasChanged then
-                coroutine.resume(advanceCoroutine, quest, step)
+                if Settings:Get("shouldStopFarm") or hasChanged then
+                    break
+                elseif (npc.PrimaryPart.CFrame.p - humanoidRootPart.CFrame.p).Magnitude < 15 then
+                    coroutine.resume(advanceCoroutine, quest, step)
+                end
             end
         end
 
