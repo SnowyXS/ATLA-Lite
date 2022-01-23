@@ -3,6 +3,7 @@ local Settings = loadstring(game:HttpGet("https://raw.githubusercontent.com/Snow
 local PropertyChanged = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/main/Libraries/Dependencies/PropertyChanged.lua"))()
 
 local Players = game:GetService("Players")
+local Stats = game:GetService("Stats")
 
 local LocalPlayer = Players.LocalPlayer
 local Character = LocalPlayer.Character
@@ -15,6 +16,12 @@ local playerData = LocalPlayer:WaitForChild("PlayerData")
 local MenuControl, BaseSelection, ValueNames
 
 local Collector = Garbage.new()
+
+local networkStats = Stats.Network
+
+local serverStatsItem = networkStats.ServerStatsItem
+
+local dataPing = serverStatsItem["Data Ping"]
 
 repeat
     MenuControl, BaseSelection, ValueNames = Collector:FetchGarbageSearch("QuestModule", "Elements", "Money4")
@@ -55,11 +62,7 @@ function ATLA:GetLastQuest()
 end
 
 function ATLA.GetDelay()
-    local previousTick = tick() 
-    
-    gameFunction:InvokeServer("GetQuestData")
-        
-    return math.clamp(tick() - previousTick, 0.15, math.huge) * 1.5
+    return dataPing:GetValue() / 1000 * 1.1
 end
 
 function ATLA.GetNpcByQuest(quest)
@@ -110,6 +113,13 @@ function ATLA:StopQuest()
     Settings:Set("shouldStopFarm", false)
 end
 
+function ATLA.AdvanceStep(quest, step)
+    gameFunction:InvokeServer("AdvanceStep", {
+        QuestName = quest,
+        Step = step
+    })
+end
+
 function ATLA:CompleteQuest(quest)
     local npc = self.GetNpcByQuest(quest)
     
@@ -146,17 +156,12 @@ function ATLA:CompleteQuest(quest)
         task.wait(self.GetDelay())
 
         for step = 1, #Quests[quest].Steps + 1 do 
-            task.spawn(function()
-                if (npc.PrimaryPart.CFrame.p - humanoidRootPart.CFrame.p).Magnitude < 15 and not Settings:Get("shouldStopFarm") and not hasChanged then
-                    gameFunction:InvokeServer("AdvanceStep", {
-                        QuestName = quest,
-                        Step = step
-                    })
-                end
-            end)
-        end
+            local advanceCoroutine = coroutine.create(self.AdvanceStep)
 
-        task.wait(4.9)
+            if (npc.PrimaryPart.CFrame.p - humanoidRootPart.CFrame.p).Magnitude < 15 and not Settings:Get("shouldStopFarm") and not hasChanged then
+                coroutine.resume(advanceCoroutine, quest, step)
+            end
+        end
 
         if hasChanged then
             Settings:Set("lastQuest", quest)
