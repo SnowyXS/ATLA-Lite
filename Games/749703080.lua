@@ -118,8 +118,8 @@ do -- AutoFarm
                     quest = minimumXP < 2000 and quest
                             or (icon == "" or icon == "rbxassetid://869158044") and "WhiteLotus1"
                             or icon == "rbxassetid://87177558" and "RedLotus1"
-
-                    ATLA:CompleteQuest(quest)
+                    
+                    repeat task.wait() until ATLA:CompleteQuest(quest) or Settings:Get("shouldStopFarm")
                 end
             end
         end
