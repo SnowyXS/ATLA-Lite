@@ -41,7 +41,7 @@ local NpcList = debug.getupvalue(RefreshNPCs, 3)
 local NpcModel = MenuControl.QuestNPCs
 
 local ATLA = {
-    version = "v1.055"
+    version = "v1.06"
 }
 
 function ATLA.GetGameModule()
@@ -65,7 +65,7 @@ function ATLA:GetLastQuest()
 end
 
 function ATLA.GetDelay()
-    return (dataPing:GetValue() + ping:GetValue() / 1.5) / 1000
+    return (dataPing:GetValue() / 1000) * 1.5
 end
 
 function ATLA.GetNpcByQuest(quest)
@@ -134,7 +134,6 @@ function ATLA:CompleteQuest(quest, exceptionPass)
                                                 and isContinuable
                                                 and not isTransitioning
                                                 and not Settings:Get("shouldStopFarm")) 
-                                                and self:GetLastQuest() ~= quest
 
     if canCompleteQuest then
         local hasChanged = false
@@ -152,16 +151,22 @@ function ATLA:CompleteQuest(quest, exceptionPass)
 
         task.wait(self.GetDelay())
 
-        for step = 1, #Quests[quest].Steps + 1 do 
-            coroutine.resume(coroutine.create(function()
-                if (npc.PrimaryPart.CFrame.p - humanoidRootPart.CFrame.p).Magnitude < 15 then
-                    gameFunction:InvokeServer("AdvanceStep", {
-                        QuestName = quest,
-                        Step = step
-                    })
-                end
-            end))
-        end 
+        while not hasChanged and not Settings:Get("shouldStopFarm") do
+            task.wait(self.GetDelay() / 2)
+
+            for step = 1, #Quests[quest].Steps + 1 do 
+                coroutine.resume(coroutine.create(function()
+                    if (npc.PrimaryPart.CFrame.p - humanoidRootPart.CFrame.p).Magnitude < 15 then
+                        gameFunction:InvokeServer("AdvanceStep", {
+                            QuestName = quest,
+                            Step = step
+                        })
+                    end
+                end))
+            end 
+        end
+
+        task.wait(4.9 - self.GetDelay())
 
         moneyPropertyChanged:DisconnectAll()
 
@@ -170,8 +175,6 @@ function ATLA:CompleteQuest(quest, exceptionPass)
         end
 
         Settings:Set("canCompleteQuest", false)
-
-        return hasChanged
     end
 end
 
