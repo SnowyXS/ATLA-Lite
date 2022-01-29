@@ -367,41 +367,42 @@ do -- Players
     end)
 end
 
+do
+    LocalPlayer.CharacterAdded:Connect(function(character)
+        Character = character
 
-LocalPlayer.CharacterAdded:Connect(function(character)
-    Character = character
+        head = Character:WaitForChild("Head") 
+        nameTag = head:WaitForChild("Nametag")
 
-    head = Character:WaitForChild("Head") 
-    nameTag = head:WaitForChild("Nametag")
+        humanoid = Character:WaitForChild("Humanoid") 
 
-    humanoid = Character:WaitForChild("Humanoid") 
+        humanoid.WalkSpeed = walkSpeedSpeedSlider:GetValue()
+        humanoid.JumpPower = jumpPowerSlider:GetValue()
 
-    humanoid.WalkSpeed = walkSpeedSpeedSlider:GetValue()
-    humanoid.JumpPower = jumpPowerSlider:GetValue()
+        if subChangerCheckBox:IsToggled() then
+            local shouldContinue = ATLA:ChangeElement(elementSelector:GetSelected(), specialSelector:GetSelected(), secondSpecialSelector:GetSelected())
 
-    if subChangerCheckBox:IsToggled() then
-        local shouldContinue = ATLA:ChangeElement(elementSelector:GetSelected(), specialSelector:GetSelected(), secondSpecialSelector:GetSelected())
+            if shouldContinue then
+                local humanoid = character:WaitForChild("Humanoid")
 
-        if shouldContinue then
-            local humanoid = character:WaitForChild("Humanoid")
+                if subChangerCheckBox:IsToggled() then
+                    task.wait()
 
-            if subChangerCheckBox:IsToggled() then
-                task.wait()
+                    humanoid.Health = 0
 
-                humanoid.Health = 0
-
-                return
+                    return
+                end
+            elseif farmAfterSubCheckBox:IsToggled() then
+                autofarmCheckBox:SetToggle(true)
             end
-        elseif farmAfterSubCheckBox:IsToggled() then
-            autofarmCheckBox:SetToggle(true)
+
+            subChangerCheckBox:SetToggle(false)
         end
 
-        subChangerCheckBox:SetToggle(false)
-    end
-    
-    local oldGameModule = ATLA.GetGameModule()
+        local oldGameModule = ATLA.GetGameModule()
 
-    repeat task.wait() until ATLA.GetGameModule() ~= oldGameModule
+        repeat task.wait() until ATLA.GetGameModule() ~= oldGameModule
 
-    ATLA.SetMaxStamina(maxStaminaSlider:GetValue())
-end)
+        ATLA.SetMaxStamina(maxStaminaSlider:GetValue())
+    end)
+end
