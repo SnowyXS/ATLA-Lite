@@ -9,7 +9,7 @@ end)
 local Players = game:GetService("Players")
 
 local LocalPlayer = Players.LocalPlayer
-local Character = LocalPlayer.Character
+local Character = LocalPlayer.Character or LocalPlayer.PlayerAdded:wait()
 
 local humanoid = Character:WaitForChild("Humanoid")
 local head = Character:WaitForChild("Head")
@@ -367,40 +367,42 @@ do -- Players
     end)
 end
 
-LocalPlayer.CharacterAdded:Connect(function(character)
-    if subChangerCheckBox:IsToggled() then
-        local shouldContinue = ATLA:ChangeElement(elementSelector:GetSelected(), specialSelector:GetSelected(), secondSpecialSelector:GetSelected())
+do
+    LocalPlayer.CharacterAdded:Connect(function(character)
+        if subChangerCheckBox:IsToggled() then
+            local shouldContinue = ATLA:ChangeElement(elementSelector:GetSelected(), specialSelector:GetSelected(), secondSpecialSelector:GetSelected())
 
-        if shouldContinue then
-            local humanoid = character:WaitForChild("Humanoid")
+            if shouldContinue then
+                local humanoid = character:WaitForChild("Humanoid")
 
-            if subChangerCheckBox:IsToggled() then
-                task.wait()
+                if subChangerCheckBox:IsToggled() then
+                    task.wait()
 
-                humanoid.Health = 0
+                    humanoid.Health = 0
 
-                return
+                    return
+                end
+            elseif farmAfterSubCheckBox:IsToggled() then
+                autofarmCheckBox:SetToggle(true)
             end
-        elseif farmAfterSubCheckBox:IsToggled() then
-            autofarmCheckBox:SetToggle(true)
+
+            subChangerCheckBox:SetToggle(false)
         end
 
-        subChangerCheckBox:SetToggle(false)
-    end
+        Character = character
 
-    Character = character
+        head = Character:WaitForChild("Head") 
+        nameTag = head:WaitForChild("Nametag")
 
-    head = Character:WaitForChild("Head") 
-    nameTag = head:WaitForChild("Nametag")
+        humanoid = Character:WaitForChild("Humanoid") 
 
-    humanoid = Character:WaitForChild("Humanoid") 
+        local oldGameModule = ATLA.GetGameModule()
+        
+        humanoid.WalkSpeed = walkSpeedSpeedSlider:GetValue()
+        humanoid.JumpPower = jumpPowerSlider:GetValue()
 
-    local oldGameModule = ATLA.GetGameModule()
-    
-    humanoid.WalkSpeed = walkSpeedSpeedSlider:GetValue()
-    humanoid.JumpPower = jumpPowerSlider:GetValue()
+        repeat task.wait() until ATLA.GetGameModule() ~= oldGameModule
 
-    repeat task.wait() until ATLA.GetGameModule() ~= oldGameModule
-
-    ATLA.SetMaxStamina(maxStaminaSlider:GetValue())
-end)
+        ATLA.SetMaxStamina(maxStaminaSlider:GetValue())
+    end)
+end
