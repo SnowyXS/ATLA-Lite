@@ -65,7 +65,7 @@ function ATLA:GetLastQuest()
 end
 
 function ATLA.GetDelay()
-    return dataPing:GetValue() / 1000 * 1.05
+    return dataPing:GetValue() / 1000
 end
 
 function ATLA.GetNpcByQuest(quest)
