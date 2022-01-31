@@ -41,7 +41,7 @@ local NpcList = debug.getupvalue(RefreshNPCs, 3)
 local NpcModel = MenuControl.QuestNPCs
 
 local ATLA = {
-    version = "v1.065"
+    version = "v1.07"
 }
 
 function ATLA.GetGameModule()
@@ -65,7 +65,7 @@ function ATLA:GetLastQuest()
 end
 
 function ATLA.GetDelay()
-    return (dataPing:GetValue() / 1000) * 1.5
+    return dataPing:GetValue() / 1000
 end
 
 function ATLA.GetNpcByQuest(quest)
