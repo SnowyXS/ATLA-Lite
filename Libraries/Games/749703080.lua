@@ -107,10 +107,9 @@ function ATLA.SpawnCharacter()
 end
 
 function ATLA:StopQuest()
-    Settings:Set("lockedNpc", false)
     Settings:Set("shouldStopFarm", true)
     Settings:Set("canCompleteQuest", false)
-
+    
     task.wait(0.5)
 
     Settings:Set("shouldStopFarm", false)
@@ -151,22 +150,18 @@ function ATLA:CompleteQuest(quest, exceptionPass)
 
         task.wait(self.GetDelay())
 
-        while not hasChanged and not Settings:Get("shouldStopFarm") do
-            task.wait(self.GetDelay() / 2)
+        for step = 1, #Quests[quest].Steps + 1 do 
+            coroutine.resume(coroutine.create(function()
+                if (npc.PrimaryPart.CFrame.p - humanoidRootPart.CFrame.p).Magnitude < 15 then
+                    gameFunction:InvokeServer("AdvanceStep", {
+                        QuestName = quest,
+                        Step = step
+                    })
+                end
+            end))
+        end 
 
-            for step = 1, #Quests[quest].Steps + 1 do 
-                coroutine.resume(coroutine.create(function()
-                    if (npc.PrimaryPart.CFrame.p - humanoidRootPart.CFrame.p).Magnitude < 15 then
-                        gameFunction:InvokeServer("AdvanceStep", {
-                            QuestName = quest,
-                            Step = step
-                        })
-                    end
-                end))
-            end 
-        end
-
-        task.wait(4.9 - self.GetDelay())
+        task.wait(5)
 
         moneyPropertyChanged:DisconnectAll()
 
