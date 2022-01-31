@@ -112,7 +112,7 @@ do -- AutoFarm
                 local lastQuest = ATLA:GetLastQuest()
                 local minimumXP = minimumXpSlider:GetValue()
                 
-                if autofarmCheckBox:IsToggled() and not Settings:Get("shouldStopFarm") and not Settings:Get("canCompleteQuest") and typeof(questData) == "table" and quest ~= lastQuest and questData.Rewards.Experience >= minimumXP then
+                if autofarmCheckBox:IsToggled() and not Settings:Get("shouldStopFarm") and typeof(questData) == "table" and quest ~= lastQuest and questData.Rewards.Experience >= minimumXP then
                     local icon = nameTag.Icon.Image
 
                     quest = minimumXP < 2000 and quest
@@ -398,7 +398,7 @@ do
 
             subChangerCheckBox:SetToggle(false)
         end
-
+        
         local oldGameModule = ATLA.GetGameModule()
 
         repeat task.wait() until ATLA.GetGameModule() ~= oldGameModule
