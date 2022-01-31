@@ -8,6 +8,8 @@ end)
 
 local Players = game:GetService("Players")
 
+local CurrentCamera = workspace.CurrentCamera
+
 local LocalPlayer = Players.LocalPlayer
 local Character = LocalPlayer.Character or LocalPlayer.PlayerAdded:wait()
 
@@ -17,38 +19,60 @@ local head = Character:WaitForChild("Head")
 do -- Loading
     local count = 1
 
-    local loadingText = Drawing.new("Text")
-    loadingText.Visible = true
-    loadingText.Size = 32
-    loadingText.ZIndex = 2
-    loadingText.Position = Vector2.new(4, 4)
-
     local loadingSquare = Drawing.new("Square")
     loadingSquare.Visible = true
     loadingSquare.Filled = true
     loadingSquare.Color = Color3.fromRGB(25, 25, 25)
-    loadingSquare.Size = loadingText.TextBounds + Vector2.new(3, 0)
+    loadingSquare.Size = Vector2.new(CurrentCamera.ViewportSize.X / 5, CurrentCamera.ViewportSize.Y / 4)
     loadingSquare.ZIndex = 1
-    loadingSquare.Position = loadingText.Position
+    loadingSquare.Position = Vector2.new(0.5 * CurrentCamera.ViewportSize.X - loadingSquare.Size.X / 2, 0.5 * CurrentCamera.ViewportSize.Y - loadingSquare.Size.Y / 2)
+
+    local brandText = Drawing.new("Text")
+    brandText.Visible = true
+    brandText.Size = 32
+    brandText.ZIndex = 2
+    brandText.Color = Color3.fromRGB(255, 255, 255)
+    brandText.Text = "SLite"
+    brandText.Position = loadingSquare.Position + Vector2.new(loadingSquare.Size.X / 2 - brandText.TextBounds.X / 2, 0)
+
+    local loadingText = Drawing.new("Text")
+    loadingText.Visible = true
+    loadingText.Size = 32
+    loadingText.ZIndex = 2
+    loadingText.Color = Color3.fromRGB(255, 0, 0)
+    loadingText.Text = "Waiting for modules."
+    loadingText.Position = loadingSquare.Position + Vector2.new(loadingSquare.Size.X / 2 - loadingText.TextBounds.X / 2, loadingSquare.Size.Y - 32)
+
+    local loadingImage = Drawing.new("Image")
+    loadingImage.Data = game:HttpGet("https://i.ibb.co/4RLhfFx/605705a9df9070fb407eb909a5e09d28.webp")
+    loadingImage.Rounding = 4
+    loadingImage.Size = Vector2.new(loadingSquare.Size.X / 2, loadingSquare.Size.Y / 1.5)
+    loadingImage.Position = loadingSquare.Position + loadingSquare.Size / 2 - loadingImage.Size / 2
+    loadingImage.ZIndex = 2
+    loadingImage.Visible = true
 
     while not (ATLA and LocalPlayer:FindFirstChild("PlayerData")) and task.wait(0.25) do
         loadingText.Color = Color3.fromRGB(255, 0, 0)
         loadingText.Text = ((not LocalPlayer:FindFirstChild("PlayerData") and "Waiting for modules") or (not ATLA and "Waiting for SLite module") or "") .. string.rep(".", count) 
 
-        loadingSquare.Size = loadingText.TextBounds + Vector2.new(3, 0)
+        loadingSquare.Position = Vector2.new(0.5 * CurrentCamera.ViewportSize.X - loadingSquare.Size.X / 2, 0.5 * CurrentCamera.ViewportSize.Y - loadingSquare.Size.Y / 2)
+        brandText.Position = loadingSquare.Position + Vector2.new(loadingSquare.Size.X / 2 - brandText.TextBounds.X / 2, 0)
+        loadingText.Position = loadingSquare.Position + Vector2.new(loadingSquare.Size.X / 2 - loadingText.TextBounds.X / 2, loadingSquare.Size.Y - 32)
+        loadingImage.Position = loadingSquare.Position + loadingSquare.Size / 2 - loadingImage.Size / 2
 
         count = count < 3 and count + 1 or 1
     end
 
     loadingText.Color = Color3.fromRGB(0, 255, 0)
-    loadingText.Text = "SLite loaded \nversion " .. ATLA.version .. "."
-
-    loadingSquare.Size = loadingText.TextBounds + Vector2.new(3, 0)
-
+    loadingText.Text = "Loaded version " .. ATLA.version .. "."
+    loadingText.Position = loadingSquare.Position + Vector2.new(loadingSquare.Size.X / 2 - loadingText.TextBounds.X / 2, loadingSquare.Size.Y - 32)
+    
     task.wait(0.5)
 
-    loadingText:Remove()
     loadingSquare:Remove()
+    brandText:Remove()
+    loadingText:Remove()
+    loadingImage:Remove()
 end
 
 local nameTag = head:WaitForChild("Nametag")
@@ -66,6 +90,7 @@ local miscText = UI:new("Text", "Misc")
 
 local autofarmCategory = autofarmCheckBox:CreateCategory()
 local minimumXpSlider = autofarmCategory:new("Slider", "Minimum XP", 0, 0, 3000, 100)
+local extraDelaySlider = autofarmCategory:new("Slider", "Extra Delay", 0, 0, 100, 1, "%")
 
 local subChangerCategory = subChangerCheckBox:CreateCategory()
 local elementSelector = subChangerCategory:new("ListSelector", {"Air", "Water", "Fire", "Earth"})
@@ -125,6 +150,10 @@ do -- AutoFarm
         end
         
         ATLA:StopQuest()
+    end)
+
+    extraDelaySlider:OnChanged(function()
+        Settings:Set("delayPercentage", extraDelaySlider:GetValue() / 100)
     end)
 end
 
