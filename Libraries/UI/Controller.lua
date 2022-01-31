@@ -17,7 +17,7 @@ local SubCategories do
 	function SubCategories:CreateCategory()
 		local _instance = self._instance
 
-		_instance.Text = _instance.Text .. " (+)"
+		_instance.Text =  "[+] " .. _instance.Text
 
 		local Category = setmetatable({
 			_objects = {},
