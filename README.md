@@ -1,5 +1,5 @@
 # How to use
-`loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/main/Stable/main.lua"))()`
+`loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/main/loader.lua"))()`
 # Supported executors
 - Synapse X 
 - Most of them should work but untested
