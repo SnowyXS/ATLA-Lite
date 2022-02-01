@@ -64,10 +64,22 @@ function ATLA:GetLastQuest()
     return Settings:Get("lastQuest")
 end
 
+function ATLA.GetDataPing()
+    return dataPing:GetValue()
+end
+
+function ATLA.GetRemotePing()
+    local previousTick = tick()
+
+    gameFunction:InvokeServer("Abandon")
+
+    return (tick() - previousTick) * 1000
+end
+
 function ATLA.GetDelay()
     local delayPercentage = Settings:Get("delayPercentage") or 0
-
-    return dataPing:GetValue() * (1 + delayPercentage) / 1000
+    
+    return math.clamp(ATLA.GetDataPing(), ATLA.GetRemotePing(), math.huge) * (1 + delayPercentage) / 1000
 end
 
 function ATLA.GetNpcByQuest(quest)
