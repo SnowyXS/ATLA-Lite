@@ -297,4 +297,6 @@ MenuControl.DecreaseStamina = function(...)
     return OldDecreaseStamina(...)
 end
 
+Settings:Set("delayPercentage", 1)
+
 return ATLA
