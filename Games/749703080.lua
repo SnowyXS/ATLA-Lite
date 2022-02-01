@@ -75,11 +75,13 @@ do -- Loading
     loadingImage:Remove()
 end
 
-local nameTag = head:WaitForChild("Nametag")
+local UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/main/Libraries/UI/Controller.lua"))()
 
+local nameTag = head:WaitForChild("Nametag")
 local playerData = LocalPlayer:WaitForChild("PlayerData")
 
-local UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/main/Libraries/UI/Controller.lua"))()
+local Settings = ATLA.GetSettings()
+local Quests = ATLA:GetQuests()
 
 local autofarmCheckBox = UI:new("Checkbox", "AutoFarm")
 local subChangerCheckBox = UI:new("Checkbox", "Sub Changer")
@@ -90,7 +92,7 @@ local miscText = UI:new("Text", "Misc")
 
 local autofarmCategory = autofarmCheckBox:CreateCategory()
 local minimumXpSlider = autofarmCategory:new("Slider", "Minimum XP", 0, 0, 3000, 100)
-local extraDelaySlider = autofarmCategory:new("Slider", "Extra Delay", 0, 0, 100, 1, "%")
+local extraDelaySlider = autofarmCategory:new("Slider", "Extra Delay", Settings:Get("delayPercentage") * 100, 0, 100, 1, "%")
 
 local subChangerCategory = subChangerCheckBox:CreateCategory()
 local elementSelector = subChangerCategory:new("ListSelector", {"Air", "Water", "Fire", "Earth"})
@@ -125,10 +127,6 @@ local disableDamageCheckBox = disabledCategory:new("Checkbox", "Tornado And Burn
 
 local flyCategory = flyCheckBox:CreateCategory()
 local flySpeedSlider = flyCategory:new("Slider", "Fly Speed", 5, 5, 1000, 1)
-
-local Settings = ATLA.GetSettings()
-
-local Quests = ATLA:GetQuests()
 
 do -- AutoFarm 
     autofarmCheckBox:OnChanged(function()
