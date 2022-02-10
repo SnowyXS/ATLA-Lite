@@ -92,7 +92,7 @@ local miscText = UI:new("Text", "Misc")
 
 local autofarmCategory = autofarmCheckBox:CreateCategory()
 local minimumXpSlider = autofarmCategory:new("Slider", "Minimum XP", 0, 0, 3000, 100)
-local extraDelaySlider = autofarmCategory:new("Slider", "Extra Delay", Settings:Get("delayPercentage") * 100, 0, 100, 1, "%")
+local extraDelaySlider = autofarmCategory:new("Slider", "Extra Delay", Settings:Get("delayPercentage") * 100, 0, 200, 1, "%")
 
 local subChangerCategory = subChangerCheckBox:CreateCategory()
 local elementSelector = subChangerCategory:new("ListSelector", {"Air", "Water", "Fire", "Earth"})
@@ -132,16 +132,16 @@ do -- AutoFarm
     autofarmCheckBox:OnChanged(function()
         while autofarmCheckBox:IsToggled() and task.wait() do
             for quest, questData in pairs(Quests) do
+                local icon = nameTag:WaitForChild("Icon").Image
                 local lastQuest = ATLA:GetLastQuest()
                 local minimumXP = minimumXpSlider:GetValue()
-                
-                if autofarmCheckBox:IsToggled() and not Settings:Get("shouldStopFarm") and typeof(questData) == "table" and quest ~= lastQuest and questData.Rewards.Experience >= minimumXP then
-                    local icon = nameTag.Icon.Image
 
-                    quest = minimumXP < 2000 and quest
-                            or (icon == "" or icon == "rbxassetid://869158044") and "WhiteLotus1"
-                            or icon == "rbxassetid://87177558" and "RedLotus1"
-                    
+                quest = typeof(questData) == "table" and (minimumXP < 2000 and quest ~= lastQuest and questData.Rewards.Experience >= minimumXP and quest
+                        or (quest == "WhiteLotus1" or quest == "RedLotus1" and (icon == "" or icon == "rbxassetid://869158044") and "WhiteLotus1" 
+                        or icon == "rbxassetid://87177558" and "RedLotus1"))
+                        or nil
+
+                if quest and autofarmCheckBox:IsToggled() then
                     ATLA:CompleteQuest(quest)
                 end
             end
