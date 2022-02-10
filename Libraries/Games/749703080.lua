@@ -41,7 +41,7 @@ local NpcList = debug.getupvalue(RefreshNPCs, 3)
 local NpcModel = MenuControl.QuestNPCs
 
 local ATLA = {
-    version = "v1.085"
+    version = "v1.08"
 }
 
 function ATLA.GetGameModule()
@@ -78,7 +78,7 @@ end
 
 function ATLA.GetDelay()
     local delayPercentage = Settings:Get("delayPercentage") or 0
-    
+
     return math.clamp(ATLA.GetDataPing(), ATLA.GetRemotePing(), math.huge) * (1 + delayPercentage) / 1000
 end
 
@@ -101,6 +101,8 @@ function ATLA:LockToNPC(npc)
             task.wait() 
         end
     end)
+
+    humanoidRootPart.CFrame = npc.PrimaryPart.CFrame
 
     return coroutine.resume(teleportCoroutine)
 end
@@ -166,7 +168,7 @@ function ATLA:CompleteQuest(quest, exceptionPass)
 
         for step = 1, #Quests[quest].Steps + 1 do 
             coroutine.resume(coroutine.create(function()
-                if (npc.PrimaryPart.CFrame.p - humanoidRootPart.CFrame.p).Magnitude < 15 then
+                if menuStatus == 2 and (npc.PrimaryPart.CFrame.p - humanoidRootPart.CFrame.p).Magnitude < 15 then
                     gameFunction:InvokeServer("AdvanceStep", {
                         QuestName = quest,
                         Step = step
