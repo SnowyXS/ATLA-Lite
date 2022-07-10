@@ -3,7 +3,7 @@ assert(not libLoaded, "SLite was already loaded.")
 local ATLA
 
 task.spawn(function()
-    ATLA = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/main/Libraries/Games/749703080.lua"))()
+    ATLA = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/main/Libraries/Games/596894229.lua"))()
 end)
 
 local Players = game:GetService("Players")
