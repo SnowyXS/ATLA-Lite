@@ -91,7 +91,7 @@ local playersText = UI:new("Text", "Players")
 local miscText = UI:new("Text", "Misc")
 
 local autofarmCategory = autofarmCheckBox:CreateCategory()
-local minimumXpSlider = autofarmCategory:new("Slider", "Minimum XP", 0, 0, 3000, 100)
+local minimumXpSlider = autofarmCategory:new("Slider", "Minimum XP", 0, 0, 1600, 100)
 local extraDelaySlider = autofarmCategory:new("Slider", "Extra Delay", Settings:Get("delayPercentage") * 100, 0, 200, 1, "%")
 
 local subChangerCategory = subChangerCheckBox:CreateCategory()
@@ -136,10 +136,7 @@ do -- AutoFarm
                 local lastQuest = ATLA:GetLastQuest()
                 local minimumXP = minimumXpSlider:GetValue()
 
-                quest = typeof(questData) == "table" and (minimumXP < 2000 and quest ~= lastQuest and questData.Rewards.Experience >= minimumXP and quest
-                        or (quest == "WhiteLotus1" or quest == "RedLotus1" and (icon == "" or icon == "rbxassetid://869158044") and "WhiteLotus1" 
-                        or icon == "rbxassetid://87177558" and "RedLotus1"))
-                        or nil
+                quest = typeof(questData) == "table" and (minimumXP < 2000 and quest ~= lastQuest and questData.Rewards.Experience >= minimumXP and quest) or nil
 
                 if quest and autofarmCheckBox:IsToggled() then
                     ATLA:CompleteQuest(quest)
