@@ -79,7 +79,7 @@ end
 function ATLA.GetDelay()
     local delayPercentage = Settings:Get("delayPercentage") or 0
 
-    return math.clamp(ATLA.GetDataPing(), ATLA.GetRemotePing(), math.huge) * (1 + delayPercentage) / 1000
+    return math.clamp(ATLA.GetDataPing(), ATLA.GetRemotePing(), math.huge) * 2 * (1 + delayPercentage) / 1000
 end
 
 function ATLA.GetNpcByQuest(quest)
