@@ -45,7 +45,7 @@ do -- Loading
     loadingText.Color = Color3.fromRGB(255, 0, 0)
     loadingText.Text = "Waiting for modules."
     loadingText.Position = loadingSquare.Position + Vector2.new(loadingSquare.Size.X / 2 - loadingText.TextBounds.X / 2, loadingSquare.Size.Y - 32)
-
+    --[[
     local loadingImage = Drawing.new("Image")
     loadingImage.Data = success and image or ""
     loadingImage.Rounding = 4
@@ -53,7 +53,7 @@ do -- Loading
     loadingImage.Position = loadingSquare.Position + loadingSquare.Size / 2 - loadingImage.Size / 2
     loadingImage.ZIndex = 2
     loadingImage.Visible = true
-
+    ]]
     while not (ATLA and LocalPlayer:FindFirstChild("PlayerData")) and task.wait(0.25) do
         loadingText.Color = Color3.fromRGB(255, 0, 0)
         loadingText.Text = ((not LocalPlayer:FindFirstChild("PlayerData") and "Waiting for modules") or (not ATLA and "Waiting for SLite module") or "") .. string.rep(".", count) 
@@ -61,7 +61,7 @@ do -- Loading
         loadingSquare.Position = Vector2.new(0.5 * CurrentCamera.ViewportSize.X - loadingSquare.Size.X / 2, 0.5 * CurrentCamera.ViewportSize.Y - loadingSquare.Size.Y / 2)
         brandText.Position = loadingSquare.Position + Vector2.new(loadingSquare.Size.X / 2 - brandText.TextBounds.X / 2, 0)
         loadingText.Position = loadingSquare.Position + Vector2.new(loadingSquare.Size.X / 2 - loadingText.TextBounds.X / 2, loadingSquare.Size.Y - 32)
-        loadingImage.Position = loadingSquare.Position + loadingSquare.Size / 2 - loadingImage.Size / 2
+        --loadingImage.Position = loadingSquare.Position + loadingSquare.Size / 2 - loadingImage.Size / 2
 
         count = count < 3 and count + 1 or 1
     end
@@ -75,7 +75,7 @@ do -- Loading
     loadingSquare:Remove()
     brandText:Remove()
     loadingText:Remove()
-    loadingImage:Remove()
+    --loadingImage:Remove()
 end
 
 local UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/main/Libraries/UI/Controller.lua"))()
