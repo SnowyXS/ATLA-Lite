@@ -18,7 +18,10 @@ local head = Character:WaitForChild("Head")
 
 do -- Loading
     local count = 1
-
+    local success, image = pcall(function()
+        return game:HttpGet("https://i.ibb.co/4RLhfFx/605705a9df9070fb407eb909a5e09d28.webp") 
+    end)
+    
     local loadingSquare = Drawing.new("Square")
     loadingSquare.Visible = true
     loadingSquare.Filled = true
@@ -44,7 +47,7 @@ do -- Loading
     loadingText.Position = loadingSquare.Position + Vector2.new(loadingSquare.Size.X / 2 - loadingText.TextBounds.X / 2, loadingSquare.Size.Y - 32)
 
     local loadingImage = Drawing.new("Image")
-    loadingImage.Data = game:HttpGet("https://i.ibb.co/4RLhfFx/605705a9df9070fb407eb909a5e09d28.webp")
+    loadingImage.Data = success and image or ""
     loadingImage.Rounding = 4
     loadingImage.Size = Vector2.new(loadingSquare.Size.X / 2, loadingSquare.Size.Y / 1.5)
     loadingImage.Position = loadingSquare.Position + loadingSquare.Size / 2 - loadingImage.Size / 2
