@@ -13,3 +13,6 @@
 - Backspace: Will close the sub category
 # Discord Server
 https://discord.com/invite/n2egDfZwgJ
+# Credits
+- Snowy (Game scripts)
+- Inori (Linoria UI Lib)
