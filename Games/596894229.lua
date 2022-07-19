@@ -247,8 +247,8 @@ do -- AutoFarm
                 end)
         
                 LockToNPC(npc)
-        
-                task.wait(riskyModeToggle.Value and dataPing:GetValue() / 1000 * 1.25 or dataPing:GetValue() / 1000 * 5)
+
+                task.wait(riskyModeToggle.Value and dataPing:GetValue() / 1000 * 1.25 or math.clamp(dataPing:GetValue() / 1000 * 10, 1, math.huge))
 
                 repeat
                     for step = 1, #Quests[quest].Steps + 1 do 
@@ -261,7 +261,7 @@ do -- AutoFarm
                             end
                         end))
                     end 
-                until task.wait(dataPing:GetValue() / 1000) and hasChanged or not autoFarmToggle.Value
+                until task.wait() and hasChanged or not autoFarmToggle.Value
 
                 moneyPropertyChanged:DisconnectAll()
         
