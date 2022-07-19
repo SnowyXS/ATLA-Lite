@@ -26,8 +26,6 @@ if success then
     SaveManager:SetFolder("SLite/" .. placeID)
 end
 
-Library.Toggle()
-
 local settingsTab = Window:AddTab("Settings")
 local menuGroup = settingsTab:AddLeftGroupbox("Menu")
 
@@ -49,3 +47,5 @@ ThemeManager:SetFolder("SLite")
 SaveManager:BuildConfigSection(settingsTab) 
 
 ThemeManager:ApplyToTab(settingsTab)
+
+Library.Toggle()
