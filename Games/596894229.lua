@@ -287,7 +287,7 @@ do -- Sub changer
         Default = 1, 
         Multi = false,
         
-        Text = "Quests",
+        Text = "Element",
         Tooltip = "Select element.",
     })
 
@@ -296,7 +296,7 @@ do -- Sub changer
         Default = 1,
         Multi = false,
         
-        Text = "Quests",
+        Text = "Special",
         Tooltip = "Select special element",
     })
 
@@ -305,7 +305,7 @@ do -- Sub changer
         Default = 1,
         Multi = false,
         
-        Text = "Quests",
+        Text = "Second Special",
         Tooltip = "Select second special element.",
     })
 
