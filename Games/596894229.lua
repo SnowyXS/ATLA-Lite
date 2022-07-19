@@ -123,9 +123,9 @@ return function(Window)
     local secondSpecialElements = {
         Ice = {"None", "Healing"},
         Plant = {"None", "Healing"},
-        Lava = {"None", "Lava Seismic"},
-        Metal = {"None", "Metal Seismic"},
-        Sand = {"None", "Sand Seismic"},
+        Lava = {"None", "Seismic Sense"},
+        Metal = {"None", "Seismic Sense"},
+        Sand = {"None", "Seismic Sense"},
     }
 
     local atlaTab = Window:AddTab("Elemental Adventure")
@@ -529,8 +529,19 @@ return function(Window)
         
             playersDropDown.Values = players
             playersDropDown:SetValues()
+        end)
+
+        Players.PlayerRemoving:Connect(function(player)
+            players = {}
+
+            for _, v in pairs(Players:GetPlayers()) do
+                table.insert(players, v.Name)
+            end
+        
+            playersDropDown.Values = players
+            playersDropDown:SetValues()
             
-            if not table.find(players, player) then
+            if playersDropDown.Value == player.Name then
                 playersDropDown:SetValue(players[1])
             end 
         end)
