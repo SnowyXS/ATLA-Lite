@@ -1,6 +1,7 @@
 return function (Window)
     local Players = game:GetService("Players")
-
+	local ReplicatedStorage = game:GetService("ReplicatedStorage")
+	
     local ModuleLoader = require(ReplicatedStorage.LoadModule)
 	
 	local Network = ModuleLoader("Network")
