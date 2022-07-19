@@ -156,13 +156,10 @@ return function(Window)
         })
 
         local function LockToNPC(npc)
-            local isContinuable = playerData.PlayerSettings.Continuable.Value
-            local menuStatus = getupvalue(MenuControl.SpawnCharacter, 2)
-        
             local teleportCoroutine = coroutine.create(function()
-                while autoFarmToggle.Value and canCompleteQuest and not MenuControl.Transitioning and isContinuable and menuStatus == 2 and humanoidRootPart do
+                while autoFarmToggle.Value and canCompleteQuest and (getupvalue(MenuControl.SpawnCharacter, 2) == 2 or getupvalue(MenuControl.SpawnCharacter, 2) == 1) and humanoidRootPart do
                     humanoidRootPart.CFrame = npc.PrimaryPart.CFrame * CFrame.new(0,-8.25,0) * CFrame.Angles(math.rad(90), 0, 0)
-        
+
                     task.wait() 
                 end
             end)
@@ -177,21 +174,6 @@ return function(Window)
                 if table.find(v, quest) then
                     return NpcModel:FindFirstChild(NPCName)
                 end
-            end
-        end
-
-        local function SpawnCharacter()
-            local isContinuable = playerData.PlayerSettings.Continuable.Value
-            local menuStatus = getupvalue(MenuControl.SpawnCharacter, 2)
-        
-            if isContinuable and menuStatus < 2 then
-                MenuControl.MainFrame:TweenPosition(UDim2.new(0.5, -150, 1.5, -150), "Out", "Quad", 1, true)
-                MenuControl.SpawnFrame:TweenPosition(UDim2.new(2, -10, 1, -10), "Out", "Quad", 2, true)
-        
-                MenuControl.MainFrame.Visible = false
-                MenuControl.SpawnFrame.Visible = false
-        
-                MenuControl.SpawnCharacter()
             end
         end
 
@@ -214,15 +196,12 @@ return function(Window)
                 local npc = GetNpcByQuest(quest)
             
                 local isContinuable, isTransitioning = playerData.PlayerSettings.Continuable.Value, MenuControl.Transitioning
-                local menuStatus = getupvalue(MenuControl.SpawnCharacter, 2)
-            
-                SpawnCharacter()
-            
+
                 canCompleteQuest =  npc and humanoid.Health > 0 
                                     and humanoid.WalkSpeed > 0
                                     and not Character:FindFirstChild("Down") 
                                     and not (humanoidRootPart:FindFirstChild("DownTimer") and humanoidRootPart.DownTimer.TextLabel.Text ~= "") 
-                                    and menuStatus == 2 
+                                    and getupvalue(MenuControl.SpawnCharacter, 2) == 2 
                                     and isContinuable
                                     and not isTransitioning
                                     and not canCompleteQuest
@@ -242,11 +221,11 @@ return function(Window)
                     LockToNPC(npc)
 
                     task.wait(riskyModeToggle.Value and dataPing:GetValue() / 1000 * 1.25 or math.clamp(dataPing:GetValue() / 1000 * 10, 1, math.huge))
-
-                    repeat
+                    
+                    while not hasChanged and humanoid.Health > 0 and autoFarmToggle.Value do
                         for step = 1, #Quests[quest].Steps + 1 do 
                             coroutine.resume(coroutine.create(function()
-                                if autoFarmToggle.Value and menuStatus == 2 and (npc.PrimaryPart.CFrame.p - humanoidRootPart.CFrame.p).Magnitude < 15 then
+                                if autoFarmToggle.Value and getupvalue(MenuControl.SpawnCharacter, 2) == 2 and (npc.PrimaryPart.CFrame.p - humanoidRootPart.CFrame.p).Magnitude < 15 and humanoid.Health > 0 then
                                     gameFunction:InvokeServer("AdvanceStep", {
                                         QuestName = quest,
                                         Step = step
@@ -254,7 +233,9 @@ return function(Window)
                                 end
                             end))
                         end 
-                    until task.wait() and hasChanged or not autoFarmToggle.Value
+
+                        task.wait()
+                    end
 
                     moneyPropertyChanged:DisconnectAll()
             
@@ -636,5 +617,20 @@ return function(Window)
 
             return OldFunc(...)
         end)
+
+        if Toggles.AutoFarmToggle.Value then
+            local continueable = playerData.PlayerSettings.Continuable.Value
+            local menuStatus = getupvalue(MenuControl.SpawnCharacter, 2)
+        
+            if continueable and menuStatus < 2 then
+                MenuControl.MainFrame:TweenPosition(UDim2.new(0.5, -150, 1.5, -150), "Out", "Quad", 1, true)
+                MenuControl.SpawnFrame:TweenPosition(UDim2.new(2, -10, 1, -10), "Out", "Quad", 2, true)
+        
+                MenuControl.MainFrame.Visible = false
+                MenuControl.SpawnFrame.Visible = false
+                
+                MenuControl.SpawnCharacter()  
+            end
+        end
     end)
 end
