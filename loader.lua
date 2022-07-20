@@ -19,10 +19,6 @@ local Window = Library:CreateWindow({
     AutoShow = false,
 })
 
-do -- Aimbot
-
-end
-
 local success, script = pcall(function()
     return game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/main/Games/" .. placeID .. ".lua") 
 end)
@@ -37,6 +33,9 @@ if success then
     SaveManager:SetFolder("SLite/" .. placeID)
 end
 
+do -- Aimbot (WIP)
+
+end
 
 do -- esp
     local espTab = Window:AddTab("Esp")
