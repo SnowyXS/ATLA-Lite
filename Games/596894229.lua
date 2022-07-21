@@ -123,9 +123,9 @@ return function(Window)
     local secondSpecialElements = {
         Ice = {"None", "Healing"},
         Plant = {"None", "Healing"},
-        Lava = {"None", "Seismic Sense"},
-        Metal = {"None", "Seismic Sense"},
-        Sand = {"None", "Seismic Sense"},
+        Lava = {"None", "Vibration Sense"},
+        Metal = {"None", "Vibration Sense"},
+        Sand = {"None", "Vibration Sense"},
     }
 
     local atlaTab = Window:AddTab("Elemental Adventure")
