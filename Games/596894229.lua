@@ -214,7 +214,7 @@ return function(Window)
             
                     LockToNPC(npc)
 
-                    task.wait(math.clamp(dataPing:GetValue() / 1000 * 10, 2, math.huge))
+                    task.wait(math.clamp(dataPing:GetValue() / 1000 * 10, 4, math.huge))
                     
                     while not hasChanged and humanoid.Health > 0 and autoFarmToggle.Value do
                         for step = 1, #Quests[quest].Steps + 1 do 
