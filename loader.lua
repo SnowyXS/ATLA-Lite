@@ -19,6 +19,10 @@ local Window = Library:CreateWindow({
     AutoShow = false,
 })
 
+do -- Aimbot
+
+end
+
 local success, script = pcall(function()
     return game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/main/Games/" .. placeID .. ".lua") 
 end)
@@ -33,9 +37,6 @@ if success then
     SaveManager:SetFolder("SLite/" .. placeID)
 end
 
-do -- Aimbot (WIP)
-
-end
 
 do -- esp
     local espTab = Window:AddTab("Esp")
@@ -135,6 +136,17 @@ do -- esp
         Text = "Team Colors",
         Default = false,
         Tooltip = "Esp color will be taken from the players team.",
+    })
+
+    local textSizeSlider = miscGroup:AddSlider("TextSize", {
+        Text = "Max Text Size",
+
+        Default = 14,
+        Min = 14,
+        Max = 100,
+        Rounding = 1,
+    
+        Compact = false,
     })
 
     local distanceSlider = miscGroup:AddSlider("Distance", {
@@ -267,7 +279,9 @@ do -- esp
                 local rootViewPort, isRendered = CurrentCamera:worldToViewportPoint(foeRootPart.Position)
                 local headViewPort = CurrentCamera:worldToViewportPoint(foeHead.Position + Vector3.new(0, 1, 0))
                 local legViewPort = CurrentCamera:worldToViewportPoint(foeRootPart.Position - Vector3.new(0, 2.5, 0))
-                
+
+                local textSize = math.clamp(CurrentCamera.ViewportSize.X / rootViewPort.Z, 0, textSizeSlider.Value)
+
                 local filter = Options.FilterDropDown.Value
                 local filterPlayers = Options.PlayersDropDown:GetActiveValues()
 
@@ -289,13 +303,13 @@ do -- esp
                     box.Size = Vector2.new(CurrentCamera.ViewportSize.X / rootViewPort.Z, headViewPort.Y - legViewPort.Y)
                     box.Position = Vector2.new(rootViewPort.X - box.Size.X / 2, (rootViewPort.Y - box.Size.Y / 2) + 2)
 
-                    playerName.Size = math.clamp(CurrentCamera.ViewportSize.X / rootViewPort.Z, 0, 14)
+                    playerName.Size = textSize
 
                     playerName.Position =
                         box.Position
                         + Vector2.new(
-                            (box.Size.X - playerName.Size + playerName.TextBounds.Y) / 2, 
-                            (box.Size.Y - playerName.Size + playerName.TextBounds.Y / 2) - playerName.Size / 2)
+                            (box.Size.X - textSize + playerName.TextBounds.Y) / 2, 
+                            (box.Size.Y - textSize + playerName.TextBounds.Y / 2) - textSize / 2)
                         
                     healthBar.Position = box.Position - Vector2.new(3, 0)
                     healthBar.Size = Vector2.new(2, (headViewPort.Y - legViewPort.Y) / (maxHealth / math.clamp(health, 0, maxHealth)))
@@ -304,13 +318,13 @@ do -- esp
                         if placeID == 596894229 then
                             local level = self._level
 
-                            level.Size = math.clamp(CurrentCamera.ViewportSize.X / rootViewPort.Z, 0, 14)
+                            level.Size = textSize
 
                             level.Position =
                                 box.Position
                                 + Vector2.new(
-                                    (box.Size.X + level.TextBounds.Y / 2 - level.Size / 2 + 2), 
-                                    (box.Size.Y - level.Size + level.TextBounds.Y / 1.5))
+                                    (box.Size.X + level.TextBounds.Y / 2 - textSize / 2 + 2), 
+                                    (box.Size.Y - textSize + level.TextBounds.Y / 1.5))
 
                             level.Color = Options.levelColor.Value
 
