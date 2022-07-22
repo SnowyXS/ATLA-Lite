@@ -201,38 +201,23 @@ return function(Window)
                                     and not canCompleteQuest
             
                 if canCompleteQuest then
-                    local hasChanged = false
-                    local moneyPropertyChanged = PropertyChanged.new(playerData.Stats.Money1,               
-                                                                    playerData.Stats.Money2,         
-                                                                    playerData.Stats.Money3, 
-                                                                    playerData.Stats.Money4,
-                                                                    playerData.Stats.Money5)
-            
-                    moneyPropertyChanged:ConnectAll(function()
-                        hasChanged = true
-                    end)
-            
                     LockToNPC(npc)
 
-                    task.wait(math.clamp(dataPing:GetValue() / 1000 * 10, 5, math.huge))
-                    
-                    while not hasChanged and humanoid.Health > 0 and autoFarmToggle.Value do
-                        for step = 1, #Quests[quest].Steps + 1 do 
+                    task.wait(math.clamp(dataPing:GetValue() / 1000, 5, math.huge))
+
+                    for step = 1, #Quests[quest].Steps + 1 do 
+                        if autoFarmToggle.Value and (npc.PrimaryPart.CFrame.p - humanoidRootPart.CFrame.p).Magnitude < 15 and humanoid.Health > 0 then
                             coroutine.resume(coroutine.create(function()
-                                if autoFarmToggle.Value and getupvalue(MenuControl.SpawnCharacter, 2) == 2 and (npc.PrimaryPart.CFrame.p - humanoidRootPart.CFrame.p).Magnitude < 15 and humanoid.Health > 0 then
-                                    gameFunction:InvokeServer("AdvanceStep", {
-                                        QuestName = quest,
-                                        Step = step
-                                    })
-                                end
+                                gameFunction:InvokeServer("AdvanceStep", {
+                                    QuestName = quest,
+                                    Step = step
+                                })
                             end))
-                        end 
+                        end
+                    end 
 
-                        task.wait()
-                    end
-
-                    moneyPropertyChanged:DisconnectAll()
-            
+                    task.wait()
+                    
                     canCompleteQuest = false
                 end
             end
