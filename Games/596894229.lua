@@ -203,7 +203,7 @@ return function(Window)
                 if canCompleteQuest then
                     LockToNPC(npc)
 
-                    task.wait(math.clamp(dataPing:GetValue() / 1000, 5, math.huge))
+                    task.wait(math.clamp(dataPing:GetValue() / 1000, 5.1, math.huge))
 
                     for step = 1, #Quests[quest].Steps + 1 do 
                         if autoFarmToggle.Value and (npc.PrimaryPart.CFrame.p - humanoidRootPart.CFrame.p).Magnitude < 15 and humanoid.Health > 0 then
