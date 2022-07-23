@@ -189,13 +189,15 @@ return function(Window)
                 local quest = GetQuest()
                 local npc = GetNpcByQuest(quest)
             
-                local isContinuable, isTransitioning = playerData.PlayerSettings.Continuable.Value, MenuControl.Transitioning
+                local isContinuable, isTransitioning = playerData.PlayerSettings.Continuable.Value
+                local isTransitioning = MenuControl.Transitioning
+                local menuStatus = getupvalue(MenuControl.SpawnCharacter, 2)
 
                 canCompleteQuest =  npc and humanoid.Health > 0 
                                     and humanoid.WalkSpeed > 0
                                     and not Character:FindFirstChild("Down") 
                                     and not (humanoidRootPart:FindFirstChild("DownTimer") and humanoidRootPart.DownTimer.TextLabel.Text ~= "") 
-                                    and getupvalue(MenuControl.SpawnCharacter, 2) == 2 
+                                    and menuStatus == 2 
                                     and isContinuable
                                     and not isTransitioning
                                     and not canCompleteQuest
@@ -206,7 +208,7 @@ return function(Window)
                     task.wait(math.clamp(dataPing:GetValue() / 1000, 5.1, math.huge))
 
                     for step = 1, #Quests[quest].Steps + 1 do 
-                        if autoFarmToggle.Value and (npc.PrimaryPart.CFrame.p - humanoidRootPart.CFrame.p).Magnitude < 15 and humanoid.Health > 0 then
+                        if autoFarmToggle.Value and (npc.PrimaryPart.CFrame.p - humanoidRootPart.CFrame.p).Magnitude < 15 and humanoid.Health > 0 and humanoid.WalkSpeed > 0 then
                             coroutine.resume(coroutine.create(function()
                                 gameFunction:InvokeServer("AdvanceStep", {
                                     QuestName = quest,
