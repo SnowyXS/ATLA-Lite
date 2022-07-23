@@ -1,4 +1,3 @@
-
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
@@ -6,20 +5,22 @@ local LocalPlayer = Players.LocalPlayer
 local character = LocalPlayer.Character
 local rootPart = character.PrimaryPart
 
+local CurrentCamera = workspace.CurrentCamera
+
 getgenv().PlayerEsp = {
     _players = {},
 }
-
 PlayerEsp.__index = PlayerEsp
 
 function PlayerEsp.new(player)
     local objects = {}
 
     local self = setmetatable({
-        _objects = objects
+        _objects = objects,
     }, PlayerEsp)
+    self.__index = self
 
-    local expection = self._expection
+    local Expection = self._expection.new(self)
 
     local box = Drawing.new("Square")
     box.Color = Options.BoxColor.Value
@@ -38,13 +39,29 @@ function PlayerEsp.new(player)
     healthBar.Thickness = 1
 
     local chams = Instance.new("Highlight", player.Character)
-    chams.Enabled = false
+    chams.Enabled = Toggles.ChamsCheckBox.Value
+    chams.FillColor = Options.ChamsColor.Value
+    chams.OutlineColor = Options.ChamsOutLineColor.Value
+    chams.FillTransparency = Options.ChamsTransparency.Value / 100
+    chams.OutlineTransparency = Options.ChamsOutLineTransparency.Value / 100
 
-    if expection then
-        expection:Build()
+    if Expection then
+        Expection._player = player
+        Expection._character = player.Character
+
+        Expection:Build()
     end
     
     local function OnCharacterAdded(character)
+        local chams = Instance.new("Highlight", character)
+        chams.Enabled = Toggles.ChamsCheckBox.Value
+        chams.FillColor = Options.ChamsColor.Value
+        chams.OutlineColor = Options.ChamsOutLineColor.Value
+        chams.FillTransparency = Options.ChamsTransparency.Value / 100
+        chams.OutlineTransparency = Options.ChamsOutLineTransparency.Value / 100
+
+        objects._chams = chams
+
         self._character = character
     end
 
@@ -75,7 +92,7 @@ function PlayerEsp:Refresh()
         local maxHealth = targetHumanoid.MaxHealth
             
         local distance = rootPart and (rootPart.CFrame.p - targetRoot.CFrame.p).Magnitude or 0
-        local renderDistance = (Options.distanceSlider.Value == 0 or distance < Options.distanceSlider.Value)
+        local renderDistance = (Options.DistanceSlider.Value == 0 or distance < Options.DistanceSlider.Value)
 
         local objects = self._objects
 
@@ -88,7 +105,7 @@ function PlayerEsp:Refresh()
         local headViewPort = CurrentCamera:worldToViewportPoint(targetHead.Position + Vector3.new(0, 1, 0))
         local legViewPort = CurrentCamera:worldToViewportPoint(targetRoot.Position - Vector3.new(0, 2.5, 0))
 
-        local textSize = math.clamp(CurrentCamera.ViewportSize.X / rootViewPort.Z, 0, Options.textSizeSlider.Value)
+        local textSize = math.clamp(CurrentCamera.ViewportSize.X / rootViewPort.Z, 0, Options.TextSizeSlider.Value)
 
         local filter = Options.FilterDropDown.Value
         local filterPlayers = Options.PlayersDropDown:GetActiveValues()
@@ -97,7 +114,7 @@ function PlayerEsp:Refresh()
                         or filter == "Blacklist" and not table.find(filterPlayers, target.Name) and isRendered
                             or filter == "Off" and isRendered
 
-        local expection = self._expection
+        local Expection = self._expection
 
         if isRendered then
             local healthPrecentage = health / maxHealth
@@ -109,25 +126,34 @@ function PlayerEsp:Refresh()
             
             box.Size = Vector2.new(CurrentCamera.ViewportSize.X / rootViewPort.Z, headViewPort.Y - legViewPort.Y)
             box.Position = Vector2.new(rootViewPort.X - box.Size.X / 2, (rootViewPort.Y - box.Size.Y / 2) + 2)
-            box.Color = (Toggles.teamColorsCheckBox.Value and target.TeamColor.Color) or Options.BoxColor.Value
-
+            box.Color = (Toggles.TeamColorsCheckBox.Value and target.TeamColor.Color) or Options.BoxColor.Value
 
             playerName.Size = textSize
             playerName.Position = box.Position + Vector2.new((box.Size.X - textSize + playerName.TextBounds.Y) / 2, (box.Size.Y - textSize + playerName.TextBounds.Y / 2) - textSize / 2)
        
-            playerName.Color = (Toggles.teamColorsCheckBox.Value and target.TeamColor.Color) or Options.NameColor.Value
+            playerName.Color = (Toggles.TeamColorsCheckBox.Value and target.TeamColor.Color) or Options.NameColor.Value
             
             healthBar.Position = box.Position - Vector2.new(3, 0)
             healthBar.Size = Vector2.new(2, (headViewPort.Y - legViewPort.Y) / (maxHealth / math.clamp(health, 0, maxHealth)))
         end
 
-        box.Visible = Toggles.boxCheckBox.Value and isRendered and renderDistance
-        playerName.Visible = Toggles.nameTagCheckBox.Value and isRendered and renderDistance
-        healthBar.Visible = Toggles.healthBarCheckBox.Value and isRendered and renderDistance
-        chams.Visible = Toggles.chamsCheckBox.Value and renderDistance
+        box.Visible = Toggles.BoxCheckBox.Value and isRendered and renderDistance
+        playerName.Visible = Toggles.NameTagCheckBox.Value and isRendered and renderDistance
+        healthBar.Visible = Toggles.HealthBarCheckBox.Value and isRendered and renderDistance
+        chams.Enabled = Toggles.ChamsCheckBox.Value
+        
+        chams.FillColor = Options.ChamsColor.Value
+        chams.OutlineColor = Options.ChamsOutLineColor.Value
 
-        if expection then
-            expection:Refresh()
+        chams.FillTransparency = Options.ChamsTransparency.Value / 100
+        chams.OutlineTransparency = Options.ChamsOutLineTransparency.Value / 100
+
+        if Expection then
+            Expection:Refresh({
+                isRendered = isRendered,
+                textSize = textSize,
+                renderDistance = renderDistance
+            })
         end
     end
 end
@@ -135,11 +161,13 @@ end
 function PlayerEsp:Destroy()
     self._players[self._player] = nil
 
-    self._characterAdded:Disconnect()
+    local objects = self._objects
 
-    self._box:Remove()
-    self._playerName:Remove()
-    self._healthBar:Remove()
+    for _, object in pairs(objects) do
+        object:Remove()
+    end
+
+    self._characterAdded:Disconnect()
 
     setmetatable(self, nil)
     table.clear(self)
