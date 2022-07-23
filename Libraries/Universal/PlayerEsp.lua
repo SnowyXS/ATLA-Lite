@@ -140,7 +140,7 @@ function PlayerEsp:Refresh()
         box.Visible = Toggles.BoxCheckBox.Value and isRendered and renderDistance
         playerName.Visible = Toggles.NameTagCheckBox.Value and isRendered and renderDistance
         healthBar.Visible = Toggles.HealthBarCheckBox.Value and isRendered and renderDistance
-        chams.Enabled = Toggles.ChamsCheckBox.Value
+        chams.Enabled = Toggles.ChamsCheckBox.Value and isRendered and renderDistance
         
         chams.FillColor = Options.ChamsColor.Value
         chams.OutlineColor = Options.ChamsOutLineColor.Value
