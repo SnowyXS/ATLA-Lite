@@ -208,7 +208,7 @@ return function(Window)
                     task.wait(math.clamp(dataPing:GetValue() / 1000, 5.1, math.huge))
 
                     for step = 1, #Quests[quest].Steps + 1 do 
-                        if autoFarmToggle.Value and (npc.PrimaryPart.CFrame.p - humanoidRootPart.CFrame.p).Magnitude < 15 and humanoid.Health > 0 and humanoid.WalkSpeed > 0 then
+                        if autoFarmToggle.Value and (npc.PrimaryPart.CFrame.p - humanoidRootPart.CFrame.p).Magnitude < 15 and humanoid.Health > 0 and humanoid.WalkSpeed > 0 and not Character:FindFirstChild("Down") and not (humanoidRootPart:FindFirstChild("DownTimer") and humanoidRootPart.DownTimer.TextLabel.Text ~= "")  then
                             coroutine.resume(coroutine.create(function()
                                 gameFunction:InvokeServer("AdvanceStep", {
                                     QuestName = quest,
@@ -570,6 +570,72 @@ return function(Window)
         flightSlider:OnChanged(function()
             setconstant(MenuControl.startRealFlying, 66, flightSlider.Value)
         end)
+    end
+
+    do -- esp 
+        local expection = {}
+        expection.__index = expection
+        
+        function expection.new(self)
+            local expection = setmetatable({
+                _objects = self._objects,
+            }, expection)
+            
+            self._expection = expection
+
+            return expection
+        end
+        
+        function expection:Build()
+            local objects = self._objects 
+
+            local level = Drawing.new("Text")
+            level.Text = "level: unknown"
+            level.Size = 18
+            level.Color = Color3.new(1, 1, 1)
+            level.Center = true
+
+            objects._level = level
+        end
+
+        function expection:Refresh(args)
+            local target = self._player
+            local objects = self._objects 
+
+            local box = objects._box
+            local level = objects._level
+
+            local isRendered = args.isRendered
+            local textSize = args.textSize
+            local renderDistance = args.renderDistance
+
+            if isRendered then
+                level.Size = textSize
+
+                level.Position = box.Position + Vector2.new((box.Size.X + textSize / 2 + level.TextBounds.X / 2 - 2), (box.Size.Y - textSize + level.TextBounds.Y / 1.5))
+                
+                level.Color = Options.LevelColor.Value
+
+                level.Text = "Level: " .. (target:FindFirstChild("PlayerData") and target.PlayerData.Stats.Level.Value or "unknown")
+            end
+
+            level.Visible = Toggles.LevelCheckBox.Value and isRendered and renderDistance
+        end
+
+        function expection.CreateUI(tab)
+            local elementalGroup = tab:AddLeftGroupbox("Elemental Adventure")
+
+            elementalGroup:AddToggle("LevelCheckBox", {
+                Text = "Level",
+                Default = false,
+                Tooltip = "Displays the level.",
+            }):AddColorPicker('LevelColor', {
+                Default = Color3.new(1, 1, 1), 
+                Title = 'Text Color', 
+            })
+        end
+
+        PlayerEsp._expection = expection
     end
 
     LocalPlayer.CharacterAdded:Connect(function(newCharacter)
