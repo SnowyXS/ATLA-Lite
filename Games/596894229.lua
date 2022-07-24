@@ -184,41 +184,45 @@ return function(Window)
             return currentQuest
         end
 
+        local function CanFarm()
+            local isContinuable = playerData.PlayerSettings.Continuable.Value
+            local isTransitioning = MenuControl.Transitioning
+            local menuStatus = getupvalue(MenuControl.SpawnCharacter, 2)
+
+            return humanoid.Health > 0 and humanoid.WalkSpeed > 0
+                    and not Character:FindFirstChild("Down") 
+                    and not (humanoidRootPart:FindFirstChild("DownTimer") and humanoidRootPart.DownTimer.TextLabel.Text ~= "") 
+                    and menuStatus == 2 
+                    and isContinuable
+                    and not isTransitioning
+        end
+
         autoFarmToggle:OnChanged(function()
             while autoFarmToggle.Value and task.wait() do
                 local quest = GetQuest()
                 local npc = GetNpcByQuest(quest)
-            
-                local isContinuable, isTransitioning = playerData.PlayerSettings.Continuable.Value
-                local isTransitioning = MenuControl.Transitioning
-                local menuStatus = getupvalue(MenuControl.SpawnCharacter, 2)
 
-                canCompleteQuest =  npc and humanoid.Health > 0 
-                                    and humanoid.WalkSpeed > 0
-                                    and not Character:FindFirstChild("Down") 
-                                    and not (humanoidRootPart:FindFirstChild("DownTimer") and humanoidRootPart.DownTimer.TextLabel.Text ~= "") 
-                                    and menuStatus == 2 
-                                    and isContinuable
-                                    and not isTransitioning
-                                    and not canCompleteQuest
+                canCompleteQuest = npc and CanFarm() and not canCompleteQuest
             
                 if canCompleteQuest then
                     LockToNPC(npc)
 
-                    task.wait(math.clamp(dataPing:GetValue() / 1000, 5.1, math.huge))
+                    task.wait(5.05 + dataPing:GetValue() / 1000)
 
                     for step = 1, #Quests[quest].Steps + 1 do 
-                        if autoFarmToggle.Value and (npc.PrimaryPart.CFrame.p - humanoidRootPart.CFrame.p).Magnitude < 15 and humanoid.Health > 0 and humanoid.WalkSpeed > 0 and not Character:FindFirstChild("Down") and not (humanoidRootPart:FindFirstChild("DownTimer") and humanoidRootPart.DownTimer.TextLabel.Text ~= "")  then
-                            coroutine.resume(coroutine.create(function()
+                        if not CanFarm() or not autoFarmToggle.Value then
+                            break
+                        end
+
+                        task.spawn(function()
+                            if CanFarm() and autoFarmToggle.Value and (npc.PrimaryPart.CFrame.p - humanoidRootPart.CFrame.p).Magnitude < 15 then
                                 gameFunction:InvokeServer("AdvanceStep", {
                                     QuestName = quest,
                                     Step = step
-                                })
-                            end))
-                        end
+                                })            
+                            end
+                        end)
                     end 
-
-                    task.wait()
                     
                     canCompleteQuest = false
                 end
