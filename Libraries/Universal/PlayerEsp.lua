@@ -20,7 +20,7 @@ function PlayerEsp.new(player)
     }, PlayerEsp)
     self.__index = self
 
-    local Expection = self._expection.new(self)
+    local Expection = self._expection and self._expection.new(self)
 
     local box = Drawing.new("Square")
     box.Color = Options.BoxColor.Value
