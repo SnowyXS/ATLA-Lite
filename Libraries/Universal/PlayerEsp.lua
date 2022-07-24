@@ -18,7 +18,6 @@ function PlayerEsp.new(player)
     local self = setmetatable({
         _objects = objects,
     }, PlayerEsp)
-    self.__index = self
 
     local Expection = self._expection and self._expection.new(self)
 
