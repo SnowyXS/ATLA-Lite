@@ -231,7 +231,7 @@ return function(Window)
                         
                         repeat
                             task.wait()
-                        until coroutine.status(AdvanceStepCoroutine) == "dead"
+                        until not AdvanceStepCoroutine or coroutine.status(AdvanceStepCoroutine) == "dead"
 
                         canCompleteQuest = false
                     end
