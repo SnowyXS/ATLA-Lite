@@ -4,13 +4,18 @@ return function(Window)
     local Players = game:GetService("Players")
     local Stats = game:GetService("Stats")
 
+    local CurrentCamera = workspace.CurrentCamera 
+
     local LocalPlayer = Players.LocalPlayer
     local Character = LocalPlayer.Character
 
     local humanoid = Character.Humanoid
     local humanoidRootPart = Character.PrimaryPart
 
-    local CurrentCamera = workspace.CurrentCamera 
+    local networkStats = Stats.Network
+    local serverStatsItem = networkStats.ServerStatsItem
+
+    local dataPing = serverStatsItem["Data Ping"]
 
     local mainMenu = LocalPlayer.PlayerGui:WaitForChild("MainMenu")
     local menuControlInstance = mainMenu:WaitForChild("MenuControl")
@@ -66,15 +71,6 @@ return function(Window)
     loadingText:Remove()
 
     local playerData = LocalPlayer:WaitForChild("PlayerData")
-
-    local networkStats = Stats.Network
-    local performanceStats = Stats.PerformanceStats
-
-    local networkStats = Stats.Network
-    local serverStatsItem = networkStats.ServerStatsItem
-
-    local dataPing = serverStatsItem["Data Ping"]
-    local ping = performanceStats.Ping
 
     for _, v in pairs(getgc(true)) do
         if typeof(v) == "table" then
@@ -150,6 +146,8 @@ return function(Window)
         })
 
         local function LockToNPC(npc)
+            humanoidRootPart.Velocity = Vector3.new(0, 0, 0)
+            
             local teleportCoroutine = coroutine.create(function()
                 while autoFarmToggle.Value and canCompleteQuest and (getupvalue(MenuControl.SpawnCharacter, 2) == 2 or getupvalue(MenuControl.SpawnCharacter, 2) == 1) and humanoidRootPart do
                     humanoidRootPart.CFrame = npc.PrimaryPart.CFrame * CFrame.new(0,-8.25,0) * CFrame.Angles(math.rad(90), 0, 0)
@@ -197,37 +195,49 @@ return function(Window)
                     and not isTransitioning
         end
 
+        local function AdvanceStep(quest, step)
+            if CanFarm() and autoFarmToggle.Value then
+                gameFunction:InvokeServer("AdvanceStep", {
+                    QuestName = quest,
+                    Step = step
+                })            
+            end
+        end
+
         autoFarmToggle:OnChanged(function()
-            while autoFarmToggle.Value and task.wait() do
-                local quest = GetQuest()
-                local npc = GetNpcByQuest(quest)
+            if autoFarmToggle.Value then
+                while autoFarmToggle.Value and task.wait() do
+                    local quest = GetQuest()
+                    local npc = GetNpcByQuest(quest)
 
-                canCompleteQuest = npc and CanFarm() and not canCompleteQuest
-            
-                if canCompleteQuest then
-                    LockToNPC(npc)
+                    canCompleteQuest = npc and CanFarm() and not canCompleteQuest
+                
+                    if canCompleteQuest then
+                        LockToNPC(npc)
 
-                    task.wait(5.05 + dataPing:GetValue() / 1000)
+                        task.wait(math.clamp(dataPing:GetValue() / 1000, 5.05, math.huge))
 
-                    for step = 1, #Quests[quest].Steps + 1 do 
-                        if not CanFarm() or not autoFarmToggle.Value then
-                            break
-                        end
+                        local AdvanceStepCoroutine
 
-                        task.spawn(function()
-                            if CanFarm() and autoFarmToggle.Value and (npc.PrimaryPart.CFrame.p - humanoidRootPart.CFrame.p).Magnitude < 15 then
-                                gameFunction:InvokeServer("AdvanceStep", {
-                                    QuestName = quest,
-                                    Step = step
-                                })            
+                        for step = 1, #Quests[quest].Steps + 1 do 
+                            if not CanFarm() or not autoFarmToggle.Value or (npc.PrimaryPart.CFrame.p - humanoidRootPart.CFrame.p).Magnitude > 15 then
+                                break
                             end
-                        end)
-                    end 
-                    
-                    canCompleteQuest = false
+                            
+                            AdvanceStepCoroutine = coroutine.create(AdvanceStep)
+
+                            coroutine.resume(AdvanceStepCoroutine, quest, step)
+                        end 
+                        
+                        repeat
+                            task.wait()
+                        until coroutine.status(AdvanceStepCoroutine) == "dead"
+
+                        canCompleteQuest = false
+                    end
                 end
             end
-
+            
             questIndex = 1
         end)
     end
