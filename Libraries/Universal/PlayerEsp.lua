@@ -1,6 +1,8 @@
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
+local CoreGui = game:GetService("CoreGui")
+
 local LocalPlayer = Players.LocalPlayer
 local character = LocalPlayer.Character
 local rootPart = character.PrimaryPart
@@ -21,51 +23,39 @@ function PlayerEsp.new(player)
 
     local Expection = self._expection and self._expection.new(self)
 
+    local character = player.Character
+
     local box = Drawing.new("Square")
-    box.Color = Options.BoxColor.Value
     box.Filled = false
     box.Thickness = 1
     
     local playerName = Drawing.new("Text")
-    playerName.Color = Options.NameColor.Value
     playerName.Size = 18
     playerName.Text = player.Name
     playerName.Center = true
 
     local healthBar = Drawing.new("Square")
-    healthBar.Color = Options.HealthColor.Value
     healthBar.Filled = false
     healthBar.Thickness = 1
 
-    local chams = Instance.new("Highlight", player.Character)
-    chams.Enabled = Toggles.ChamsCheckBox.Value
-    chams.FillColor = Options.ChamsColor.Value
-    chams.OutlineColor = Options.ChamsOutLineColor.Value
-    chams.FillTransparency = Options.ChamsTransparency.Value / 100
-    chams.OutlineTransparency = Options.ChamsOutLineTransparency.Value / 100
+    local chams = Instance.new("Highlight", CoreGui)
+    chams.Adornee = character
 
     if Expection then
         Expection._player = player
-        Expection._character = player.Character
+        Expection._character = character
 
         Expection:Build()
     end
     
     local function OnCharacterAdded(character)
-        local chams = Instance.new("Highlight", character)
-        chams.Enabled = Toggles.ChamsCheckBox.Value
-        chams.FillColor = Options.ChamsColor.Value
-        chams.OutlineColor = Options.ChamsOutLineColor.Value
-        chams.FillTransparency = Options.ChamsTransparency.Value / 100
-        chams.OutlineTransparency = Options.ChamsOutLineTransparency.Value / 100
-
-        objects._chams = chams
+        chams.Adornee = character
 
         self._character = character
     end
 
     self._player = player
-    self._character = player.Character
+    self._character = character
     self._characterAdded = player.CharacterAdded:Connect(OnCharacterAdded)
 
     objects._box = box
@@ -133,7 +123,7 @@ function PlayerEsp:Refresh()
             playerName.Color = (Toggles.TeamColorsCheckBox.Value and target.TeamColor.Color) or Options.NameColor.Value
             
             healthBar.Position = box.Position - Vector2.new(3, 0)
-            healthBar.Size = Vector2.new(2, (headViewPort.Y - legViewPort.Y) / (maxHealth / math.clamp(health, 0, maxHealth)))
+            healthBar.Size = Vector2.new(2, box.Size.Y / (maxHealth / health))
         end
 
         box.Visible = Toggles.BoxCheckBox.Value and isRendered and renderDistance
