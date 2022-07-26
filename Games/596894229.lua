@@ -229,9 +229,13 @@ return function(Window)
                             coroutine.resume(AdvanceStepCoroutine, quest, step)
                         end 
                         
-                        repeat
-                            task.wait()
-                        until not AdvanceStepCoroutine or coroutine.status(AdvanceStepCoroutine) == "dead"
+                        if AdvanceStepCoroutine then
+                            repeat
+                                task.wait()
+                            until coroutine.status(AdvanceStepCoroutine) == "dead"
+                        end
+
+                        task.wait(0.5)
 
                         canCompleteQuest = false
                     end
