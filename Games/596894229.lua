@@ -607,6 +607,7 @@ return function(Window)
     
         local scrollsDropDown = subChangerBox:AddDropdown("scrolls", {
             Values = {"PassiveScroll", "AbilityScroll"},
+            Default = 1,
             Multi = true,
             
             Text = "Scrolls",
@@ -621,7 +622,7 @@ return function(Window)
                             return Library:Notify("Scroll Snipe: Insufficent funds", 5)
                         end
 
-                        GameFunction:InvokeServer("Buy", {
+                        gameFunction:InvokeServer("Buy", {
                             ItemName = scroll, 
                             ItemType = 1
                         })
@@ -637,7 +638,14 @@ return function(Window)
                 local scroll = workspace:FindFirstChild("ScrollModel")
         
                 if scroll then
+                    local lastCFrame = humanoidRootPart.CFrame
+                    humanoidRootPart.CFrame = scroll.PrimaryPart.CFrame
+
+                    task.wait(dataPing:GetValue() / 1000)
+
                     fireclickdetector(scroll.ClickDetector)
+
+                    humanoidRootPart.CFrame = lastCFrame
 
                     return Library:Notify("Scroll Snipe: Picked up a scroll", 5)
                 end
@@ -646,7 +654,14 @@ return function(Window)
     
         workspace.ChildAdded:Connect(function(instance)
             if autoPickUpToggle.Value and instance.Name == "ScrollModel" then
+                local lastCFrame = humanoidRootPart.CFrame
+                humanoidRootPart.CFrame = scroll.PrimaryPart.CFrame
+
+                task.wait(dataPing:GetValue() / 1000)
+
                 fireclickdetector(instance.ClickDetector)
+
+                humanoidRootPart.CFrame = lastCFrame
 
                 return Library:Notify("Scroll Snipe: Picked up a scroll", 5)
             end
@@ -661,7 +676,7 @@ return function(Window)
                         return Library:Notify("Scroll Snipe: Insufficent funds", 5)
                     end
 
-                    GameFunction:InvokeServer("Buy", {
+                    gameFunction:InvokeServer("Buy", {
                         ItemName = name, 
                         ItemType = 1
                     })
