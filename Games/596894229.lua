@@ -1,6 +1,7 @@
 return function(Window)
     local PropertyChanged = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/main/Libraries/Dependencies/PropertyChanged.lua"))()
-
+    
+    local ReplicatedStorage = game:GetService("ReplicatedStorage")
     local Players = game:GetService("Players")
     local Stats = game:GetService("Stats")
 
@@ -70,8 +71,6 @@ return function(Window)
     brandText:Remove()
     loadingText:Remove()
 
-    local playerData = LocalPlayer:WaitForChild("PlayerData")
-
     for _, v in pairs(getgc(true)) do
         if typeof(v) == "table" then
             if rawget(v, "Elements") then
@@ -84,6 +83,18 @@ return function(Window)
         end
     end
 
+    local gameEvent, gameFunction = MenuControl.GameEvent, MenuControl.GameFunction
+
+    local Quests = MenuControl.QuestModule
+    local RefreshNPCs = Quests.RefreshNPCs
+
+    local NpcList = debug.getupvalue(RefreshNPCs, 3)
+    local NpcModel = MenuControl.QuestNPCs
+
+    local formattedQuests = {}
+
+    local playerData = LocalPlayer:WaitForChild("PlayerData")
+
     for _, v in pairs(getconnections(playerData.Stats.Stamina.Changed)) do
         if v.Function then
             local upvalues = getupvalues(v.Function)
@@ -94,16 +105,6 @@ return function(Window)
             end
         end
     end
-
-    local gameEvent, gameFunction = MenuControl.GameEvent, MenuControl.GameFunction
-
-    local Quests = MenuControl.QuestModule
-    local RefreshNPCs = Quests.RefreshNPCs
-
-    local NpcList = debug.getupvalue(RefreshNPCs, 3)
-    local NpcModel = MenuControl.QuestNPCs
-
-    local formattedQuests = {}
 
     for _, v in pairs(NpcList) do
         table.insert(formattedQuests, v[1])
@@ -127,7 +128,9 @@ return function(Window)
     local atlaTab = Window:AddTab("Elemental Adventure")
 
     do -- AutoFarm
+        local isAutoFarmRunning = false
         local questIndex = 1
+
         local autoFarmBox = atlaTab:AddLeftGroupbox("Auto-Farm")
 
         local autoFarmToggle = autoFarmBox:AddToggle("AutoFarmToggle", {
@@ -148,7 +151,7 @@ return function(Window)
         local function LockToNPC(npc)
             humanoidRootPart.Velocity = Vector3.new(0, 0, 0)
             
-            local teleportCoroutine = coroutine.create(function()
+            local teleportThread = coroutine.create(function()
                 while autoFarmToggle.Value and canCompleteQuest and (getupvalue(MenuControl.SpawnCharacter, 2) == 2 or getupvalue(MenuControl.SpawnCharacter, 2) == 1) and humanoidRootPart do
                     humanoidRootPart.CFrame = npc.PrimaryPart.CFrame * CFrame.new(0,-8.25,0) * CFrame.Angles(math.rad(90), 0, 0)
 
@@ -158,7 +161,7 @@ return function(Window)
         
             humanoidRootPart.CFrame = npc.PrimaryPart.CFrame
         
-            return coroutine.resume(teleportCoroutine)
+            return coroutine.resume(teleportThread)
         end
 
         local function GetNpcByQuest(quest)
@@ -204,45 +207,60 @@ return function(Window)
             end
         end
 
+        local function CompleteQuest(quest, npc)
+            LockToNPC(npc)
+
+            task.wait(math.clamp(dataPing:GetValue() / 1000, 5.05, math.huge))
+
+            local AdvanceStepCoroutine
+
+            for step = 1, #Quests[quest].Steps + 1 do 
+                if not autoFarmToggle.Value then
+                    canCompleteQuest = false
+
+                    return
+                elseif not CanFarm() or (npc.PrimaryPart.CFrame.p - humanoidRootPart.CFrame.p).Magnitude > 15 then
+                    break
+                end
+
+                AdvanceStepCoroutine = coroutine.create(AdvanceStep)
+
+                coroutine.resume(AdvanceStepCoroutine, quest, step)
+            end 
+            
+            if AdvanceStepCoroutine then
+                repeat
+                    task.wait()
+                until coroutine.status(AdvanceStepCoroutine) == "dead"
+            end
+        end
+
         autoFarmToggle:OnChanged(function()
-            if autoFarmToggle.Value then
+            if autoFarmToggle.Value and not isAutoFarmRunning then
+                isAutoFarmRunning = true
+
                 while autoFarmToggle.Value and task.wait() do
                     local quest = GetQuest()
                     local npc = GetNpcByQuest(quest)
 
-                    canCompleteQuest = npc and CanFarm() and not canCompleteQuest
+                    canCompleteQuest = npc and CanFarm() and autoFarmToggle.Value and not canCompleteQuest
                 
                     if canCompleteQuest then
-                        LockToNPC(npc)
+                        local CompleteQuestThread = coroutine.create(CompleteQuest)
 
-                        task.wait(math.clamp(dataPing:GetValue() / 1000, 5.05, math.huge))
+                        coroutine.resume(CompleteQuestThread, quest, npc)
 
-                        local AdvanceStepCoroutine
-
-                        for step = 1, #Quests[quest].Steps + 1 do 
-                            if not CanFarm() or not autoFarmToggle.Value or (npc.PrimaryPart.CFrame.p - humanoidRootPart.CFrame.p).Magnitude > 15 then
-                                break
-                            end
-                            
-                            AdvanceStepCoroutine = coroutine.create(AdvanceStep)
-
-                            coroutine.resume(AdvanceStepCoroutine, quest, step)
-                        end 
-                        
-                        if AdvanceStepCoroutine then
-                            repeat
-                                task.wait()
-                            until coroutine.status(AdvanceStepCoroutine) == "dead"
-                        end
-
-                        task.wait(0.5)
+                        repeat
+                            task.wait()
+                        until coroutine.status(CompleteQuestThread) == "dead" or not autoFarmToggle.Value
 
                         canCompleteQuest = false
                     end
-                end
+                end 
+
+                isAutoFarmRunning = false
+                questIndex = 1
             end
-            
-            questIndex = 1
         end)
     end
 
@@ -330,10 +348,11 @@ return function(Window)
                     "\n\nCurrent Second Special: " .. secondSpecialAbility.Value, 
                     "\n -> Waiting For: " ..  selectedSecondSpecial, 
                     "\n -> hasGotSecondSpecial: " .. tostring(secondSpecialAbility.Value == selectedSecondSpecial))
-            
-                local shouldContinue = ((specialAbility.Value ~= selectedSpecial 
-                                        or secondSpecialAbility.Value ~= selectedSecondSpecial) and gameFunction:InvokeServer("NewGame", {Selections = BaseSelection}) and true) 
-                                        or (specialAbility.Value == selectedSpecial and secondSpecialAbility.Value == selectedSecondSpecial and false) 
+
+                gameFunction:InvokeServer("NewGame", {Selections = BaseSelection})
+
+                local shouldContinue =  (specialAbility.Value ~= selectedSpecial or secondSpecialAbility.Value ~= selectedSecondSpecial)
+                                            or specialAbility.Value == selectedSpecial and secondSpecialAbility.Value == selectedSecondSpecial
 
                 if shouldContinue then
                     local humanoid = character:WaitForChild("Humanoid")
@@ -544,6 +563,93 @@ return function(Window)
                 playersDropDown:SetValue(players[1])
             end 
         end)
+    end
+
+    do -- Scroll Snipe
+        local shops = ReplicatedStorage.Shops
+        local globalShop = shops.Global
+        
+        local coins = playerData.Stats.Money5
+
+        local subChangerBox = atlaTab:AddLeftGroupbox("Scroll Snipe")
+        
+        local autoBuyToggle = subChangerBox:AddToggle("AutoBuyToggle", {
+            Text = "Auto Buy",
+            Default = false,
+            Tooltip = "Auto buy scrolls.",
+        })
+    
+        local autoPickUpToggle = subChangerBox:AddToggle("AutoPickUpToggle", {
+            Text = "Auto Pick Up",
+            Default = false,
+            Tooltip = "Picks up the scrolls for you.",
+        })
+    
+        local scrollsDropDown = subChangerBox:AddDropdown("scrolls", {
+            Values = {"PassiveScroll", "AbilityScroll"},
+            Multi = true,
+            
+            Text = "Scrolls",
+            Tooltip = "Select scrolls.",
+        })
+    
+        autoBuyToggle:OnChanged(function()
+            if autoBuyToggle.Value then
+                for _, scroll in pairs(scrollsDropDown.Value) do
+                    if globalShop:FindFirstChild(scroll) then
+                        if coins.Value < 1000 then
+                            return Library:Notify("Scroll Snipe: Insufficent funds", 5)
+                        end
+
+                        GameFunction:InvokeServer("Buy", {
+                            ItemName = scroll, 
+                            ItemType = 1
+                        })
+
+                        return Library:Notify("Scroll Snipe: Bought " .. scroll, 5)
+                    end
+                end
+            end
+        end)
+    
+        autoPickUpToggle:OnChanged(function()
+            if autoPickUpToggle.Value then
+                local scroll = workspace:FindFirstChild("ScrollModel")
+        
+                if scroll then
+                    fireclickdetector(scroll.ClickDetector)
+
+                    return Library:Notify("Scroll Snipe: Picked up a scroll", 5)
+                end
+            end
+        end)
+    
+        workspace.ChildAdded:Connect(function(instance)
+            if autoPickUpToggle.Value and instance.Name == "ScrollModel" then
+                fireclickdetector(instance.ClickDetector)
+
+                return Library:Notify("Scroll Snipe: Picked up a scroll", 5)
+            end
+        end)
+        
+        globalShop.ChildAdded:Connect(function(item)
+            if autoBuyToggle.Value then
+                local name = item.Name
+        
+                if table.find(scrollsDropDown.Value, name) then
+                    if coins.Value < 1000 then
+                        return Library:Notify("Scroll Snipe: Insufficent funds", 5)
+                    end
+
+                    GameFunction:InvokeServer("Buy", {
+                        ItemName = name, 
+                        ItemType = 1
+                    })
+
+                    return Library:Notify("Scroll Snipe: Bought " .. name, 5)
+                end
+            end
+        end)    
     end
 
     do -- Misc
