@@ -95,16 +95,7 @@ return function(Window)
 
     local playerData = LocalPlayer:WaitForChild("PlayerData")
 
-    for _, v in pairs(getconnections(playerData.Stats.Stamina.Changed)) do
-        if v.Function then
-            local upvalues = getupvalues(v.Function)
-
-            if typeof(upvalues[3]) == "number" then
-                StaminaConnection = v
-                break
-            end
-        end
-    end
+    StaminaConnection = getconnections(playerData.Stats.Stamina.Changed)[1]
 
     for _, v in pairs(NpcList) do
         table.insert(formattedQuests, v[1])
@@ -118,11 +109,11 @@ return function(Window)
     }
 
     local secondSpecialElements = {
-        Ice = {"None", "Healing"},
-        Plant = {"None", "Healing"},
-        Lava = {"None", "Vibration Sense"},
-        Metal = {"None", "Vibration Sense"},
-        Sand = {"None", "Vibration Sense"},
+        Ice = {"Healing"},
+        Plant = {"Healing"},
+        Lava = {"Vibration Sense"},
+        Metal = {"Vibration Sense"},
+        Sand = {"Vibration Sense"},
     }
 
     local atlaTab = Window:AddTab("Elemental Adventure")
@@ -285,7 +276,7 @@ return function(Window)
         local specialDropDown = subChangerBox:AddDropdown("special", {
             Values = {"Flight"},
             Default = 1,
-            Multi = false,
+            Multi = true,
             
             Text = "Special",
             Tooltip = "Select special element",
@@ -293,8 +284,7 @@ return function(Window)
 
         local secondSpecialDropDown = subChangerBox:AddDropdown("special2", {
             Values = {"None"},
-            Default = 1,
-            Multi = false,
+            Multi = true,
             
             Text = "Second Special",
             Tooltip = "Select second special element.",
@@ -303,23 +293,50 @@ return function(Window)
         elementsDropDown:OnChanged(function()
             local specialElements = specialElements[elementsDropDown.Value]
 
+            local enabledSpecial = {}
+            enabledSpecial[specialElements[1]] = true
+
             specialDropDown.Values = specialElements
             specialDropDown:SetValues()
-            specialDropDown:SetValue(specialElements[1])
+            specialDropDown:SetValue(enabledSpecial)
 
-            local secondSpecialElements = secondSpecialElements[specialDropDown.Value] or {"None"}
+            local specials = {}
+            
+            for _, v in pairs(specialDropDown:GetActiveValues()) do
+                local secondSpecialElements = secondSpecialElements[v]
 
-            secondSpecialDropDown.Values = secondSpecialElements
+                if secondSpecialElements then
+                    for _, special in pairs(secondSpecialElements) do
+                        if not table.find(specials, special) then
+                            table.insert(specials, special)
+                        end
+                    end
+                end
+            end
+
+            secondSpecialDropDown.Values = specials
             secondSpecialDropDown:SetValues()
-            secondSpecialDropDown:SetValue(secondSpecialElements[1])
+            secondSpecialDropDown:SetValue({})
         end)
         
         specialDropDown:OnChanged(function()
-            local secondSpecialElements = secondSpecialElements[specialDropDown.Value] or {"None"}
+            local specials = {}
 
-            secondSpecialDropDown.Values = secondSpecialElements
+            for _, v in pairs(specialDropDown:GetActiveValues()) do
+                local secondSpecialElements = secondSpecialElements[v]
+
+                if secondSpecialElements then
+                    for _, special in pairs(secondSpecialElements) do
+                        if not table.find(specials, special) then
+                            table.insert(specials, special)
+                        end
+                    end
+                end
+            end
+
+            secondSpecialDropDown.Values = specials
             secondSpecialDropDown:SetValues()
-            secondSpecialDropDown:SetValue(secondSpecialElements[1])
+            secondSpecialDropDown:SetValue({})
         end)
 
         subChangerToggle:OnChanged(function()
@@ -335,24 +352,27 @@ return function(Window)
                 local specialAbility = appearance.Special
                 local secondSpecialAbility = appearance.Special2
             
-                local selectedSpecial = specialDropDown.Value
-                local selectedSecondSpecial = secondSpecialDropDown.Value
+                local selectedSpecial = specialDropDown:GetActiveValues()
+                local selectedSecondSpecial = secondSpecialDropDown:GetActiveValues()
                 
                 BaseSelection.Elements = elementsDropDown.Value
-            
-                print("\n--- Element changer ---",
-                    "\nElement: " .. elementsDropDown.Value, 
-                    "\n\nCurrent Special: " .. specialAbility.Value, 
-                    "\n -> Waiting For: " ..  selectedSpecial, 
-                    "\n -> hasGotSpecial: " ..  tostring(specialAbility.Value == selectedSpecial), 
-                    "\n\nCurrent Second Special: " .. secondSpecialAbility.Value, 
-                    "\n -> Waiting For: " ..  selectedSecondSpecial, 
-                    "\n -> hasGotSecondSpecial: " .. tostring(secondSpecialAbility.Value == selectedSecondSpecial))
 
                 gameFunction:InvokeServer("NewGame", {Selections = BaseSelection})
 
-                local shouldContinue =  (specialAbility.Value ~= selectedSpecial or secondSpecialAbility.Value ~= selectedSecondSpecial)
-                                            or specialAbility.Value == selectedSpecial and secondSpecialAbility.Value == selectedSecondSpecial
+                local specials = #selectedSpecial == 0 and "None" or table.concat(selectedSpecial, ", ")
+                local secondSpecials = #selectedSecondSpecial == 0 and "None" or table.concat(selectedSecondSpecial, ", ")
+
+                local hasGottenSpecial = #selectedSpecial == 0 and specialAbility.Value == "None" or table.find(selectedSpecial, specialAbility.Value) ~= nil
+                local hasGottenSecondSpecial = #selectedSecondSpecial == 0 and secondSpecialAbility.Value == "None" or table.find(selectedSecondSpecial, secondSpecialAbility.Value) ~= nil
+
+                local shouldContinue =  not (hasGottenSpecial and hasGottenSecondSpecial)
+
+                Library:Notify("Special Ability: " .. tostring(specialAbility.Value) 
+                                .. "\n -> Specials: " .. specials
+                                .. "\n -> hasGotSpecial: " .. tostring(hasGottenSpecial)
+                                .. "\nSecond Special Ability: " .. tostring(secondSpecialAbility.Value) 
+                                .. "\n -> Second Specials: " .. secondSpecials
+                                .. "\n -> hasGotSecondSpecial: " .. tostring(hasGottenSecondSpecial), 5)
 
                 if shouldContinue then
                     local humanoid = character:WaitForChild("Humanoid")
@@ -780,16 +800,7 @@ return function(Window)
 
         MenuControl = MenuControlEnv
 
-        for _, v in pairs(getconnections(playerData.Stats.Stamina.Changed)) do
-            if v.Function then
-                local upvalues = getupvalues(v.Function)
-
-                if typeof(upvalues[3]) == "number" then
-                    StaminaConnection = v
-                    break
-                end
-            end
-        end
+        StaminaConnection = getconnections(playerData.Stats.Stamina.Changed)[1]
 
         local OldFunc
         OldFunc = hookfunc(MenuControl.DecreaseStamina, function(...)
@@ -814,5 +825,13 @@ return function(Window)
                 MenuControl.SpawnCharacter()  
             end
         end
+
+        local staminaValue = Options.MaxStamina.Value
+
+        setupvalue(MenuControl.CurrentStamina, 1, staminaValue)
+
+        StaminaConnection:Fire(staminaValue - 25)
+
+        setconstant(MenuControl.startRealFlying, 66, Options.flightSlider.Value)
     end)
 end
