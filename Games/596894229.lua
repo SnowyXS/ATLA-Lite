@@ -655,7 +655,7 @@ return function(Window)
         workspace.ChildAdded:Connect(function(instance)
             if autoPickUpToggle.Value and instance.Name == "ScrollModel" then
                 local lastCFrame = humanoidRootPart.CFrame
-                humanoidRootPart.CFrame = scroll.PrimaryPart.CFrame
+                humanoidRootPart.CFrame = instance.PrimaryPart.CFrame
 
                 task.wait(dataPing:GetValue() / 1000)
 
