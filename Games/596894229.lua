@@ -1,6 +1,4 @@
 return function(Window)
-    local PropertyChanged = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/main/Libraries/Dependencies/PropertyChanged.lua"))()
-    
     local ReplicatedStorage = game:GetService("ReplicatedStorage")
     local Players = game:GetService("Players")
     local Stats = game:GetService("Stats")
@@ -22,7 +20,6 @@ return function(Window)
     local menuControlInstance = mainMenu:WaitForChild("MenuControl")
 
     local MenuControl = getsenv(menuControlInstance)
-    local BaseSelection, ValueNames, StaminaConnection
 
     local count = 1
         
@@ -50,26 +47,28 @@ return function(Window)
     loadingText.Text = "Waiting for modules."
     loadingText.Position = loadingSquare.Position + Vector2.new(loadingSquare.Size.X / 2 - loadingText.TextBounds.X / 2, loadingSquare.Size.Y - 32)
 
-    while not (MenuControl.DecreaseStamina and LocalPlayer:FindFirstChild("PlayerData")) and task.wait(0.25) do
+    while not MenuControl.DecreaseStamina do
         loadingText.Color = Color3.fromRGB(255, 0, 0)
-        loadingText.Text = ((not LocalPlayer:FindFirstChild("PlayerData") and "Waiting for modules") or (not ATLA and "Waiting for SLite module") or "") .. string.rep(".", count) 
+        loadingText.Text = "Waiting for modules" .. string.rep(".", count) 
 
         loadingSquare.Position = Vector2.new(0.5 * CurrentCamera.ViewportSize.X - loadingSquare.Size.X / 2, 0.5 * CurrentCamera.ViewportSize.Y - loadingSquare.Size.Y / 2)
         brandText.Position = loadingSquare.Position + Vector2.new(loadingSquare.Size.X / 2 - brandText.TextBounds.X / 2, 0)
         loadingText.Position = loadingSquare.Position + Vector2.new(loadingSquare.Size.X / 2 - loadingText.TextBounds.X / 2, loadingSquare.Size.Y - 32)
 
         count = count < 3 and count + 1 or 1
+
+        task.wait(0.25)
     end
 
     loadingText.Color = Color3.fromRGB(0, 255, 0)
     loadingText.Text = "Loaded."
     loadingText.Position = loadingSquare.Position + Vector2.new(loadingSquare.Size.X / 2 - loadingText.TextBounds.X / 2, loadingSquare.Size.Y - 32)
-        
-    task.wait(0.5)
 
     loadingSquare:Remove()
     brandText:Remove()
     loadingText:Remove()
+
+    local BaseSelection, ValueNames, StaminaConnection
 
     for _, v in pairs(getgc(true)) do
         if typeof(v) == "table" then
