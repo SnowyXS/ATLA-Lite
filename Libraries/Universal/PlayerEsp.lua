@@ -115,7 +115,7 @@ function PlayerEsp:Refresh()
             
             box.Size = Vector2.new(CurrentCamera.ViewportSize.X / rootViewPort.Z, headViewPort.Y - legViewPort.Y)
             box.Position = Vector2.new(rootViewPort.X - box.Size.X / 2, (rootViewPort.Y - box.Size.Y / 2) + 2)
-            box.Color = (Toggles.TeamColorsCheckBox.Value and target.TeamColor.Color) or Options.BoxColor.Value
+            box.Color = (self._customBoxColor ~= nil and self._customBoxColor) or (Toggles.TeamColorsCheckBox.Value and target.TeamColor.Color) or Options.BoxColor.Value
 
             playerName.Size = textSize
             playerName.Position = box.Position + Vector2.new((box.Size.X - textSize + playerName.TextBounds.Y) / 2, (box.Size.Y - textSize + playerName.TextBounds.Y / 2) - textSize / 2)
