@@ -148,6 +148,10 @@ function PlayerEsp:Refresh()
 end
 
 function PlayerEsp:Destroy()
+    self._players[self._player] = nil
+	
+    task.wait()
+
     local objects = self._objects
 
     for _, object in pairs(objects) do
@@ -155,7 +159,6 @@ function PlayerEsp:Destroy()
     end
 
     self._characterAdded:Disconnect()
-    self._players[self._player] = nil
 	
     setmetatable(self, nil)
     table.clear(self)
