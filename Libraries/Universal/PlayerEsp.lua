@@ -148,20 +148,15 @@ function PlayerEsp:Refresh()
 end
 
 function PlayerEsp:Destroy()
-    self._players[self._player] = nil
-
     local objects = self._objects
 
     for _, object in pairs(objects) do
-        pcall(function()
-		    object.Visible = false
-	    end)
-
         object:Remove()
     end
 
     self._characterAdded:Disconnect()
-
+    self._players[self._player] = nil
+	
     setmetatable(self, nil)
     table.clear(self)
 end
