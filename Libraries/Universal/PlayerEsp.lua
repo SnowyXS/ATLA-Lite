@@ -153,7 +153,10 @@ function PlayerEsp:Destroy()
     local objects = self._objects
 
     for _, object in pairs(objects) do
-        object.Visible = false
+        pcall(function()
+		    object.Visible = false
+	    end)
+
         object:Remove()
     end
 
