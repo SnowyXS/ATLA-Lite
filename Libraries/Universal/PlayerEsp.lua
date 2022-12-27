@@ -30,10 +30,11 @@ function Esp.new(player)
     box.Thickness = 2
     
     local playerName = Drawing.new("Text")
-    playerName.Size = 18
+    playerName.Size = 24
     playerName.Text = player.Name
     playerName.Center = true
     playerName.Outline = true
+    playerName.Font = 3
     
     local healthBar = Drawing.new("Square")
     healthBar.Filled = false
