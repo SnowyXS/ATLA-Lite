@@ -149,17 +149,16 @@ end
 
 function PlayerEsp:Destroy()
     local objects = self._objects
-    local players = PlayerEsp._players
-    players[self._player] = nil
+    local players = self._players
+    local player = self._player
 
     for _, object in pairs(objects) do
         object:Remove()
     end
 
-    self._characterAdded:Disconnect()
-	
+    players[player] = nil
+
     table.clear(self)
-    setmetatable(self, nil)
 end
 
 return PlayerEsp
