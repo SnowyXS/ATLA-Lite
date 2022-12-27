@@ -736,16 +736,16 @@ return function(Window)
         
         function expection.new(self)
             local expection = setmetatable({
-                _objects = self._objects,
+                objects = self.objects,
             }, expection)
             
-            self._expection = expection
+            self.expection = expection
 
             return expection
         end
         
         function expection:Build()
-            local objects = self._objects 
+            local objects = self.objects 
 
             local level = Drawing.new("Text")
             level.Text = "level: unknown"
@@ -753,15 +753,15 @@ return function(Window)
             level.Color = Color3.new(1, 1, 1)
             level.Center = true
 
-            objects._level = level
+            objects.level = level
         end
 
         function expection:Refresh(args)
-            local target = self._player
-            local objects = self._objects 
+            local target = self.player
+            local objects = self.objects 
 
-            local box = objects._box
-            local level = objects._level
+            local box = objects.box
+            local level = objects.level
 
             local isRendered = args.isRendered
             local textSize = args.textSize
@@ -793,7 +793,7 @@ return function(Window)
             })
         end
 
-        PlayerEsp._expection = expection
+        Esp.expection = expection
     end
 
     LocalPlayer.CharacterAdded:Connect(function(newCharacter)
