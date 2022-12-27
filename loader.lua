@@ -13,7 +13,8 @@ getgenv().Library = loadstring(game:HttpGet(repository .. "Library.lua"))()
 local ThemeManager = loadstring(game:HttpGet(repository .. "addons/ThemeManager.lua"))()
 local SaveManager = loadstring(game:HttpGet(repository .. "addons/SaveManager.lua"))()
 
-local PlayerEsp = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/main/Libraries/Universal/PlayerEsp.lua"))()
+local Esp = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/main/Libraries/Universal/PlayerEsp.lua"))()
+local PlayersEsp = Esp.players
 
 local Window = Library:CreateWindow({
     Title = "SLite",
@@ -35,6 +36,7 @@ if success then
 
     SaveManager:SetFolder("SLite/" .. placeID)
 end
+
 
 
 do -- esp
@@ -115,29 +117,21 @@ do -- esp
         })
 
         Players.PlayerAdded:Connect(function(player)
-            players = {}
-
-            for _, v in pairs(Players:GetPlayers()) do
-                table.insert(players, v.Name)
-            end
+            table.insert(players, player.Name)
         
             playersDropDown.Values = players
             playersDropDown:SetValues()
         end)
 
-        Players.PlayerRemoving:Connect(function(player)
-            players = {}
 
-            for _, v in pairs(Players:GetPlayers()) do
-                table.insert(players, v.Name)
-            end
+        Players.PlayerRemoving:Connect(function(player)
+            local index = table.find(players, player.Name)
+            
+            table.remove(players, index)
         
+            playersDropDown.Value[player] = nil
             playersDropDown.Values = players
             playersDropDown:SetValues()
-            
-            if playersDropDown.Value == player.Name then
-                playersDropDown:SetValue(players[1])
-            end 
         end)
     end
     
@@ -193,37 +187,37 @@ do -- esp
         Compact = false,
     })
 
-    local EspPlayers = PlayerEsp._players
-    local Expection = PlayerEsp._expection
+    local Expection = Esp._expection
 
     if Expection then
         Expection.CreateUI(espTab)
     end
 
-    Players.PlayerAdded:Connect(function(player)
-        PlayerEsp.new(player)
-    end)
-
-    Players.PlayerRemoving:Connect(function(player)
-        local ESP = PlayerEsp._players[player]
-
-        if ESP then
-            ESP:Destroy()
-        end
-    end)
-
     for _, player in pairs(Players:GetPlayers()) do
         if player ~= LocalPlayer then
-            PlayerEsp.new(player)
+            Esp.new(player)
         end
     end
 
+    Players.PlayerAdded:Connect(function(player)
+        Esp.new(player)
+    end)
+
+    Players.PlayerRemoving:Connect(function(player)
+        local PlayerEsp = PlayersEsp[player]
+
+        PlayerEsp:Destroy()
+        
+        print(player.Name .. " Left and was removed from esp")
+    end)
+
     RunService.RenderStepped:Connect(function()
-        for _, esp in pairs(EspPlayers) do
-            esp:Refresh()
+        for _, PlayerEsp in pairs(PlayersEsp) do
+            PlayerEsp:Refresh()
         end
     end)
 end
+
 
 local settingsTab = Window:AddTab("Settings")
 local menuGroup = settingsTab:AddLeftGroupbox("Menu")
