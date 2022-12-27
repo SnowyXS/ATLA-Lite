@@ -21,7 +21,7 @@ function Esp.new(player)
         objects = objects,
     }, Esp)
 
-    local Expection = self._expection and self._expection.new(self)
+    local Expection = self.expection and self.expection.new(self)
 
     local character = player.Character
 
