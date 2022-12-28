@@ -9,8 +9,9 @@ local rootPart = character.PrimaryPart
 
 local CurrentCamera = workspace.CurrentCamera
 
+local PlayersEsp = {}
 local Esp = {
-    players = {},
+    players = PlayersEsp,
 }
 Esp.__index = Esp
 
@@ -19,6 +20,7 @@ function Esp.new(player)
 
     local self = setmetatable({
         objects = objects,
+        customColors = {}
     }, Esp)
 
     local Expection = self.expection and self.expection.new(self)
@@ -80,7 +82,12 @@ function Esp:Refresh()
     local playerName = objects.playerName
     local healthBar = objects.healthBar
     local chams = objects.chams
-    
+
+    local customColors = self.customColors
+    local boxColor = customColors[box]
+    local playerNameColor = customColors[playerName]
+    local chamsColor = customColors[chams]
+
     if targetChar then
         local targetHead = targetChar:FindFirstChild("Head")
         local targetRoot = targetChar:FindFirstChild("HumanoidRootPart")
@@ -118,12 +125,11 @@ function Esp:Refresh()
                 
                 box.Size = Vector2.new(CurrentCamera.ViewportSize.X / rootViewPort.Z, headViewPort.Y - legViewPort.Y)
                 box.Position = Vector2.new(rootViewPort.X - box.Size.X / 2, (rootViewPort.Y - box.Size.Y / 2) + 2)
-                box.Color = (self._customBoxColor ~= nil and self._customBoxColor) or (Toggles.TeamColorsCheckBox.Value and target.TeamColor.Color) or Options.BoxColor.Value
+                box.Color = boxColor or (Toggles.TeamColorsCheckBox.Value and target.TeamColor.Color) or Options.BoxColor.Value
     
                 playerName.Size = textSize
                 playerName.Position = box.Position + Vector2.new((box.Size.X - textSize + playerName.TextBounds.Y) / 2, (box.Size.Y - textSize + playerName.TextBounds.Y / 2) - textSize / 2)
-           
-                playerName.Color = (self._customNameColor ~= nil and self._customNameColor) or (Toggles.TeamColorsCheckBox.Value and target.TeamColor.Color) or Options.NameColor.Value
+                playerName.Color = playerNameColor or (Toggles.TeamColorsCheckBox.Value and target.TeamColor.Color) or Options.NameColor.Value
                 
                 healthBar.Position = box.Position - Vector2.new(3 + box.Thickness / 2, 0)
                 healthBar.Size = Vector2.new(2, box.Size.Y / (maxHealth / health))
@@ -134,8 +140,8 @@ function Esp:Refresh()
             healthBar.Visible = Toggles.HealthBarCheckBox.Value and isRendered and renderDistance
             chams.Enabled = Toggles.ChamsCheckBox.Value and isRendered and renderDistance
             
-            chams.FillColor = Options.ChamsColor.Value
-            chams.OutlineColor = Options.ChamsOutLineColor.Value
+            chams.FillColor = chamsColor or Options.ChamsColor.Value
+            chams.OutlineColor = chamsColor or Options.ChamsOutLineColor.Value
     
             chams.FillTransparency = Options.ChamsTransparency.Value / 100
             chams.OutlineTransparency = Options.ChamsOutLineTransparency.Value / 100
@@ -153,6 +159,17 @@ function Esp:Refresh()
             healthBar.Visible = false
         end
     end
+end
+
+function Esp:SetColor(objectName, color)
+    local customColors = self.customColors
+
+    local objects = self.objects
+    local object = objects[objectName]
+
+    assert(object ~= nil, "Invalid object.")
+
+    customColors[object] = color
 end
 
 function Esp:Destroy()
