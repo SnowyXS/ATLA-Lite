@@ -125,7 +125,7 @@ function Esp:Refresh()
            
                 playerName.Color = (self._customNameColor ~= nil and self._customNameColor) or (Toggles.TeamColorsCheckBox.Value and target.TeamColor.Color) or Options.NameColor.Value
                 
-                healthBar.Position = box.Position - Vector2.new(3, 0)
+                healthBar.Position = box.Position - Vector2.new(3 + box.Thickness / 2, 0)
                 healthBar.Size = Vector2.new(2, box.Size.Y / (maxHealth / health))
             end
     
