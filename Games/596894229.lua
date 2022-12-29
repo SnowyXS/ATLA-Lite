@@ -749,7 +749,7 @@ return function(Window)
 
             local level = Drawing.new("Text")
             level.Text = "level: unknown"
-            level.Size = 24
+            level.Size = 18
             level.Color = Color3.new(1, 1, 1)
             level.Center = true
             level.Outline = true
