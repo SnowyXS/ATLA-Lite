@@ -187,7 +187,7 @@ do -- esp
         Compact = false,
     })
 
-    local Expection = Esp._expection
+    local Expection = Esp.expection
 
     if Expection then
         Expection.CreateUI(espTab)
