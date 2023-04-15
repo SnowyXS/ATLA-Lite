@@ -36,7 +36,7 @@ return function(Window)
     brandText.Size = 32
     brandText.ZIndex = 2
     brandText.Color = Color3.fromRGB(255, 255, 255)
-    brandText.Text = "SLite"
+    brandText.Text = "SLite v2.0.1"
     brandText.Position = loadingSquare.Position + Vector2.new(loadingSquare.Size.X / 2 - brandText.TextBounds.X / 2, 0)
 
     local loadingText = Drawing.new("Text")
@@ -200,29 +200,19 @@ return function(Window)
         local function CompleteQuest(quest, npc)
             LockToNPC(npc)
 
-            task.wait(math.clamp(dataPing:GetValue() / 1000, 5.05, math.huge))
+            task.wait(math.clamp(dataPing:GetValue() / 1000, 5, math.huge))
 
             local AdvanceStepCoroutine
 
             for step = 1, #Quests[quest].Steps + 1 do 
-                if not autoFarmToggle.Value then
-                    canCompleteQuest = false
-
-                    return
-                elseif not CanFarm() or (npc.PrimaryPart.CFrame.p - humanoidRootPart.CFrame.p).Magnitude > 15 then
-                    break
-                end
+                if not autoFarmToggle.Value then return end
+                if not CanFarm() or (npc.PrimaryPart.CFrame.p - humanoidRootPart.CFrame.p).Magnitude > 15 then break end
 
                 AdvanceStepCoroutine = coroutine.create(AdvanceStep)
-
                 coroutine.resume(AdvanceStepCoroutine, quest, step)
             end 
             
-            if AdvanceStepCoroutine then
-                repeat
-                    task.wait()
-                until coroutine.status(AdvanceStepCoroutine) == "dead"
-            end
+            repeat task.wait() until coroutine.status(AdvanceStepCoroutine) == "dead"
         end
 
         autoFarmToggle:OnChanged(function()
@@ -237,12 +227,9 @@ return function(Window)
                 
                     if canCompleteQuest then
                         local CompleteQuestThread = coroutine.create(CompleteQuest)
-
                         coroutine.resume(CompleteQuestThread, quest, npc)
 
-                        repeat
-                            task.wait()
-                        until coroutine.status(CompleteQuestThread) == "dead" or not autoFarmToggle.Value
+                        repeat task.wait() until coroutine.status(CompleteQuestThread) == "dead"
 
                         canCompleteQuest = false
                     end
