@@ -111,7 +111,8 @@ do -- esp
         local playersDropDown = playersGroup:AddDropdown("PlayersDropDown", {
             Values = players,
             Multi = true,
-            
+            AllowNull = true,
+                
             Text = "Players",
             Tooltip = "Select a player to whitelist / blacklist",
         })
