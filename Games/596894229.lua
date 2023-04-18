@@ -270,6 +270,7 @@ return function(Window)
 
         local secondSpecialDropDown = subChangerBox:AddDropdown("special2", {
             Values = {"None"},
+            AllowNull = true,
             Multi = true,
             
             Text = "Second Special",
