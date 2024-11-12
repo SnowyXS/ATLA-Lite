@@ -7,11 +7,11 @@ local LocalPlayer = Players.LocalPlayer
 
 local placeID = game.PlaceId
 
-local repository = "https://raw.githubusercontent.com/wally-rblx/LinoriaLib/main/"
+local repository = "https://raw.githubusercontent.com/weakhoes/Roblox-UI-Libs/refs/heads/main/Linoria%20Lib/Linoria%20Lib%20Source.lua"
 
-getgenv().Library = loadstring(game:HttpGet(repository .. "Library.lua"))()
-local ThemeManager = loadstring(game:HttpGet(repository .. "addons/ThemeManager.lua"))()
-local SaveManager = loadstring(game:HttpGet(repository .. "addons/SaveManager.lua"))()
+getgenv().Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/weakhoes/Roblox-UI-Libs/refs/heads/main/Linoria%20Lib/Linoria%20Lib%20Source.lua"))()
+--local ThemeManager = loadstring(game:HttpGet(repository .. "addons/ThemeManager.lua"))()
+--local SaveManager = loadstring(game:HttpGet(repository .. "addons/SaveManager.lua"))()
 
 local Esp = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/main/Libraries/Universal/PlayerEsp.lua"))()
 local PlayersEsp = Esp.players
