@@ -51,7 +51,7 @@ function FovCircle:_IsInFOV(character)
     local rootPart = character.HumanoidRootPart
     local position = Camera:WorldToScreenPoint(rootPart.Position)
     
-    return self:_GetDistance(Vector2.new(position.X, position.Y))
+    return self:_GetDistance(Vector2.new(position.X, position.Y)) <= circle.Radius
 end
 
 function FovCircle:GetClosestTarget()
