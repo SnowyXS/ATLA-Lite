@@ -67,7 +67,9 @@ function FovCircle:GetClosestTarget()
         local rootPart = targetChar:FindFirstChild("HumanoidRootPart")
         if not rootPart then continue end
 
-        local expectionCheck = self.ExpectionCheck and self.ExpectionCheck(Target) or true
+        local expectionCheck = self.ExpectionCheck and self.ExpectionCheck(Target)
+                               or not self.ExpectionCheck and false
+        print(expectionCheck)
         if expectionCheck then continue end
 
         local rootPos = rootPart.Position
