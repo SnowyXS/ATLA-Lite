@@ -68,14 +68,12 @@ return function(Window)
                 local targetTeam = target.Team.Name
     
                 local firstTeam, secondTeam = teams[1], teams[2]
-                local isSameTeam = table.find(secondTeam, team) and table.find(secondTeam, targetTeam) 
-                                    or table.find(secondTeam, team) and table.find(secondTeam, targetTeam)
-
-                if character:GetAttribute("Infection") or character:GetAttribute("409Infection") then
-                    return false 
-                end
+                local isSameTeam = table.find(firstTeam, team) and table.find(firstTeam, targetTeam) and true
+                                    or table.find(secondTeam, team) and table.find(secondTeam, targetTeam) and true
 
                 return isSameTeam and not head:FindFirstChild("Rogue")
+                       or not character:GetAttribute("Infection") and false
+                       or not character:GetAttribute("409Infection") and false
             end
 
             local function UpdateFov(value)
