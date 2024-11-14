@@ -109,7 +109,7 @@ return function(Window)
                 if Target then
                     local character = Target.Character
                     if not character then return end
-
+                    print(character)
                     local head = character:FindFirstChild("Head")
                     if not head then return end     
                     
