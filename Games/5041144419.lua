@@ -61,14 +61,20 @@ return function(Window)
     
             function Circle.ExpectionCheck(target)
                 local character = target.Character
-    
+                local head = character:FindFirstChild("Head")
+                if not head then return true end
+
                 local team = LocalPlayer.Team.Name
                 local targetTeam = target.Team.Name
     
                 local firstTeam, secondTeam = teams[1], teams[2]
+                local isSameTeam = table.find(secondTeam, team) and table.find(secondTeam, targetTeam) 
+                                    or table.find(secondTeam, team) and table.find(secondTeam, targetTeam)
 
-                return table.find(firstTeam, team) and table.find(firstTeam, targetTeam) 
-                       or table.find(secondTeam, team) and table.find(secondTeam, targetTeam) 
+                return not head:FindFirstChild("Rogue")
+                       or not character:GetAttribute("Infection")
+                       or not character:GetAttribute("409Infection")
+                       or isSameTeam
             end
 
             local function UpdateFov(value)
@@ -83,7 +89,6 @@ return function(Window)
                 Circle:SetPosition(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
                 Circle:SetVisibility(true)
 
-                UserInputService.MouseBehavior = Enum.MouseBehavior.LockCenter
                 return returnValues
             end)
 
@@ -92,7 +97,6 @@ return function(Window)
                 local returnValues = OldUnEquipGun(...)
                 Circle:SetVisibility(false)
 
-                UserInputService.MouseBehavior = Enum.MouseBehavior.Default
                 return returnValues
             end)
         end

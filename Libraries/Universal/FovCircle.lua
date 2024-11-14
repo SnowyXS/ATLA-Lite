@@ -69,7 +69,7 @@ function FovCircle:GetClosestTarget()
 
         local expectionCheck = self.ExpectionCheck and self.ExpectionCheck(Target)
                                or not self.ExpectionCheck and false
-        print(expectionCheck)
+
         if expectionCheck then continue end
 
         local rootPos = rootPart.Position
