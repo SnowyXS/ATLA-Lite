@@ -28,19 +28,17 @@ function FovCircle:SetVisibility(bool)
 end
 
 function FovCircle:UpdateRadius(fov)
-    local screenWidth = Camera.ViewportSize.X
-    local screenHeight = Camera.ViewportSize.Y
-
-    local horizontalFovSize = math.tan(math.rad(fov / 2)) * screenWidth
-
     local circle = self.circle
+    
+    local screenWidth = Camera.ViewportSize.X
+    local radius = screenWidth / (90 / fov)
 
-    circle.Radius = horizontalFovSize / 2
+    circle.Radius = radius
 end
 
 function FovCircle:_GetDistance(destination)
     local origin = isMouse and UserInputService:GetMouseLocation() or Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
-    local magnitude = (destination - origin).magnitude
+    local magnitude = (origin - destination).magnitude
     return magnitude
 end
 
