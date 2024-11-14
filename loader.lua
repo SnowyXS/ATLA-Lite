@@ -13,15 +13,14 @@ getgenv().Library = loadstring(game:HttpGet(repository .. "Library.lua"))()
 local ThemeManager = loadstring(game:HttpGet(repository .. "addons/ThemeManager.lua"))()
 local SaveManager = loadstring(game:HttpGet(repository .. "addons/SaveManager.lua"))()
 
-local Esp = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/main/Libraries/Universal/PlayerEsp.lua"))()
-local PlayersEsp = Esp.players
+local Esp = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/main/Libraries/Universal/Esp.lua"))()
+local PlayersEsp = Esp:GetCache()
 
 local Window = Library:CreateWindow({
     Title = "SLite",
     Center = true, 
     AutoShow = false,
 })
-
 
 local success, script = pcall(function()
     return game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/main/Games/" .. placeID .. ".lua") 
@@ -36,8 +35,6 @@ if success then
 
     SaveManager:SetFolder("SLite/" .. placeID)
 end
-
-
 
 do -- esp
     local espTab = Window:AddTab("Esp")
@@ -57,15 +54,6 @@ do -- esp
         Text = "Health Bar",
         Default = false,
         Tooltip = "Enables HealthBar Esp.",
-    }):AddColorPicker('HealthColor', {
-        Default = Color3.new(0, 1, 0), 
-        Title = 'High Health Color', 
-    }):AddColorPicker('HealthMediumColor', {
-        Default = Color3.new(1, 0.8, 0), 
-        Title = 'Medium Health Color', 
-    }):AddColorPicker('HealthLowColor', {
-        Default = Color3.new(1, 0, 0), 
-        Title = 'Low Health Color', 
     })
 
     playersGroup:AddToggle("ChamsCheckBox", {
@@ -88,53 +76,6 @@ do -- esp
         Default = Color3.new(1, 1, 1), 
         Title = 'Text Color', 
     })
-
-    do -- Players Drop Down Handler
-        local playersGroup = espTab:AddRightGroupbox("Filtering")
-        local players = {}
-
-        for _, v in pairs(Players:GetPlayers()) do
-            if v ~= LocalPlayer then
-                table.insert(players, v.Name)
-            end
-        end
-
-        playersGroup:AddDropdown("FilterDropDown", {
-            Values = {"Off", "Whitelist", "Blacklist"},
-            Default = 1,
-            Multi = false,
-            
-            Text = "Filter",
-            Tooltip = "Allows you to whitelist / blacklist people",
-        })
-
-        local playersDropDown = playersGroup:AddDropdown("PlayersDropDown", {
-            Values = players,
-            Multi = true,
-            AllowNull = true,
-                
-            Text = "Players",
-            Tooltip = "Select a player to whitelist / blacklist",
-        })
-
-        Players.PlayerAdded:Connect(function(player)
-            table.insert(players, player.Name)
-        
-            playersDropDown.Values = players
-            playersDropDown:SetValues()
-        end)
-
-
-        Players.PlayerRemoving:Connect(function(player)
-            local index = table.find(players, player.Name)
-            
-            table.remove(players, index)
-        
-            playersDropDown.Value[player] = nil
-            playersDropDown.Values = players
-            playersDropDown:SetValues()
-        end)
-    end
     
     local miscGroup = espTab:AddRightGroupbox("Misc")
 
@@ -214,7 +155,7 @@ do -- esp
 
     RunService.RenderStepped:Connect(function()
         for _, PlayerEsp in pairs(PlayersEsp) do
-            PlayerEsp:Refresh()
+            PlayerEsp:Render()
         end
     end)
 end
