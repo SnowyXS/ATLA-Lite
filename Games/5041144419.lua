@@ -1,6 +1,7 @@
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
-
+local RunService = game:GetService("RunService")
+ 
 local Camera = workspace.CurrentCamera
 
 local FovCircle = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/main/Libraries/Universal/FovCircle.lua"))()
@@ -97,6 +98,29 @@ return function(Window)
                 Circle:SetVisibility(false)
 
                 return returnValues
+            end)
+
+            local text = Drawing.new("Text")
+            text.Visible = false
+
+            RunService.RenderStepped:Connect(function(...)
+                local textWidth = text.TextBounds.X
+                local textHeight = text.TextBounds.Y
+    
+                local character = Circle:GetClosestTarget()
+                print(character)
+                if character then
+                    text.Position = Vector2.new(
+                        (Camera.ViewportSize.X - textWidth + 9) / 2, 
+                        Camera.ViewportSize.Y / 2
+                    )
+                    text.Text = character.Name
+                    text.Visible = true
+
+                    return
+                end
+
+                text.Visible = false
             end)
         end
 
