@@ -52,7 +52,7 @@ return function(Window)
                     "Scientific Department",
                     "Medical Department",
                     "Administrative Department"
-                }
+                },
                 {
                     "Class - D",
                     "Chaos Insurgency"
