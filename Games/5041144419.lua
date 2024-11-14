@@ -71,10 +71,11 @@ return function(Window)
                 local isSameTeam = table.find(secondTeam, team) and table.find(secondTeam, targetTeam) 
                                     or table.find(secondTeam, team) and table.find(secondTeam, targetTeam)
 
+                if character:GetAttribute("Infection") or character:GetAttribute("409Infection") then
+                    return false 
+                end
+
                 return isSameTeam and not head:FindFirstChild("Rogue")
-                       or not character:GetAttribute("Infection")
-                       or not character:GetAttribute("409Infection")
-                       or isSameTeam
             end
 
             local function UpdateFov(value)

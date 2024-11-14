@@ -64,10 +64,10 @@ end
 function Esp:Render()
     local target = self.player
     local targetChar = self.character
-    if not targetChar then return end 
+    if not targetChar then return self:HideObjects() end 
 
     local targetRoot = targetChar:FindFirstChild("HumanoidRootPart")
-    if not targetRoot then return end
+    if not targetRoot then return self:HideObjects() end
 
     local targetRootPos = targetRoot.Position
 
