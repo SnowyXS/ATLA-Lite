@@ -104,9 +104,12 @@ return function(Window)
             local line = Drawing.new("Line")
 
             RunService.RenderStepped:Connect(function(...)
-                local character = Circle:GetClosestTarget()
+                local Target = Circle:GetClosestTarget()
 
-                if character then
+                if Target then
+                    local character = Target.Character
+                    if not character then return end
+
                     local head = character:FindFirstChild("Head")
                     if not head then return end     
                     
@@ -125,9 +128,9 @@ return function(Window)
                     line.From =  Vector2.new(viewPortWidth / 2, viewPortHeight / 2)
                     line.To = Vector2.new(headViewPort.X, headViewPort.Y)
                 end
-                print(character ~= nil)
-                text.Visible = character ~= nil
-                line.Visible = character ~= nil
+
+                line.Visible = Target ~= nil
+                text.Visible = Target ~= nil
             end)
         end
 
