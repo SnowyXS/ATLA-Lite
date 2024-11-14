@@ -72,7 +72,7 @@ function FovCircle:GetClosestTarget()
 
         if onScreen and self:_IsInFOV(targetChar) then
             local distance = (mousePos - Vector2.new(vector.X, vector.Y)).Magnitude
-            local oldDistance = Closest[3] or math.huge
+            local oldDistance = ClosestDist or math.huge
 
             if distance <= oldDistance then
                 ClosestTarget = Target
