@@ -47,11 +47,19 @@ end
 
 function FovCircle:_IsInFOV(character)
     local circle = self.circle
-
     local rootPart = character.HumanoidRootPart
     local position = Camera:WorldToScreenPoint(rootPart.Position)
-    
-    return self:_GetDistance(Vector2.new(position.X, position.Y)) <= circle.Radius
+
+    local screenCenter = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
+
+    local dx = position.X - screenCenter.X
+    local dy = position.Y - screenCenter.Y
+    local distance = (dx^2 + dy^2)^(0.5)
+
+    local horizontalFovAngle = math.tan(math.rad(self.fov / 2)) * Camera.ViewportSize.X / 2
+    local verticalFovAngle = math.tan(math.rad(self.fov / 2)) * Camera.ViewportSize.Y / 2
+
+    return distance <= circle.Radius and math.abs(dx) <= horizontalFovAngle and math.abs(dy) <= verticalFovAngle
 end
 
 function FovCircle:GetClosestTarget()
