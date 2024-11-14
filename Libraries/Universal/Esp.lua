@@ -112,8 +112,8 @@ function Esp:UpdateObjects(rootViewPort)
     local targetRootPos = targetRoot.Position
     
     local targetHead = targetChar:FindFirstChild("Head")
-    if not targetHead then return end
-    
+    if not targetHead then return self:HideObjects() end
+
     local targetHeadPos = targetChar.Head.Position
 
     local viewPortSize = CurrentCamera.ViewportSize

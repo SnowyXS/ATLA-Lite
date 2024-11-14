@@ -42,6 +42,35 @@ return function(Window)
         local Circle = FovCircle.new()
 
         do -- Setup's the FovCircle
+            local teams = {
+                {
+                    "Mobile Task Force",
+                    "Security Department",
+                    "Intelligence Agency",
+                    "Rapid Response Team",
+                    "Internal Security Department",
+                    "Scientific Department",
+                    "Medical Department",
+                    "Administrative Department"
+                }
+                {
+                    "Class - D",
+                    "Chaos Insurgency"
+                }
+            }
+    
+            function Circle.ExpectionCheck(target)
+                local character = target.Character
+    
+                local team = LocalPlayer.Team.Name
+                local targetTeam = target.Team.Name
+    
+                local firstTeam, secondTeam = teams[1], teams[2]
+
+                return table.find(firstTeam, team) and table.find(firstTeam, targetTeam) 
+                       or table.find(secondTeam, team) and table.find(secondTeam, targetTeam) 
+            end
+
             local function UpdateFov(value)
                 Circle:UpdateRadius(value)
             end
@@ -51,10 +80,10 @@ return function(Window)
             local OldEquipGun
             OldEquipGun = hookfunction(senv.EquipGun, function(...)
                 local returnValues = OldEquipGun(...)
-
                 Circle:SetPosition(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
                 Circle:SetVisibility(true)
-                
+
+                UserInputService.MouseBehavior = Enum.MouseBehavior.LockCenter
                 return returnValues
             end)
 
@@ -63,6 +92,7 @@ return function(Window)
                 local returnValues = OldUnEquipGun(...)
                 Circle:SetVisibility(false)
 
+                UserInputService.MouseBehavior = Enum.MouseBehavior.Default
                 return returnValues
             end)
         end
