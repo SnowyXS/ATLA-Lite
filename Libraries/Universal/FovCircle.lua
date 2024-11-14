@@ -12,7 +12,7 @@ function FovCircle.new(isMouse)
     local circle = Drawing.new("Circle")
 
     return setmetatable({
-        circle = circle
+        circle = circle,
         isMouse = isMouse
     }, FovCircle)
 end
