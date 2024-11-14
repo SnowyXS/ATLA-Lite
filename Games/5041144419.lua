@@ -101,26 +101,33 @@ return function(Window)
             end)
 
             local text = Drawing.new("Text")
-            text.Visible = false
+            local line = Drawing.new("Line")
 
             RunService.RenderStepped:Connect(function(...)
-                local textWidth = text.TextBounds.X
-                local textHeight = text.TextBounds.Y
-    
                 local character = Circle:GetClosestTarget()
-                print(character)
-                if character then
-                    text.Position = Vector2.new(
-                        (Camera.ViewportSize.X - textWidth + 9) / 2, 
-                        Camera.ViewportSize.Y / 2
-                    )
-                    text.Text = character.Name
-                    text.Visible = true
 
-                    return
+                if character then
+                    local head = character:FindFirstChild("Head")
+                    if not head then return end     
+                    
+                    local textWidth = text.TextBounds.X
+                    local textHeight = text.TextBounds.Y
+
+                    local viewPortWidth = Camera.ViewportSize.X 
+					local viewPortHeight = Camera.ViewportSize.Y
+
+                    local headViewPort, isRendered = Camera:worldToViewportPoint(head.Position)
+
+                    text.Position = Vector2.new((viewPortWidth - textWidth + 9) / 2, viewPortHeight / 2)
+                    text.Visible = true
+                    text.Text = character.Name
+
+                    line.From =  Vector2.new(viewPortWidth / 2, viewPortHeight / 2)
+                    line.To = Vector2.new(headViewPort.X, headViewPort.Y)
                 end
 
-                text.Visible = false
+                text.Visible = character ~= nil
+                line.Visible = character ~= nil
             end)
         end
 
