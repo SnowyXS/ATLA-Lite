@@ -40,12 +40,12 @@ end
 
 function FovCircle:_IsInFOV(character)
     local circle = self.circle
-    local mousePos = UserInputService:GetMouseLocation()
+    local screenCenter = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
 
     for _, part in ipairs(character:GetChildren()) do
         if part:IsA("BasePart") then
             local position = Camera:WorldToScreenPoint(part.Position)
-            local magnitude = (mousePos - Vector2.new(position.X, position.Y)).magnitude
+            local magnitude = (screenCenter - Vector2.new(position.X, position.Y)).magnitude
 
             if magnitude <= circle.Radius then return true end
         end
@@ -55,10 +55,10 @@ function FovCircle:_IsInFOV(character)
 end
 
 function FovCircle:GetClosestTarget()
-	local ClosestTarget, ClosestDist
-	local mousePos = UserInputService:GetMouseLocation()
+    local ClosestTarget, ClosestDist
+    local screenCenter = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2) 
 
-	for _, Target in pairs(Players:GetPlayers()) do
+    for _, Target in pairs(Players:GetPlayers()) do
         if Target == LocalPlayer then continue end
         
         local targetChar = Target.Character
@@ -76,7 +76,7 @@ function FovCircle:GetClosestTarget()
         local vector, onScreen = Camera:WorldToScreenPoint(rootPos)
 
         if onScreen and self:_IsInFOV(targetChar) then
-            local distance = (mousePos - Vector2.new(vector.X, vector.Y)).Magnitude
+            local distance = (screenCenter - Vector2.new(vector.X, vector.Y)).Magnitude
             local oldDistance = ClosestDist or math.huge
 
             if distance <= oldDistance then
@@ -84,9 +84,9 @@ function FovCircle:GetClosestTarget()
                 ClosestDist = distance
             end
         end
-	end
+    end
 
-	return ClosestTarget
+    return ClosestTarget
 end
 
 return FovCircle
