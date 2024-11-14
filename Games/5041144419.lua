@@ -31,7 +31,7 @@ return function(Window)
             Tooltip = 'Brings out your inner demon', 
         })
 
-        local ShowTargetToggle = SilentAimGroup:AddToggle('WallBangToggle', {
+        local ShowTargetToggle = SilentAimGroup:AddToggle('ShowTargetToggle', {
             Text = 'Show Target',
             Default = false,
             Tooltip = 'Displays who the silent aim will target.', 
