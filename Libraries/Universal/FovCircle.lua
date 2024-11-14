@@ -64,7 +64,7 @@ function FovCircle:GetClosestTarget()
         local targetChar = Target.Character
         if not targetChar then continue end
 
-        local rootPart = targetChar.HumanoidRootPart
+        local rootPart = targetChar:FindFirstChild("HumanoidRootPart")
         if not rootPart then continue end
 
         local rootPos = rootPart.Position
