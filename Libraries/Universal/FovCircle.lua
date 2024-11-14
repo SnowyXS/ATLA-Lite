@@ -29,11 +29,11 @@ end
 
 function FovCircle:UpdateRadius(fov)
     local circle = self.circle
-    
-    local screenWidth = Camera.ViewportSize.X
-    local radius = screenWidth / (90 / fov)
 
-    circle.Radius = radius
+    local screenWidth = Camera.ViewportSize.X
+    local radius = math.tan(math.rad(fov / 2)) * screenWidth
+
+    circle.Radius = 300
 end
 
 function FovCircle:_GetDistance(destination)
