@@ -35,12 +35,12 @@ function FovCircle:UpdateRadius(fov)
 
     local circle = self.circle
 
-    circle.Radius = horizontalFovSize
+    circle.Radius = horizontalFovSize / 2
 end
 
 function FovCircle:_GetDistance(destination)
     local origin = isMouse and UserInputService:GetMouseLocation() or Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
-    local magnitude = (origin - destination).magnitude
+    local magnitude = (destination - origin).magnitude
     return magnitude
 end
 
