@@ -35,7 +35,8 @@ function FovCircle:UpdateRadius(fov)
     local verticalFovSize = math.tan(math.rad(fov / 2)) * screenHeight
 
     local circle = self.circle
-
+    
+    self.fov = fov
     circle.Radius = (horizontalFovSize + verticalFovSize) / 4
 end
 
