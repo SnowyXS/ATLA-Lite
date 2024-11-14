@@ -71,7 +71,7 @@ return function(Window)
                 local isSameTeam = table.find(secondTeam, team) and table.find(secondTeam, targetTeam) 
                                     or table.find(secondTeam, team) and table.find(secondTeam, targetTeam)
 
-                return not head:FindFirstChild("Rogue")
+                return isSameTeam and not head:FindFirstChild("Rogue")
                        or not character:GetAttribute("Infection")
                        or not character:GetAttribute("409Infection")
                        or isSameTeam
