@@ -125,7 +125,7 @@ return function(Window)
                     line.From =  Vector2.new(viewPortWidth / 2, viewPortHeight / 2)
                     line.To = Vector2.new(headViewPort.X, headViewPort.Y)
                 end
-
+                print(character ~= nil)
                 text.Visible = character ~= nil
                 line.Visible = character ~= nil
             end)
