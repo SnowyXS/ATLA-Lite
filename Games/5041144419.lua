@@ -30,7 +30,13 @@ return function(Window)
             Default = false,
             Tooltip = 'Brings out your inner demon', 
         })
-        
+
+        local ShowTargetToggle = SilentAimGroup:AddToggle('WallBangToggle', {
+            Text = 'Show Target',
+            Default = false,
+            Tooltip = 'Displays who the silent aim will target.', 
+        })
+
         local FovSlider = SilentAimGroup:AddSlider('FovSlider', {
             Text = 'FOV',
             Default = 15,
@@ -40,7 +46,7 @@ return function(Window)
             Compact = false,
         })
 
-        local Circle = FovCircle.new()
+        local Circle = FovCircle.new(false)
 
         do -- Setup's the FovCircle
             local teams = {
@@ -99,11 +105,13 @@ return function(Window)
 
                 return returnValues
             end)
+        end
 
-            local text = Drawing.new("Text")
-            local line = Drawing.new("Line")
+        local text = Drawing.new("Text")
+        local line = Drawing.new("Line")
 
-            RunService.RenderStepped:Connect(function(...)
+        RunService.RenderStepped:Connect(function(...)
+            if ShowTargetToggle.Value then
                 local Target = Circle:GetClosestTarget()
 
                 if Target then
@@ -117,7 +125,7 @@ return function(Window)
                     local textHeight = text.TextBounds.Y
 
                     local viewPortWidth = Camera.ViewportSize.X 
-					local viewPortHeight = Camera.ViewportSize.Y
+                    local viewPortHeight = Camera.ViewportSize.Y
 
                     local headViewPort, isRendered = Camera:worldToViewportPoint(head.Position)
 
@@ -131,8 +139,8 @@ return function(Window)
 
                 line.Visible = Target ~= nil
                 text.Visible = Target ~= nil
-            end)
-        end
+            end
+        end)
 
         local OldFunction
         OldFunction = hookfunction(senv.BulletHit, function(...)

@@ -8,11 +8,12 @@ local LocalPlayer = Players.LocalPlayer
 local FovCircle = {}
 FovCircle.__index = FovCircle
 
-function FovCircle.new(fov)
+function FovCircle.new(isMouse)
     local circle = Drawing.new("Circle")
 
     return setmetatable({
         circle = circle
+        isMouse = isMouse
     }, FovCircle)
 end
 
@@ -38,20 +39,19 @@ function FovCircle:UpdateRadius(fov)
     circle.Radius = (horizontalFovSize + verticalFovSize) / 4
 end
 
+function FovCircle:_GetDistance(destination)
+    local origin = isMouse and UserInputService:GetMouseLocation() or Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
+    local magnitude = (origin - destination).magnitude
+    return magnitude
+end
+
 function FovCircle:_IsInFOV(character)
     local circle = self.circle
-    local screenCenter = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
 
-    for _, part in ipairs(character:GetChildren()) do
-        if part:IsA("BasePart") then
-            local position = Camera:WorldToScreenPoint(part.Position)
-            local magnitude = (screenCenter - Vector2.new(position.X, position.Y)).magnitude
-
-            if magnitude <= circle.Radius then return true end
-        end
-    end
+    local rootPart = targetChar.HumanoidRootPart
+    local position = Camera:WorldToScreenPoint(rootPart.Position)
     
-    return false
+    return self:_GetDistance(Vector2.new(position.X, position.Y))
 end
 
 function FovCircle:GetClosestTarget()
@@ -73,10 +73,10 @@ function FovCircle:GetClosestTarget()
         if expectionCheck then continue end
 
         local rootPos = rootPart.Position
-        local vector, onScreen = Camera:WorldToScreenPoint(rootPos)
+        local position, onScreen = Camera:WorldToScreenPoint(rootPos)
 
         if onScreen and self:_IsInFOV(targetChar) then
-            local distance = (screenCenter - Vector2.new(vector.X, vector.Y)).Magnitude
+            local distance =  self:_GetDistance(Vector2.new(position.X, position.Y))
             local oldDistance = ClosestDist or math.huge
 
             if distance <= oldDistance then
