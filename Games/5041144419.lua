@@ -90,23 +90,6 @@ return function(Window)
             end
 
             FovSlider:OnChanged(UpdateFov)
-
-            local OldEquipGun
-            OldEquipGun = hookfunction(senv.EquipGun, function(...)
-                local returnValues = OldEquipGun(...)
-                Circle:SetPosition(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
-                Circle:SetVisibility(true)
-
-                return returnValues
-            end)
-
-            local OldUnEquipGun
-            OldUnEquipGun = hookfunction(senv.UnequipGun, function(...)
-                local returnValues = OldUnEquipGun(...)
-                Circle:SetVisibility(false)
-
-                return returnValues
-            end)
         end
 
         local text = Drawing.new("Text")
@@ -142,6 +125,26 @@ return function(Window)
                 line.Visible = Target ~= nil
                 text.Visible = Target ~= nil
             end
+        end)
+        
+        local OldEquipGun
+        OldEquipGun = hookfunction(senv.EquipGun, function(...)
+            local returnValues = OldEquipGun(...)
+            Circle:SetPosition(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
+            Circle:SetVisibility(true)
+
+            return returnValues
+        end)
+
+        local OldUnEquipGun
+        OldUnEquipGun = hookfunction(senv.UnequipGun, function(...)
+            local returnValues = OldUnEquipGun(...)
+            Circle:SetVisibility(false)
+            
+            line.Visible = false
+            text.Visible = false
+
+            return returnValues
         end)
 
         local OldFunction
