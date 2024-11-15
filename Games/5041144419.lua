@@ -4,7 +4,7 @@ local RunService = game:GetService("RunService")
  
 local Camera = workspace.CurrentCamera
 
-local FovCircle = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/main/Libraries/Universal/FovCircle.lua"))()
+local FovIndicator = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/main/Libraries/Universal/FOV/FovIndicator.lua"))()
 
 return function(Window)
     local LocalPlayer = Players.LocalPlayer
@@ -46,7 +46,7 @@ return function(Window)
             Compact = false,
         })
 
-        local Circle = FovCircle.new(false)
+        local Circle = FovIndicator.new(false)
 
         do -- Setup's the FovCircle
             local teams = {
@@ -78,11 +78,10 @@ return function(Window)
                 local isSameTeam = table.find(firstTeam, team) and table.find(firstTeam, targetTeam) and true
                                     or table.find(secondTeam, team) and table.find(secondTeam, targetTeam) and true
 
-                if character:GetAttribute("Infection") or character:GetAttribute("409Infection") then
-                    return false
-                end
-
-                return isSameTeam and not head:FindFirstChild("Rogue")
+                return not isSameTeam 
+                       or isSameTeam and head:FindFirstChild("Rogue")
+                       or character:GetAttribute("Infection") 
+                       or character:GetAttribute("409Infection")
             end
 
             local function UpdateFov(value)
