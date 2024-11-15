@@ -68,7 +68,7 @@ function Esp:Render()
     if not targetChar then return self:HideObjects() end 
     
     local targetRoot = targetChar:FindFirstChild("HumanoidRootPart")
-    if not targetRoot then return end
+    if not targetRoot then return self:HideObjects() end
     
     local targetRootPos = targetRoot.Position
 
@@ -111,7 +111,7 @@ function Esp:UpdateObjects(rootViewPort)
     local targetRootPos = targetRoot.Position
     
     local targetHead = targetChar:FindFirstChild("Head")
-    if not targetHead then return end
+    if not targetHead then return self:HideObjects() end
     
     local targetHeadPos = targetChar.Head.Position
 
