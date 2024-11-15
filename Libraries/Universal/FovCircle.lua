@@ -50,7 +50,6 @@ end
 
 function FovCircle:GetClosestTarget()
     local ClosestTarget, ClosestDist
-    local screenCenter = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2) 
 
     for _, Target in pairs(Players:GetPlayers()) do
         if Target == LocalPlayer then continue end
