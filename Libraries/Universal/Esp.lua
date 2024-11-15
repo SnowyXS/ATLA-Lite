@@ -161,11 +161,9 @@ function Esp:GetCache()
 end
 
 function Esp:Destroy()
-    local players = self.players
-    local player = self.player
-
     local objects = self.objects
     local cache = self:GetCache()
+    local player = self.player
 
     for _, object in pairs(objects) do
         object:Remove()
@@ -175,7 +173,7 @@ function Esp:Destroy()
     
     setmetatable(self, nil)
     table.clear(self)
-
+    
     cache[player] = nil
 end
 
