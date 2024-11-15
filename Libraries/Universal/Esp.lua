@@ -64,10 +64,8 @@ end
 function Esp:Render()
     local target = self.player
     local targetChar = self.character
-    if not targetChar then return self:HideObjects() end 
-
     local targetRoot = targetChar:FindFirstChild("HumanoidRootPart")
-    if not targetRoot then return self:HideObjects() end
+    if not targetChar and not targetRoot then return self:HideObjects() end 
 
     local targetRootPos = targetRoot.Position
 
@@ -75,10 +73,7 @@ function Esp:Render()
     local isInRenderDistance = Esp:IsInRenderDistance(distance)
     
     local rootViewPort, isRendered = CurrentCamera:worldToViewportPoint(targetRootPos)
-
-    if not isRendered or not isInRenderDistance then
-        return self:HideObjects()
-    end
+    if not isRendered or not isInRenderDistance then return self:HideObjects() end
 
     self:UpdateObjects(rootViewPort)
 end
@@ -106,27 +101,25 @@ function Esp:GetHealthPercentage()
 end
 
 function Esp:UpdateObjects(rootViewPort)
+    local objects = self.objects
     local targetChar = self.character
 
     local targetRoot = targetChar.HumanoidRootPart
     local targetRootPos = targetRoot.Position
     
-    local targetHead = targetChar:FindFirstChild("Head")
-    if not targetHead then return self:HideObjects() end
-
+    local targetHead = targetChar.Heaad
     local targetHeadPos = targetChar.Head.Position
 
     local viewPortSize = CurrentCamera.ViewportSize
     local headViewPort = CurrentCamera:worldToViewportPoint(targetHeadPos + Vector3.new(0, 1.5, 0))
     local legViewPort = CurrentCamera:worldToViewportPoint(targetRootPos - Vector3.new(0, 2.5, 0))
 
-    local objects = self.objects
     local boxWidth = (viewPortSize.X / rootViewPort.Z) * 1.5
     local boxHeight = headViewPort.Y - legViewPort.Y
+    local textSize = math.clamp(boxWidth, 0, Options.TextSizeSlider.Value)
 
     local healthPercentage = self:GetHealthPercentage()
-    local textSize = math.clamp(boxWidth, 0, Options.TextSizeSlider.Value)
-    
+
     local box = objects.box
     box.Size = Vector2.new(boxWidth, boxHeight)
     box.Thickness = 1.5

@@ -156,18 +156,16 @@ return function(Window)
                 if Target then
                     local targetChar = Target.Character
 
-                    if targetChar:FindFirstChild("Head") then
-                        local oldCastInfo = args[1]
+                    local head = targetChar.Head
+                    local headPos = head.Position
 
-                        local rayOrigin = WallBangToggle.Value and targetChar.Head.Position + Vector3.new(0, 1, 0) or Camera.CFrame.p
-                        local rayDestination = targetChar.Head.Position
+                    local oldCastInfo = args[1]
+                    local rayOrigin = WallBangToggle.Value and headPos + Vector3.new(0, 1, 0) or Camera.CFrame.p
+                    local rayDestination = headPos
+                    local rayDirection = rayDestination - rayOrigin
+                    local parameters = oldCastInfo.RayInfo.Parameters
 
-                        local rayDirection = rayDestination - rayOrigin
-
-                        local parameters = oldCastInfo.RayInfo.Parameters
-
-                        args[2] = workspace:Raycast(rayOrigin, rayDirection, parameters)
-                    end
+                    args[2] = workspace:Raycast(rayOrigin, rayDirection, parameters)
                 end
             end
 
