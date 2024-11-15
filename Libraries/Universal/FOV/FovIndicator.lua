@@ -16,10 +16,8 @@ function FovIndicator.new(isMouse)
         circle = circle,
         isMouse = isMouse
     }, FovIndicator)
-
-    setmetatable(newFovIndicator, { __index = TargetFinder })
-
-    return newFovIndicator
+    
+    return setmetatable(TargetFinder, {__index = newFovIndicator})
 end
 
 function FovIndicator:SetPosition(x, y)
