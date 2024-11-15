@@ -1,7 +1,9 @@
 # Script
 `loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/main/loader.lua"))()`
 # Supported executors
-- Krampus
+- Nihon V3
+- Synapse Z
+- Wave
 # Discord Server
 https://discord.com/invite/n2egDfZwgJ
 # Credits
