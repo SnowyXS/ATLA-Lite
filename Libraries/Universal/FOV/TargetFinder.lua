@@ -15,7 +15,7 @@ function TargetFinder:_GetDistance(destination)
 end
 
 function TargetFinder:_IsInFOV(position)
-    local circle = self.circle
+    local circle = self.circle  
     local magnitude = self:_GetDistance(position)
 
     return magnitude, magnitude <= circle.Radius
@@ -46,7 +46,7 @@ function TargetFinder:GetClosestTarget()
         local distance, isInFov = self:_IsInFOV(screenPos)
         if not isInFov then continue end
 
-        if distance <= oldDistance then
+        if distance <= ClosestDist then
             ClosestTarget = Target
             ClosestDist = distance
         end
