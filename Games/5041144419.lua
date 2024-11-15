@@ -113,7 +113,7 @@ return function(Window)
         local line = Drawing.new("Line")
 
         RunService.RenderStepped:Connect(function(...)
-            if ShowTargetToggle.Value then
+            if ShowTargetToggle.Value and Circle:IsVisible() then
                 local Target = Circle:GetClosestTarget()
 
                 if Target then

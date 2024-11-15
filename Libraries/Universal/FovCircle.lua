@@ -22,6 +22,11 @@ function FovCircle:SetPosition(x, y)
     circle.Position = Vector2.new(x, y)
 end
 
+function FovCircle:IsVisible()
+    local circle = self.circle
+    return circle.Visible
+end
+
 function FovCircle:SetVisibility(bool)
     local circle = self.circle
     circle.Visible = bool
