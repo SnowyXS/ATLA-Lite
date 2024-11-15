@@ -160,7 +160,6 @@ do -- esp
     end)
 end
 
-
 local settingsTab = Window:AddTab("Settings")
 local menuGroup = settingsTab:AddLeftGroupbox("Menu")
 
