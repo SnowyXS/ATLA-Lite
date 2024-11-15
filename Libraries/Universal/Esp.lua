@@ -63,10 +63,13 @@ end
 
 function Esp:Render()
     local target = self.player
-    local targetChar = self.character
-    local targetRoot = targetChar:FindFirstChild("HumanoidRootPart")
-    if not targetChar and not targetRoot then return self:HideObjects() end 
 
+    local targetChar = self.character
+    if not targetChar then return self:HideObjects() end 
+    
+    local targetRoot = targetChar:FindFirstChild("HumanoidRootPart")
+    if not targetRoot then return self:HideObjects() then
+    
     local targetRootPos = targetRoot.Position
 
     local distance = (primaryPart.CFrame.p - targetRootPos).Magnitude

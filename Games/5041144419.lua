@@ -68,8 +68,7 @@ return function(Window)
     
             function Circle.ExpectionCheck(target)
                 local character = target.Character
-                local head = character:FindFirstChild("Head")
-                if not head then return true end
+                local head = character.Head
 
                 local team = LocalPlayer.Team.Name
                 local targetTeam = target.Team.Name
@@ -100,10 +99,7 @@ return function(Window)
 
                 if Target then
                     local character = Target.Character
-                    if not character then return end
-
-                    local head = character:FindFirstChild("Head")
-                    if not head then return end     
+                    local head = character.Head
                     
                     local textWidth = text.TextBounds.X
                     local textHeight = text.TextBounds.Y

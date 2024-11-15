@@ -11,7 +11,7 @@ TargetFinder.__index = TargetFinder
 function TargetFinder:_GetDistance(destination)
     local origin = isMouse and UserInputService:GetMouseLocation() or Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
     local magnitude = (origin - destination).magnitude
-    
+
     return magnitude
 end
 
@@ -29,9 +29,11 @@ function TargetFinder:GetClosestTarget()
         if Target == LocalPlayer then continue end
         
         local targetChar = Target.Character
-        local head = targetChar:FindFirstChild("Head")
-        if not targetChar and not head then continue end
+        if not targetChar then continue end
 
+        local head = targetChar:FindFirstChild("Head")
+        if not head then continue end
+        
         local expectionCheck = self.ExpectionCheck and self.ExpectionCheck(Target)
                                or not self.ExpectionCheck and false
 
