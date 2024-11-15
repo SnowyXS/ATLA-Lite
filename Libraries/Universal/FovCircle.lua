@@ -45,7 +45,7 @@ end
 function FovCircle:_IsInFOV(position)
     local circle = self.circle
 
-    return self:_GetDistance(Vector2.new(position.X, position.Y)) <= circle.Radius
+    return self:_GetDistance(position) <= circle.Radius
 end
 
 function FovCircle:GetClosestTarget()
@@ -68,9 +68,10 @@ function FovCircle:GetClosestTarget()
 
         local rootPos = rootPart.Position
         local position, onScreen = Camera:WorldToViewportPoint(rootPos)
+        local screenPosition = Vector2.new(position.X, position.Y)
 
-        if onScreen and self:_IsInFOV(position) then
-            local distance =  self:_GetDistance(Vector2.new(position.X, position.Y))
+        if onScreen and self:_IsInFOV(screenPosition) then
+            local distance =  self:_GetDistance(screenPosition)
             local oldDistance = ClosestDist or math.huge
 
             if distance <= oldDistance then
