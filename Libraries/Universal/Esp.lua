@@ -68,7 +68,7 @@ function Esp:Render()
     if not targetChar then return self:HideObjects() end 
     
     local targetRoot = targetChar:FindFirstChild("HumanoidRootPart")
-    if not targetRoot then return self:HideObjects() then
+    if not targetRoot then return self:HideObjects() end
     
     local targetRootPos = targetRoot.Position
 
@@ -173,7 +173,7 @@ function Esp:Destroy()
     
     setmetatable(self, nil)
     table.clear(self)
-    
+
     cache[player] = nil
 end
 
