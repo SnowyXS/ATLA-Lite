@@ -107,7 +107,7 @@ function Esp:UpdateObjects(rootViewPort)
     local targetRoot = targetChar.HumanoidRootPart
     local targetRootPos = targetRoot.Position
     
-    local targetHead = targetChar.Heaad
+    local targetHead = targetChar.Head
     local targetHeadPos = targetChar.Head.Position
 
     local viewPortSize = CurrentCamera.ViewportSize
