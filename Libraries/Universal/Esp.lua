@@ -177,6 +177,4 @@ function Esp:Destroy()
     cache[player] = nil
 end
 
-getgenv().Esp = Esp
-
 return Esp
