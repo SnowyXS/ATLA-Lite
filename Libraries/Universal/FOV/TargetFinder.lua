@@ -1,3 +1,10 @@
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+
+local Camera = workspace.CurrentCamera
+
+local LocalPlayer = Players.LocalPlayer
+
 local TargetFinder = {}
 TargetFinder.__index = TargetFinder
 
