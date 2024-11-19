@@ -1,10 +1,7 @@
 local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
 
 local CurrentCamera = workspace.CurrentCamera
-
 local LocalPlayer = Players.LocalPlayer
-
 local placeID = game.PlaceId
 
 local repository = "https://raw.githubusercontent.com/violin-suzutsuki/LinoriaLib/main/"
@@ -13,7 +10,7 @@ getgenv().Library = loadstring(game:HttpGet(repository .. "Library.lua"))()
 local ThemeManager = loadstring(game:HttpGet(repository .. "addons/ThemeManager.lua"))()
 local SaveManager = loadstring(game:HttpGet(repository .. "addons/SaveManager.lua"))()
 
-local EspController = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/main/Libraries/Universal/ESP/EspController.lua"))()
+local EspController = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/main/Libraries/Universal/ESP/EspController.lua"))()()
 
 local Window = Library:CreateWindow({
     Title = "SLite",
