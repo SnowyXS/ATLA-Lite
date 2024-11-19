@@ -10,8 +10,6 @@ getgenv().Library = loadstring(game:HttpGet(repository .. "Library.lua"))()
 local ThemeManager = loadstring(game:HttpGet(repository .. "addons/ThemeManager.lua"))()
 local SaveManager = loadstring(game:HttpGet(repository .. "addons/SaveManager.lua"))()
 
-local EspController = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/main/Libraries/Universal/ESP/EspController.lua"))()()
-
 local Window = Library:CreateWindow({
     Title = "SLite",
     Center = true, 
@@ -123,6 +121,8 @@ do -- esp
     
         Compact = false,
     })
+    
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/main/Libraries/Universal/ESP/EspController.lua"))()()
 end
 
 local settingsTab = Window:AddTab("Settings")
