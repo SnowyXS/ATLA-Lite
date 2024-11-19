@@ -155,6 +155,6 @@ function PlayerESP:GetHealthPercentage()
     local maxHealth = targetHumanoid.MaxHealth
 
     return health / maxHealth
-ene
+end
 
 return PlayerESP
