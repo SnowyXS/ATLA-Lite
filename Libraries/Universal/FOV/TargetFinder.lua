@@ -9,7 +9,7 @@ local TargetFinder = {}
 TargetFinder.__index = TargetFinder
 
 function TargetFinder:_GetDistance(destination)
-    local origin = isMouse and UserInputService:GetMouseLocation() or Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
+    local origin = self.isMouse and UserInputService:GetMouseLocation() or Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
     local magnitude = (origin - destination).magnitude
 
     return magnitude
