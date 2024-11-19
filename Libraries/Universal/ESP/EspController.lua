@@ -41,7 +41,7 @@ end
 function Controller:AddPlayer(player)
     local playerList = self._playerList
     
-    playerList[player] = Player.new(player)
+    playerList[player] = PlayerESP.new(player)
 end
 
 function Controller:RemovePlayer(player)
