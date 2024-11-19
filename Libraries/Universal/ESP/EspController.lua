@@ -38,7 +38,7 @@ end
 function Controller:AddPlayer(player)
     local players = self._playerList
     
-    players[player] = Player.new()
+    players[player] = Player.new(player)
 end
 
 function Controller:RemovePlayer(player)
