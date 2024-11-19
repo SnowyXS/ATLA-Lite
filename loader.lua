@@ -29,47 +29,54 @@ if success then
     SaveManager:SetFolder("SLite/" .. placeID)
 end
 
-do -- esp
-    local espTab = Window:AddTab("Esp")
+do -- ESP
+    local espTab = Window:AddTab("ESP")
 
-    local playersGroup = espTab:AddLeftGroupbox("Players")
+    do -- Player ESP
+        local playersGroup = espTab:AddLeftGroupbox("Players")
 
-    playersGroup:AddToggle("BoxCheckBox", {
-        Text = "Box",
-        Default = false,
-        Tooltip = "Enables Box Esp.",
-    }):AddColorPicker('BoxColor', {
-        Default = Color3.new(1, 1, 1), 
-        Title = 'Box Color', 
-    })
+        playersGroup:AddToggle("BoxCheckBox", {
+            Text = "Box",
+            Default = false,
+            Tooltip = "Enables Box Esp.",
+        }):AddColorPicker('BoxColor', {
+            Default = Color3.new(1, 1, 1), 
+            Title = 'Box Color', 
+        })
 
-    playersGroup:AddToggle("HealthBarCheckBox", {
-        Text = "Health Bar",
-        Default = false,
-        Tooltip = "Enables HealthBar Esp.",
-    })
+        playersGroup:AddToggle("HealthBarCheckBox", {
+            Text = "Health Bar",
+            Default = false,
+            Tooltip = "Enables HealthBar Esp.",
+        })
 
-    playersGroup:AddToggle("ChamsCheckBox", {
-        Text = "Chams",
-        Default = false,
-        Tooltip = "Enables Chams.",
-    }):AddColorPicker('ChamsColor', {
-        Default = Color3.new(0, 0, 0), 
-        Title = 'Fill Color', 
-    }):AddColorPicker('ChamsOutLineColor', {
-        Default = Color3.new(1, 1, 1), 
-        Title = 'OutLine Color', 
-    })
+        playersGroup:AddToggle("ChamsCheckBox", {
+            Text = "Chams",
+            Default = false,
+            Tooltip = "Enables Chams.",
+        }):AddColorPicker('ChamsColor', {
+            Default = Color3.new(0, 0, 0), 
+            Title = 'Fill Color', 
+        }):AddColorPicker('ChamsOutLineColor', {
+            Default = Color3.new(1, 1, 1), 
+            Title = 'OutLine Color', 
+        })
 
-    playersGroup:AddToggle("NameTagCheckBox", {
-        Text = "Name",
-        Default = false,
-        Tooltip = "Enables Name Esp.",
-    }):AddColorPicker('NameColor', {
-        Default = Color3.new(1, 1, 1), 
-        Title = 'Text Color', 
-    })
-    
+        playersGroup:AddToggle("NameTagCheckBox", {
+            Text = "Name",
+            Default = false,
+            Tooltip = "Enables Name Esp.",
+        }):AddColorPicker('NameColor', {
+            Default = Color3.new(1, 1, 1), 
+            Title = 'Text Color', 
+        })
+    end
+
+    do -- Entity ESP
+        -- WIP
+    end
+
+        
     local miscGroup = espTab:AddRightGroupbox("Misc")
 
     miscGroup:AddToggle("TeamColorsCheckBox", {
@@ -80,49 +87,46 @@ do -- esp
 
     miscGroup:AddSlider("TextSizeSlider", {
         Text = "Max Text Size",
-
         Default = 14,
         Min = 14,
         Max = 100,
         Rounding = 1,
-    
         Compact = false,
     })
 
     miscGroup:AddSlider("DistanceSlider", {
         Text = "Render Distance",
-
         Default = 0,
         Min = 0,
         Max = 10000,
         Rounding = 1,
-    
         Compact = false,
     })
 
     miscGroup:AddSlider("ChamsTransparency", {
         Text = "Chams Transparency",
-
         Default = 0,
         Min = 0,
         Max = 100,
         Rounding = 1,
-    
         Compact = false,
     })
 
     miscGroup:AddSlider("ChamsOutLineTransparency", {
         Text = "Chams OutLine Transparency",
-
         Default = 0,
         Min = 0,
         Max = 100,
         Rounding = 1,
-    
         Compact = false,
     })
+<<<<<<< HEAD
+
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/main/Libraries/Universal/ESP/EspController.lua"))()()
+=======
     
     loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/main/Libraries/Universal/ESP/EspController.lua"))()()
+>>>>>>> 3a17d8eab7b0ce2324bd78174415ba765bb96f73
 end
 
 local settingsTab = Window:AddTab("Settings")
