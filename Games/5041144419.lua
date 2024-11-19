@@ -1,12 +1,12 @@
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
- 
-local Camera = workspace.CurrentCamera
 
 local FovIndicator = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/main/Libraries/Universal/FOV/FovIndicator.lua"))()
 
 return function(Window)
+    local Camera = workspace.CurrentCamera
+
     local LocalPlayer = Players.LocalPlayer
     local PlayerScripts = LocalPlayer.PlayerScripts
     
@@ -107,7 +107,7 @@ return function(Window)
                     local viewPortWidth = Camera.ViewportSize.X 
                     local viewPortHeight = Camera.ViewportSize.Y
 
-                    local headViewPort, isRendered = Camera:worldToViewportPoint(head.Position)
+                    local headViewPort = Camera:worldToViewportPoint(head.Position)
 
                     text.Position = Vector2.new((viewPortWidth - textWidth + 9) / 2, viewPortHeight / 2)
                     text.Visible = true

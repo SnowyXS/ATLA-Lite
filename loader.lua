@@ -13,8 +13,7 @@ getgenv().Library = loadstring(game:HttpGet(repository .. "Library.lua"))()
 local ThemeManager = loadstring(game:HttpGet(repository .. "addons/ThemeManager.lua"))()
 local SaveManager = loadstring(game:HttpGet(repository .. "addons/SaveManager.lua"))()
 
-local Esp = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/main/Libraries/Universal/Esp.lua"))()
-local PlayersEsp = Esp:GetCache()
+local EspController = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/main/Libraries/Universal/ESP/EspController.lua"))()
 
 local Window = Library:CreateWindow({
     Title = "SLite",
@@ -27,10 +26,9 @@ local success, script = pcall(function()
 end)
 
 if success then
-    print("Found script for " .. game.PlaceId)
-    
-    local GameScript = loadstring(script)()
+    Library:Notify(`Found script for {game.PlaceId}`, 5)
 
+    local GameScript = loadstring(script)()
     GameScript(Window)
 
     SaveManager:SetFolder("SLite/" .. placeID)
@@ -128,36 +126,6 @@ do -- esp
     
         Compact = false,
     })
-
-    local Expection = Esp.expection
-
-    if Expection then
-        Expection.CreateUI(espTab)
-    end
-
-    for _, player in pairs(Players:GetPlayers()) do
-        if player ~= LocalPlayer then
-            Esp.new(player)
-        end
-    end
-
-    Players.PlayerAdded:Connect(function(player)
-        Esp.new(player)
-    end)
-
-    Players.PlayerRemoving:Connect(function(player)
-        local PlayerEsp = PlayersEsp[player]
-
-        PlayerEsp:Destroy()
-        
-        print(player.Name .. " Left and was removed from esp")
-    end)
-
-    RunService.RenderStepped:Connect(function()
-        for _, PlayerEsp in pairs(PlayersEsp) do
-            PlayerEsp:Render()
-        end
-    end)
 end
 
 local settingsTab = Window:AddTab("Settings")

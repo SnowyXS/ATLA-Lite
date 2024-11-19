@@ -1,6 +1,4 @@
 local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-
 local CoreGui = game:GetService("CoreGui")
 
 local LocalPlayer = Players.LocalPlayer
@@ -9,13 +7,10 @@ local primaryPart = character.PrimaryPart
 
 local CurrentCamera = workspace.CurrentCamera
 
-local cache = {}
-local Esp = {
-    _cache = cache,
-}
-Esp.__index = Esp
+local PlayerESP = {}
+PlayerESP.__index = PlayerESP
 
-function Esp.new(player)
+function PlayerESP.new(player)
     local objects = {}
     local character = player.Character
 
@@ -26,6 +21,7 @@ function Esp.new(player)
     local playerName = Drawing.new("Text")
     playerName.Size = 24
     playerName.Text = player.Name
+    playerName.Font = Drawing.Fonts.UI
     playerName.Center = true
     playerName.Outline = true
     playerName.Font = 3
@@ -42,28 +38,24 @@ function Esp.new(player)
     objects.healthBar = healthBar
     objects.chams = chams
 
-    local PlayerESP = setmetatable({
+    local EspObject = setmetatable({
         objects = objects,
         player = player,
         character = character,
-    }, Esp)
+    }, PlayerESP)
 
     local function OnCharacterAdded(character)
         chams.Adornee = character
 
-        PlayerESP.character = character
+        EspObject.character = character
     end
+    EspObject.characterAdded = player.CharacterAdded:Connect(OnCharacterAdded)
 
-    PlayerESP.characterAdded = player.CharacterAdded:Connect(OnCharacterAdded)
-
-    cache[player] = PlayerESP
-
-    return PlayerESP
+    return EspObject
 end
 
-function Esp:Render()
+function PlayerESP:Render()
     local target = self.player
-
     local targetChar = self.character
     if not targetChar then return self:HideObjects() end 
     
@@ -73,37 +65,15 @@ function Esp:Render()
     local targetRootPos = targetRoot.Position
 
     local distance = (primaryPart.CFrame.p - targetRootPos).Magnitude
-    local isInRenderDistance = Esp:IsInRenderDistance(distance)
+    local isInDistance = Options.DistanceSlider.Value == 0 or distance < Options.DistanceSlider.Value
     
     local rootViewPort, isRendered = CurrentCamera:worldToViewportPoint(targetRootPos)
-    if not isRendered or not isInRenderDistance then return self:HideObjects() end
+    if not isRendered or not isInDistance then return self:HideObjects() end
 
     self:UpdateObjects(rootViewPort)
 end
 
-function Esp:IsInRenderDistance(distance)
-    return Options.DistanceSlider.Value == 0 or distance < Options.DistanceSlider.Value
-end
-
-function Esp:HideObjects() 
-    local objects = self.objects
-    objects.box.Visible = false
-    objects.playerName.Visible = false
-    objects.healthBar.Visible = false
-    objects.chams.Enabled = false
-end
-
-function Esp:GetHealthPercentage()
-    local targetChar = self.character
-    local targetHumanoid = targetChar.Humanoid
-    
-    local health = targetHumanoid.Health
-    local maxHealth = targetHumanoid.MaxHealth
-
-    return health / maxHealth
-end
-
-function Esp:UpdateObjects(rootViewPort)
+function PlayerESP:UpdateObjects(rootViewPort)
     local objects = self.objects
     local targetChar = self.character
 
@@ -158,15 +128,15 @@ function Esp:UpdateObjects(rootViewPort)
     chams.Enabled = Toggles.ChamsCheckBox.Value
 end
 
-function Esp:GetCache()
-    return self._cache
+function PlayerESP:HideObjects() 
+    local objects = self.objects
+    objects.box.Visible = false
+    objects.playerName.Visible = false
+    objects.healthBar.Visible = false
+    objects.chams.Enabled = false
 end
 
-function Esp:Destroy()
-    local objects = self.objects
-    local cache = self:GetCache()
-    local player = self.player
-
+function PlayerESP:Remove()
     for _, object in pairs(objects) do
         object:Remove()
     end
@@ -175,8 +145,16 @@ function Esp:Destroy()
     
     setmetatable(self, nil)
     table.clear(self)
-
-    cache[player] = nil
 end
 
-return Esp
+function PlayerESP:GetHealthPercentage()
+    local targetChar = self.character
+    local targetHumanoid = targetChar.Humanoid
+    
+    local health = targetHumanoid.Health
+    local maxHealth = targetHumanoid.MaxHealth
+
+    return health / maxHealth
+ene
+
+return PlayerESP
