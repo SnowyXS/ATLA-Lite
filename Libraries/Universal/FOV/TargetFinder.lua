@@ -9,10 +9,7 @@ local TargetFinder = {}
 TargetFinder.__index = TargetFinder
 
 function TargetFinder:_GetDistance(destination)
-    local circle = self.circle
-    local radius = circle.Radius
-
-    local origin = self.isMouse and UserInputService:GetMouseLocation() - Vector2.new(radius, radius) or Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
+    local origin = self.isMouse and UserInputService:GetMouseLocation() or Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
     local magnitude = (origin - destination).magnitude
 
     return magnitude
@@ -38,7 +35,7 @@ function TargetFinder:GetClosestTarget()
         if not head then continue end
         
         local expectionCheck = self.ExpectionCheck and self.ExpectionCheck(Target)
-                               or not self.ExpectionCheck and false
+                               or not self.ExpectionCheck and true
 
         if not expectionCheck then continue end
 
