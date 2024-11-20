@@ -17,8 +17,11 @@ function FovIndicator.new(isMouse)
     if isMouse then
         UserInputService.InputChanged:Connect(function(input, gameprocessed)
             if input.UserInputType == Enum.UserInputType.MouseMovement then
+                local inputPos = input.Position
+                local mousePos = Vector2.new(inputPos.X, inputPos.Y)
+
                 local radius = circle.Radius
-                local position = input.Position - Vector2.new(radius, radius)
+                local position = mousePos - Vector2.new(radius, radius)
                 
                 newFovIndicator:SetPosition(position.x, position.y)
             end
