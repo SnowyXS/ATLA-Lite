@@ -1,3 +1,5 @@
+local UserInputService = game:GetService("UserInputService")
+
 local Camera = workspace.CurrentCamera
 
 local FovIndicator = {}
@@ -12,6 +14,15 @@ function FovIndicator.new(isMouse)
         isMouse = isMouse
     }, FovIndicator)
     
+    if isMouse then
+        UserInputService.InputChanged:Connect(function(input, gameprocessed)
+            if input.UserInputType == Enum.UserInputType.MouseMovement then
+                local position = input.Position
+                newFovIndicator:SetPosition(position.X, position.Y)
+            end
+        end)
+    end
+
     return setmetatable(TargetFinder, {__index = newFovIndicator})
 end
 
