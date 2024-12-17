@@ -285,6 +285,12 @@ return function(Window)
             Tooltip = "Breath like a fish.",
         })
 
+        local freezeToggle = playerTab:AddToggle("FreezeToggle", {
+            Text = "Freeze",
+            Default = false,
+            Tooltip = "Cold player. No move!",
+        })
+
         local walkSpeedSlider = playerTab:AddSlider('WalkSpeedSlider', {
             Text = 'WalkSpeed',
             Default = 16,
@@ -350,6 +356,21 @@ return function(Window)
             Humanoid.JumpPower = value
         end
 
+        local bodyPosition
+
+        local function OnFreezeChanged(value)
+            if bodyPosition then bodyPosition:Destroy() end
+
+            if value then
+                bodyPosition = Instance.new("BodyPosition")
+                bodyPosition.MaxForce = Vector3.new(400000, 400000, 400000)
+                bodyPosition.D = 1000
+                bodyPosition.P = 100000
+                bodyPosition.Position = HumanoidRootPart.Position
+                bodyPosition.Parent = HumanoidRootPart
+            end
+        end
+
         local function OnCharacterAdded(newCharacter)
             Humanoid = newCharacter:WaitForChild("Humanoid")
             HumanoidRootPart = newCharacter:WaitForChild("HumanoidRootPart")
@@ -360,8 +381,10 @@ return function(Window)
             Character = newCharacter
         end
 
+        freezeToggle:OnChanged(OnFreezeChanged)
         walkSpeedSlider:OnChanged(OnWalkSpeedChanged)
         jumpPowerSlider:OnChanged(OnJumpPowerChanged)
+
         LocalPlayer.CharacterAdded:Connect(OnCharacterAdded)
     end
 
