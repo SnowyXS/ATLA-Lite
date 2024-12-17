@@ -120,13 +120,8 @@ do -- ESP
         Rounding = 1,
         Compact = false,
     })
-<<<<<<< HEAD
 
     loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/main/Libraries/Universal/ESP/EspController.lua"))()()
-=======
-    
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/main/Libraries/Universal/ESP/EspController.lua"))()()
->>>>>>> 3a17d8eab7b0ce2324bd78174415ba765bb96f73
 end
 
 local settingsTab = Window:AddTab("Settings")
