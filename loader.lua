@@ -11,7 +11,7 @@ local ThemeManager = loadstring(game:HttpGet(repository .. "addons/ThemeManager.
 local SaveManager = loadstring(game:HttpGet(repository .. "addons/SaveManager.lua"))()
 
 local Window = Library:CreateWindow({
-    Title = "SLite",
+    Title = "🌸 SLite - discord.gg/R4uaR9CN6y",
     Center = true, 
     AutoShow = false,
 })
