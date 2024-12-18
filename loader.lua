@@ -28,7 +28,7 @@ if success then
 
     SaveManager:SetFolder("SLite/" .. placeID)
 end
---[[
+
 do -- ESP
     local espTab = Window:AddTab("ESP")
 
@@ -123,7 +123,7 @@ do -- ESP
 
     loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/main/Libraries/Universal/ESP/EspController.lua"))()()
 end
-]]
+
 local settingsTab = Window:AddTab("Settings")
 local menuGroup = settingsTab:AddLeftGroupbox("Menu")
 
