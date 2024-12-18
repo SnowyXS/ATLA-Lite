@@ -1,5 +1,5 @@
 
-local version = "1.03"
+local version = "v1.04"
 
 local VirtualInputManager = game:GetService("VirtualInputManager")
 local VirtualUser = game:GetService("VirtualUser")
@@ -11,7 +11,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 
 return function(Window)
-    Library:Notify(`Loaded Fisch - {version} `, 5)
+    Library:Notify(`Loaded Fisch - {version}`, 5)
 
     local events = ReplicatedStorage:WaitForChild("events")
     local modules = ReplicatedStorage:WaitForChild("modules")
