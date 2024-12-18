@@ -16,6 +16,8 @@ return function(Window)
     local events = ReplicatedStorage:WaitForChild("events")
     local modules = ReplicatedStorage:WaitForChild("modules")
 
+    local CharacterModule = require(modules.character)
+
     local LocalPlayer = Players.LocalPlayer
     local PlayerGui = LocalPlayer.PlayerGui
     local Backpack = LocalPlayer.Backpack
@@ -535,6 +537,8 @@ return function(Window)
             local npcs = world.npcs
             local chests = world.chests
             
+            local inventory = CharacterModule.PS(LocalPlayer):WaitForChild("Inventory")
+
             local purchaseRemote = events.purchase
             local library = modules.library
 
@@ -557,7 +561,7 @@ return function(Window)
                 table.insert(crates, i)
             end
 
-            local function fireproximityprompt(prompt)
+            local function clickproximityprompt(prompt)
                 local part = Instance.new("Part")
                 part.Size = Vector3.new(1, 1, 1) 
                 part.Anchored = true
@@ -579,6 +583,8 @@ return function(Window)
                 prompt.MaxActivationDistance = 7
                 prompt.RequiresLineOfSight = true
                 prompt.Parent = oldParent
+
+                part:Destroy()
             end
             
             local itemsTab = miscTabbox:AddTab("Items")
@@ -647,7 +653,7 @@ return function(Window)
                     local sell, sellall = merchant.sell, merchant.sellall
 
                     if firstTime then
-                        fireproximityprompt(prompt)
+                        clickproximityprompt(prompt)
                         firstTime = false
                     end
 
@@ -665,7 +671,26 @@ return function(Window)
                     if not prompt then continue end
 
                     fireproximityprompt(prompt)
+
+                    task.wait()
                 end
+                --[[
+                ** Alternative for the future in case it's not always rendering the treasure chests. **
+                for _, v in pairs(inventory:GetChildren()) do
+                    if v.Name:find("Treasure Map") and v.Repaired.Value == true then 
+                        local x,y,z = v.x.Value, v.y.Value, v.z.Value
+                        local position = Vector3.new(x, y, z)
+                        LocalPlayer:RequestStreamAroundAsync(position)
+
+                        local chest = chests:WaitForChild(`TreasureChest_{x}_{y}_{z}`)
+                        local prompt = chest.ProximityPrompt
+
+                        fireproximityprompt(prompt)
+
+                        task.wait()
+                    end
+                end
+                ]]
             end)
 
             do
@@ -682,7 +707,7 @@ return function(Window)
                     local repairmap = treasure.repairmap
 
                     if firstTime then
-                        fireproximityprompt(prompt)
+                        clickproximityprompt(prompt)
                         firstTime = false
                     end
 
