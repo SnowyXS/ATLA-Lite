@@ -165,7 +165,7 @@ return function(Window)
             end
 
             autoCastToggle:OnChanged(CastRod)
-            Backpack.ChildAdded:Connect(OnChildAdded)
+            Backpack.ChildAdded:Connect(OnBackPackChildAdded)
             humanoidRootPart.ChildAdded:Connect(OnRootPartChildAdded)
         end
 
