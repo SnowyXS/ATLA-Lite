@@ -69,12 +69,12 @@ return function(Window)
             })
 
             local castType = castTab:AddDropdown('CastTypeDropDown', {
-                Values = {"Remote", "Normal"},
+                Values = {"Skip", "Normal"},
                 Default = 1,
                 Multi = false,
             
                 Text = 'Type',
-                Tooltip = 'Remote will cast without the minigame.\nNormal will cast normally with the minigame.',
+                Tooltip = 'Skip will cast the bobber without the minigame.\nNormal will cast the bobber normally with the minigame.',
             })
 
             local function IsPerfect()
@@ -117,7 +117,7 @@ return function(Window)
 
                 task.wait(0.2)
 
-                if castType.Value == "Remote" then
+                if castType.Value == "Skip" then
                     castRemote:FireServer(percentage, 1)
                 else
                     VirtualInputManager:SendMouseButtonEvent(0, 0, 0, true, game, 1)
@@ -150,7 +150,7 @@ return function(Window)
             end
 
             local function OnRootPartChildAdded(instance)
-                if autoCastToggle.Value and castType.Value == "Remote" or instance.Name ~= "power" then return end
+                if autoCastToggle.Value and castType.Value == "Skip" or instance.Name ~= "power" then return end
 
                 local powerbar = instance:WaitForChild("powerbar")
                 local bar = powerbar.bar
