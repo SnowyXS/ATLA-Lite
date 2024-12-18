@@ -157,11 +157,13 @@ return function(Window)
                 local powerbar = instance:WaitForChild("powerbar")
                 local bar = powerbar.bar
 
-                bar:GetPropertyChangedSignal("Size"):Connect(function()
+                local connection
+                connection = bar:GetPropertyChangedSignal("Size"):Connect(function()
                     local scale = percentage / 100
 
                     if (scale == 1 and bar.Size.Y.Scale == scale) or (scale < 1 and bar.Size.Y.Scale / scale >= 0.94) then
                         VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, game, 1)
+                        connection:Disconnect()
                     end
                 end)
             end
