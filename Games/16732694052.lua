@@ -487,22 +487,6 @@ return function(Window)
         LocalPlayer.Idled:Connect(AntiAFK)
     end
 
-    do -- Ingame Automations
-        local autoTabbox = fischTab:AddLeftTabbox()
-
-        do -- Auto Event
-            local eventTab = autoTabbox:AddTab("Auto Event")
-
-        end
-
-        do -- Auto Apprasie
-            local apprasieTab = autoTabbox:AddTab("Auto Apprasie")
-        end
-        do -- Auto Enchant
-            local enchantTab = autoTabbox:AddTab("Auto Enchant")
-        end
-    end
-
     do -- Teleports
         local tpTabbox = fischTab:AddLeftTabbox()
 
