@@ -46,13 +46,13 @@ return function(Window)
         return math.round(rand.NextNumber(rand, min, max))
     end    
 
-    local fischTab = Window:AddTab('Fisch')
+    local fischTab = Window:AddTab("Fisch")
     
     do -- Auto Fish
         local autoTabbox = fischTab:AddLeftTabbox()
 
         do -- Cast
-            local castTab = autoTabbox:AddTab('Cast')
+            local castTab = autoTabbox:AddTab("Cast")
 
             local autoCastToggle = castTab:AddToggle("AutoCastToggle", {
                 Text = "Auto-Cast",
@@ -60,8 +60,8 @@ return function(Window)
                 Tooltip = "Will automatically cast the bobber.",
             })
             
-            local perfectSlider = castTab:AddSlider('CastPerfectSlider', {
-                Text = 'Perfect Chance',
+            local perfectSlider = castTab:AddSlider("CastPerfectSlider", {
+                Text = "Perfect Chance",
                 Default = 60,
                 Min = 1,
                 Suffix = "%",
@@ -70,13 +70,13 @@ return function(Window)
                 Compact = false,
             })
 
-            local castType = castTab:AddDropdown('CastTypeDropDown', {
+            local castType = castTab:AddDropdown("CastTypeDropDown", {
                 Values = {"Skip", "Normal"},
                 Default = 1,
                 Multi = false,
             
-                Text = 'Type',
-                Tooltip = 'Skip will cast the bobber without the minigame.\nNormal will cast the bobber normally with the minigame.',
+                Text = "Type",
+                Tooltip = "Skip will cast the bobber without the minigame.\nNormal will cast the bobber normally with the minigame.",
             })
 
             local function IsPerfect()
@@ -159,6 +159,7 @@ return function(Window)
 
                 local connection
                 connection = bar:GetPropertyChangedSignal("Size"):Connect(function()
+                    if not percentage then return end
                     local scale = percentage / 100
 
                     if (scale == 1 and bar.Size.Y.Scale == scale) or (scale < 1 and bar.Size.Y.Scale / scale >= 0.94) then
@@ -174,7 +175,7 @@ return function(Window)
         end
 
         do -- Shake
-            local shakeTab = autoTabbox:AddTab('Shake')
+            local shakeTab = autoTabbox:AddTab("Shake")
 
             local autoShakeToggle = shakeTab:AddToggle("AutoShakeToggle", {
                 Text = "Auto-Shake",
@@ -182,8 +183,8 @@ return function(Window)
                 Tooltip = "Will automatically pass the shake minigame perfectly.",
             })
 
-            local minDelaySlider = shakeTab:AddSlider('ShakeMinSlider', {
-                Text = 'Minimum Delay',
+            local minDelaySlider = shakeTab:AddSlider("ShakeMinSlider", {
+                Text = "Minimum Delay",
                 Default = 0.2,
                 Min = 0,
                 Suffix = "s",
@@ -192,8 +193,8 @@ return function(Window)
                 Compact = false,
             })
 
-            local maxDelaySlider = shakeTab:AddSlider('ShakeMaxSlider', {
-                Text = 'Maximum Delay',
+            local maxDelaySlider = shakeTab:AddSlider("ShakeMaxSlider", {
+                Text = "Maximum Delay",
                 Default = 0.5,
                 Min = 0,
                 Suffix = "s",
@@ -202,13 +203,13 @@ return function(Window)
                 Compact = false,
             })
             
-            local shakeType = shakeTab:AddDropdown('ShakeTypeDropDown', {
+            local shakeType = shakeTab:AddDropdown("ShakeTypeDropDown", {
                 Values = {"Navigation", "Mouse"},
                 Default = 1,
                 Multi = false,
             
-                Text = 'Type',
-                Tooltip = 'Mouse Click will use VirtualInputManager to click the Shake.\nNavigation will use UI Navigation to press the Shake.',
+                Text = "Type",
+                Tooltip = "Mouse Click will use VirtualInputManager to click the Shake.\nNavigation will use UI Navigation to press the Shake.",
             })
 
             local function UIPressButton(button)
@@ -270,7 +271,7 @@ return function(Window)
         end
 
         do -- Reel
-            local reelTab = autoTabbox:AddTab('Reel')
+            local reelTab = autoTabbox:AddTab("Reel")
 
             local reelFinished = events.reelfinished
     
@@ -286,8 +287,8 @@ return function(Window)
                 Tooltip = "Will instantly catch the fish by skipping the minigame.\nMay or may not result in a ban in the future. Use at your own risk!",
             })
 
-            local perfectSlider = reelTab:AddSlider('CatchPerfectSlider', {
-                Text = 'Perfect Chance',
+            local perfectSlider = reelTab:AddSlider("CatchPerfectSlider", {
+                Text = "Perfect Chance",
                 Default = 44,
                 Min = 1,
                 Suffix = "%",
@@ -366,8 +367,8 @@ return function(Window)
             Tooltip = "Want to go make some coffee? No problem. Go make some coffee.",
         })
 
-        local walkSpeedSlider = playerTab:AddSlider('WalkSpeedSlider', {
-            Text = 'WalkSpeed',
+        local walkSpeedSlider = playerTab:AddSlider("WalkSpeedSlider", {
+            Text = "WalkSpeed",
             Default = 16,
             Min = 16,
             Suffix = "",
@@ -376,8 +377,8 @@ return function(Window)
             Compact = false,
         })
 
-        local jumpPowerSlider = playerTab:AddSlider('JumpPowerSlider', {
-            Text = 'JumpPower',
+        local jumpPowerSlider = playerTab:AddSlider("JumpPowerSlider", {
+            Text = "JumpPower",
             Default = 50,
             Min = 50,
             Suffix = "",
@@ -486,22 +487,38 @@ return function(Window)
         LocalPlayer.Idled:Connect(AntiAFK)
     end
 
+    do -- Ingame Automations
+        local autoTabbox = fischTab:AddLeftTabbox()
+
+        do -- Auto Event
+            local eventTab = autoTabbox:AddTab("Auto Event")
+
+        end
+
+        do -- Auto Apprasie
+            local apprasieTab = autoTabbox:AddTab("Auto Apprasie")
+        end
+        do -- Auto Enchant
+            local enchantTab = autoTabbox:AddTab("Auto Enchant")
+        end
+    end
+
     do -- Teleports
         local tpTabbox = fischTab:AddLeftTabbox()
 
         do -- Locations
             local locationTab = tpTabbox:AddTab("Locations")
 
-            local dropDown = locationTab:AddDropdown('LocationsDropDown', {
+            local dropDown = locationTab:AddDropdown("LocationsDropDown", {
                 Values = dropDownLocations,
                 Default = 1,
                 Multi = false,
             
-                Text = 'Locations',
-                Tooltip = 'This is a tooltip',
+                Text = "Locations",
+                Tooltip = "This is a tooltip",
             })
 
-            locationTab:AddButton('Teleport', function() 
+            locationTab:AddButton("Teleport", function() 
                 local location = dropDown.Value
                 local cframe = locations[location]
 
@@ -514,13 +531,13 @@ return function(Window)
         do -- Players
             local playersTab = tpTabbox:AddTab("Players")
 
-            local playersDropDown = playersTab:AddDropdown('LocationsDropDown', {
-                SpecialType = 'Player',
-                Text = 'Players',
-                Tooltip = 'This is a tooltip',
+            local playersDropDown = playersTab:AddDropdown("LocationsDropDown", {
+                SpecialType = "Player",
+                Text = "Players",
+                Tooltip = "This is a tooltip",
             })
 
-            playersTab:AddButton('Teleport', function() 
+            playersTab:AddButton("Teleport", function() 
                 local player = Players[playersDropDown.Value]
                 if not player then return end
 
@@ -591,32 +608,32 @@ return function(Window)
             
             local itemsTab = miscTabbox:AddTab("Items")
 
-            local rodsDropDown = itemsTab:AddDropdown('rodsDown', {
+            local rodsDropDown = itemsTab:AddDropdown("rodsDown", {
                 Values = rods,
                 Default = 1,
                 Multi = false,
             
-                Text = 'Rods',
-                Tooltip = 'This is a tooltip',
+                Text = "Rods",
+                Tooltip = "This is a tooltip",
             })
 
-            itemsTab:AddButton('Buy', function() 
+            itemsTab:AddButton("Buy", function() 
                 local rod = rodsDropDown.Value
                 purchaseRemote:FireServer(rod, "Rod", nil, 1)
             end)
             itemsTab:AddDivider()
 
-            local cratesDropDown = itemsTab:AddDropdown('cratesDown', {
+            local cratesDropDown = itemsTab:AddDropdown("cratesDown", {
                 Values = crates,
                 Default = 1,
                 Multi = false,
             
-                Text = 'Crates',
-                Tooltip = 'This is a tooltip',
+                Text = "Crates",
+                Tooltip = "This is a tooltip",
             })
 
-            local cratesAmount = itemsTab:AddSlider('CrateAmountSlider', {
-                Text = 'Amount',
+            local cratesAmount = itemsTab:AddSlider("CrateAmountSlider", {
+                Text = "Amount",
                 Default = 1,
                 Min = 1,
                 Max = 500,
@@ -624,26 +641,26 @@ return function(Window)
                 Compact = false,
             })
 
-            itemsTab:AddButton('Buy', function() 
+            itemsTab:AddButton("Buy", function() 
                 local crate = cratesDropDown.Value
                 local amount = cratesAmount.Value
                 purchaseRemote:FireServer(crate, "fish", nil, amount)
             end)
             itemsTab:AddDivider()
 
-            local sellType = itemsTab:AddDropdown('SellDropDown', {
-                Values = { 'Hand', 'All' },
+            local sellType = itemsTab:AddDropdown("SellDropDown", {
+                Values = { "Hand", "All" },
                 Default = 1,
                 Multi = false,
             
-                Text = 'Sell Type',
-                Tooltip = 'This is a tooltip',
+                Text = "Sell Type",
+                Tooltip = "This is a tooltip",
             })
 
             do
                 local firstTime = true
 
-                itemsTab:AddButton('Sell', function() 
+                itemsTab:AddButton("Sell", function() 
                     LocalPlayer:RequestStreamAroundAsync(locations.moosewood.p)
                     
                     local type = sellType.Value
@@ -667,7 +684,7 @@ return function(Window)
 
             itemsTab:AddDivider()
 
-            itemsTab:AddButton('Collect Treasure Chests', function() 
+            itemsTab:AddButton("Collect Treasure Chests", function() 
                 for _, v in pairs(chests:GetChildren()) do
                     local prompt = v:FindFirstChild("ProximityPrompt")
                     if not prompt then continue end
@@ -677,7 +694,7 @@ return function(Window)
                     task.wait()
                 end
                 --[[
-                ** Alternative for the future in case it's not always rendering the treasure chests. **
+                ** Alternative for the future in case it"s not always rendering the treasure chests. **
                 for _, v in pairs(inventory:GetChildren()) do
                     if v.Name:find("Treasure Map") and v.Repaired.Value == true then 
                         local x,y,z = v.x.Value, v.y.Value, v.z.Value
@@ -699,7 +716,7 @@ return function(Window)
                 local jackPos = Vector3.new(-2830.748046875, 215.2417449951172, 1518.34814453125)
                 local firstTime = true
 
-                itemsTab:AddButton('Fix Treasure Maps', function() 
+                itemsTab:AddButton("Fix Treasure Maps", function() 
                     LocalPlayer:RequestStreamAroundAsync(jackPos)
                     
                     local jack = npcs:WaitForChild("Jack Marrow")
@@ -742,7 +759,7 @@ return function(Window)
             })
             ]]
 
-            bestiaryTab:AddButton('Discover all locations', function() 
+            bestiaryTab:AddButton("Discover all locations", function() 
                 for i, v in pairs(scroll:GetChildren()) do
                     if not v:IsA("ImageButton") then continue end
                     discoverLocation:FireServer(v.Name)
