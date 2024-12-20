@@ -125,6 +125,10 @@ function RodController:Reset()
     end
 end
 
+function RodController:GetRod()
+    return self._rod
+end
+
 function RodController:IsEquipped()
     return self._isEquipped
 end
