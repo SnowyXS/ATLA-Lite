@@ -10,8 +10,14 @@ local GuiService = game:GetService("GuiService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 
+local ServerEvents = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/refs/heads/main/Libraries/Fisch/ServerEvents.lua"))()
+local RodController = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/refs/heads/main/Libraries/Fisch/RodController.lua"))()
+
 return function(Window)
     Library:Notify(`Loaded Fisch - {version}`, 5)
+
+    local ServerEvent = ServerEvents.new()
+    local Rod = RodController.new()
 
     local events = ReplicatedStorage:WaitForChild("events")
     local modules = ReplicatedStorage:WaitForChild("modules")
@@ -20,14 +26,15 @@ return function(Window)
 
     local LocalPlayer = Players.LocalPlayer
     local PlayerGui = LocalPlayer.PlayerGui
-    local Backpack = LocalPlayer.Backpack
+    local backpack = LocalPlayer.Backpack
 
-    local Character = LocalPlayer.Character
-    local humanoidRootPart = Character.HumanoidRootPart
-    local humanoid = Character.Humanoid
+    local character = LocalPlayer.Character
+    local humanoidRootPart = character.HumanoidRootPart
+    local humanoid = character.Humanoid
 
     local camera = workspace.Camera
     local world = workspace.world
+
     local spawns = world.spawns
 
     local rand = Random.new()
@@ -79,62 +86,25 @@ return function(Window)
                 Tooltip = "Skip will cast the bobber without the minigame.\nNormal will cast the bobber normally with the minigame.",
             })
 
+            local percentage
+
             local function IsPerfect()
                 local chance = RandomNumber(1, 100)
 
                 return chance <= perfectSlider.Value
             end
 
-            local function IsRod(instance)
-                local name = instance.Name:lower()
-                return instance:IsA("Tool") and (name:find("rod") or instance:FindFirstChild("rod/client"))
-            end
-
-            local castRemote
-
-            for _, v in pairs(Backpack:GetChildren()) do
-                if IsRod(v) then
-                    local events = v.events
-                    castRemote = events.cast
-
-                    break
-                end
-            end
-
-            for _, v in pairs(Character:GetChildren()) do
-                if IsRod(v) then
-                    local events = v.events
-                    castRemote = events.cast
-
-                    break
-                end
-            end
-
-            local percentage
-
-            local function CastRod()
-                if not autoCastToggle.Value then return end
-
-                percentage = IsPerfect() and 100 or RandomNumber(82, 90)
-
-                task.wait(0.2)
-
-                if castType.Value == "Skip" then
-                    castRemote:FireServer(percentage, 1)
-                else
-                    VirtualInputManager:SendMouseButtonEvent(0, 0, 0, true, game, 1)
-                end
-            end
-
             local OldNamecall
             OldNamecall = hookmetamethod(game, "__namecall", function(self, ...)
                 local method = getnamecallmethod()
-                if method == "FireServer" then
-                    if autoCastToggle.Value and self.Name == "reset" then
+                if not checkcaller() and method == "FireServer" then
+                    if Rod:IsEquipped() and autoCastToggle.Value and self.Name == "reset" then
                         local returnValue = OldNamecall(self, ...)
+                        local isSkip = castType.Value == "Skip"
+                        percentage = IsPerfect() and 100 or RandomNumber(82, 90)
 
                         setthreadidentity(3)
-                        CastRod()
+                        Rod:Cast(isSkip, percentage)
                         setthreadidentity(2)
 
                         return returnValue
@@ -143,13 +113,6 @@ return function(Window)
         
                 return OldNamecall(self, ...)
             end)
-
-            local function OnBackPackChildAdded(instance)
-                if not IsRod(instance) then return end
-
-                local events = instance:WaitForChild("events")
-                castRemote = events.cast
-            end
 
             local function OnRootPartChildAdded(instance)
                 if autoCastToggle.Value and castType.Value == "Skip" or instance.Name ~= "power" then return end
@@ -169,9 +132,22 @@ return function(Window)
                 end)
             end
 
-            autoCastToggle:OnChanged(CastRod)
-            Backpack.ChildAdded:Connect(OnBackPackChildAdded)
+            local function OnCharacterAdded(newCharacter)
+                local humanoidRootPart = newCharacter:WaitForChild("HumanoidRootPart")
+                backpack = LocalPlayer.Backpack
+                humanoidRootPart.ChildAdded:Connect(OnRootPartChildAdded)
+            end
+
             humanoidRootPart.ChildAdded:Connect(OnRootPartChildAdded)
+            LocalPlayer.CharacterAdded:Connect(OnCharacterAdded)
+
+            autoCastToggle:OnChanged(function(value)
+                if not Rod:IsEquipped() or not value then return end 
+                local isSkip = castType.Value == "Skip"
+                percentage = IsPerfect() and 100 or RandomNumber(82, 90)
+
+                Rod:Cast(isSkip, percentage)
+            end)
         end
 
         do -- Shake
@@ -230,6 +206,23 @@ return function(Window)
                 VirtualInputManager:SendMouseButtonEvent(x, y, 0, false, game, 1)
             end
 
+            local function OnToggle(bool)
+                if not bool then return end
+
+                local shakeui = PlayerGui:FindFirstChild("shakeui")
+                if not shakeui then return end
+
+                local safezone = shakeui.safezone
+                local button = safezone.button
+
+                if shakeType.Value == "Mouse" then
+                    MousePressButton(button)
+                else
+                    UIPressButton(button)
+                end
+            end
+
+
             PlayerGui.ChildAdded:Connect(function(instance)
                 if instance.Name == "shakeui" then
                     local safezone = instance.safezone
@@ -254,18 +247,6 @@ return function(Window)
             PlayerGui.ChildRemoved:Connect(function(instance)
                 if instance.name == "shakeui" then GuiService.SelectedObject = nil end
             end)
-
-            local function OnToggle(bool)
-                if not bool then return end
-
-                local shakeui = PlayerGui:FindFirstChild("shakeui")
-                if not shakeui then return end
-
-                local safezone = shakeui.safezone
-                local button = safezone.button
-
-                PressButton(button)
-            end
 
             autoShakeToggle:OnChanged(OnToggle)
         end
@@ -387,6 +368,46 @@ return function(Window)
             Compact = false,
         })
 
+        local bodyPosition
+
+        local function OnWalkSpeedChanged(value)
+            humanoid.WalkSpeed = value
+        end
+
+        local function OnJumpPowerChanged(value)
+            humanoid.JumpPower = value
+        end
+
+        local function OnFreezeChanged(value)
+            if bodyPosition then bodyPosition:Destroy() end
+
+            if value then
+                bodyPosition = Instance.new("BodyPosition")
+                bodyPosition.MaxForce = Vector3.new(400000, 400000, 400000)
+                bodyPosition.D = 1000
+                bodyPosition.P = 100000
+                bodyPosition.Position = humanoidRootPart.Position
+                bodyPosition.Parent = humanoidRootPart
+            end
+        end
+
+        local function AntiAFK()
+            if not antiAfkToggle.Value then return end
+
+			VirtualUser:CaptureController()
+			VirtualUser:ClickButton2(Vector2.new())
+        end
+
+        local function OnCharacterAdded(newCharacter)
+            humanoid = newCharacter:WaitForChild("Humanoid")
+            humanoidRootPart = newCharacter:WaitForChild("HumanoidRootPart")
+
+            humanoid.WalkSpeed = walkSpeedSlider.Value
+            humanoid.JumpPower = jumpPowerSlider.Value
+
+            Character = newCharacter
+        end
+
         local Oldtick
         Oldtick = hookfunction(tick, function(...)
             local script = getcallingscript()
@@ -438,46 +459,6 @@ return function(Window)
             return OldNewIndex(self, index, value)
         end)
 
-        local function OnWalkSpeedChanged(value)
-            humanoid.WalkSpeed = value
-        end
-
-        local function OnJumpPowerChanged(value)
-            humanoid.JumpPower = value
-        end
-
-        local bodyPosition
-
-        local function OnFreezeChanged(value)
-            if bodyPosition then bodyPosition:Destroy() end
-
-            if value then
-                bodyPosition = Instance.new("BodyPosition")
-                bodyPosition.MaxForce = Vector3.new(400000, 400000, 400000)
-                bodyPosition.D = 1000
-                bodyPosition.P = 100000
-                bodyPosition.Position = humanoidRootPart.Position
-                bodyPosition.Parent = humanoidRootPart
-            end
-        end
-
-        local function AntiAFK()
-            if not antiAfkToggle.Value then return end
-
-			VirtualUser:CaptureController()
-			VirtualUser:ClickButton2(Vector2.new())
-        end
-
-        local function OnCharacterAdded(newCharacter)
-            humanoid = newCharacter:WaitForChild("humanoid")
-            humanoidRootPart = newCharacter:WaitForChild("humanoidRootPart")
-
-            humanoid.WalkSpeed = walkSpeedSlider.Value
-            humanoid.JumpPower = jumpPowerSlider.Value
-
-            Character = newCharacter
-        end
-
         antiAfkToggle:OnChanged(AntiAFK)
         freezeToggle:OnChanged(OnFreezeChanged)
         walkSpeedSlider:OnChanged(OnWalkSpeedChanged)
@@ -485,6 +466,49 @@ return function(Window)
 
         LocalPlayer.CharacterAdded:Connect(OnCharacterAdded)
         LocalPlayer.Idled:Connect(AntiAFK)
+    end
+
+    do -- Ingame Automations
+        local autoTabbox = fischTab:AddLeftTabbox()
+
+        do -- Auto Apprasie
+            local apprasieTab = autoTabbox:AddTab("Apprasie")
+        end
+
+        do -- Auto Enchant
+            local enchantTab = autoTabbox:AddTab("Enchant")
+        end
+
+        do -- Auto Event
+            local eventTab = autoTabbox:AddTab("Event")
+
+            local autoEventToggle = eventTab:AddToggle("AutoEventToggle", {
+                Text = "Auto-Event",
+                Default = false,
+                Tooltip = "Will automatically go and farm selected events whenever they are active.",
+            })
+
+            local showActiveToggle = eventTab:AddToggle("ShowEventsToggle", {
+                Text = "Show Active Events",
+                Default = false,
+                Tooltip = "Opens a window that will show currently active events.",
+            })
+
+            local eventDown = eventTab:AddDropdown("EventDropDown", {
+                Values = ServerEvent:GetEventList(),
+                Default = 1,
+                Multi = false,
+            
+                Text = "Events",
+                Tooltip = "This is a tooltip",
+            })
+
+            local function OnActiveToggle(value)
+                ServerEvent:SetVisibility(value)
+            end
+
+            showActiveToggle:OnChanged(OnActiveToggle)
+        end
     end
 
     do -- Teleports
@@ -504,6 +528,8 @@ return function(Window)
 
             locationTab:AddButton("Teleport", function() 
                 local location = dropDown.Value
+                if not location then return end
+
                 local cframe = locations[location]
 
                 LocalPlayer:RequestStreamAroundAsync(cframe.p)
@@ -522,13 +548,46 @@ return function(Window)
             })
 
             playersTab:AddButton("Teleport", function() 
-                local player = Players[playersDropDown.Value]
+                local player = Players:FindFirstChild(playersDropDown.Value)
                 if not player then return end
 
                 local character = player.Character
-                local rootPart = character.humanoidRootPart
+                local rootPart = character.HumanoidRootPart
 
                 humanoidRootPart.CFrame = rootPart.CFrame
+            end)
+        end
+
+        do -- Events
+            local eventsTab = tpTabbox:AddTab("Events")
+
+            local activeEvents = ServerEvent:GetActiveEvents()
+            local objects = activeEvents.objects
+            local array = activeEvents.array
+
+            local eventsDown = eventsTab:AddDropdown("EventsDropDown", {
+                Values = array,
+                Default = 1,
+                Multi = false,
+            
+                Text = "Events",
+                Tooltip = "This is a tooltip",
+            })
+
+            eventsTab:AddButton("Teleport", function() 
+                local event = eventsDown.Value
+                if not event then return end
+
+                local instance = objects[event]
+                local cframe = instance.CFrame
+
+                LocalPlayer:RequestStreamAroundAsync(cframe.p)
+
+                humanoidRootPart.CFrame = cframe
+            end)
+            
+            ServerEvent:OnChanged(function()
+                eventsDown:BuildDropdownList()
             end)
         end
     end
@@ -714,7 +773,7 @@ return function(Window)
                         firstTime = false
                     end
 
-                    for _, v in pairs(Backpack:GetChildren()) do
+                    for _, v in pairs(backpack:GetChildren()) do
                         if v.Name == "Treasure Map" then
                             humanoid:EquipTool(v)
                             repairmap:InvokeServer()
