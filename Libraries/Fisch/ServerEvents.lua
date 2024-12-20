@@ -56,26 +56,31 @@ function ServerEvents.new()
     local ChildAdded = fishing.ChildAdded:Connect(function(object)
         local name = object.Name
 
-        if event == name or event:find(name) then 
-            Window:UpdateTextColor(event, green)
+        for _, event in pairs(list) do
+            if event == name or event:find(name) then 
+                Window:UpdateTextColor(event, green)
 
-            objects[event] = object
-            array[event] = event
+                objects[event] = object
+                array[event] = event
 
-            bindableEvent:Fire(active)
+                bindableEvent:Fire(active)
+            end
         end
+
     end)
     
     local ChildRemoved = fishing.ChildRemoved:Connect(function(object)
         local name = object.Name
+        
+        for _, event in pairs(array) do
+            if event == name or event:find(name) then 
+                Window:UpdateTextColor(event, red)
 
-        if event == name or event:find(name) then 
-            Window:UpdateTextColor(event, red)
+                objects[event] = nil
+                array[event] = nil
 
-            objects[event] = nil
-            array[event] = nil
-
-            bindableEvent:Fire(active)
+                bindableEvent:Fire(active)
+            end
         end
     end)
 
