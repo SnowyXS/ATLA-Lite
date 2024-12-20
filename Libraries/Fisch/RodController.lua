@@ -103,8 +103,8 @@ end
 
 function RodController:Cast(skip, percentage)
     self:Reset()
-    task.wait(0.1)
-    
+    task.wait(0.2)
+
     if not skip then return VirtualInputManager:SendMouseButtonEvent(0, 0, 0, true, game, 1) end
 
     local castRemote = self._castRemote

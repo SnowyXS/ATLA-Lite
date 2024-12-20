@@ -63,7 +63,7 @@ function ServerEvents.new()
                 objects[event] = object
                 array[event] = event
 
-                bindableEvent:Fire(active)
+                bindableEvent:Fire(object)
             end
         end
 
@@ -79,7 +79,7 @@ function ServerEvents.new()
                 objects[event] = nil
                 array[event] = nil
 
-                bindableEvent:Fire(active)
+                bindableEvent:Fire()
             end
         end
     end)
