@@ -1,5 +1,5 @@
-local Windows = loadstring(game:HttpGet("https://github.com/SnowyXS/SLite/tree/main/Libraries/Universal/Interface/Windows.lua"))()
-local BindableEvents = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/refs/heads/main/Libraries/Dependencies/PropertyChanged.lua"))()
+local Windows = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/refs/heads/main/Libraries/Universal/Interface/Windows.lua"))()
+local BindableEvents = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/refs/heads/main/Libraries/Dependencies/BindableEvents.lua"))()
 
 local zones = workspace.zones
 local fishing = zones.fishing
