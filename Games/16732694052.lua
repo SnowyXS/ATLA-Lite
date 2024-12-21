@@ -19,8 +19,10 @@ return function(Window)
     local ServerEvent = ServerEvents.new()
     local Rod = RodController.new()
 
-    local events = ReplicatedStorage:WaitForChild("events")
-    local modules = ReplicatedStorage:WaitForChild("modules")
+    local link = ReplicatedStorage:WaitForChild("Link")
+
+    local events = link:WaitForChild("events")
+    local modules = link:WaitForChild("modules")
 
     local CharacterModule = require(modules.character)
 
