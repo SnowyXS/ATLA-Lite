@@ -74,12 +74,18 @@ function ServerEvents.new()
         
         for _, event in pairs(array) do
             if event == name or event:find(name) then 
-                Window:UpdateTextColor(event, red)
+                local newObject = fishing:FindFirstChild(name)
 
-                objects[event] = nil
-                array[event] = nil
+                if not newObject then 
+                    Window:UpdateTextColor(event, red)
 
-                bindableEvent:Fire(object, true)
+                    objects[event] = nil
+                    array[event] = nil
+
+                    return bindableEvent:Fire(object, true)
+                end
+
+                objects[event] = newObject
             end
         end
     end)
