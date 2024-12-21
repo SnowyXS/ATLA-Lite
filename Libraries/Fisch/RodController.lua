@@ -27,13 +27,15 @@ local function IsRod(instance)
 end
 
 function RodController.new()
-    local bindableEvent = BindableEvents:Create()
+    local rodAddedEvent = BindableEvents:Create()
+    local rodEquippedEvent = BindableEvents:Create()
+    local childRemovedEvent = BindableEvents:Create()
+
     local Controller = setmetatable({
-        _rod = rodObject,
-        _castRemote = castRemote,
-        _resetRemote = reset,
-        _isEquipped = isEquipped,
-        _bindableEvent = bindableEvent
+        _isEquipped = false,
+        _rodAddedEvent = rodAddedEvent,
+        _rodEquippedEvent = rodEquippedEvent,
+        _rodChildRemoved = childRemovedEvent
     }, RodController)
 
     for _, v in pairs(backpack:GetChildren()) do
@@ -59,6 +61,19 @@ function RodController.new()
         end
     end
 
+    local function OnEquip()
+        Controller._isEquipped = true
+        rodEquippedEvent:Fire()
+    end
+
+    local function OnUnequip()
+        Controller._isEquipped = false
+    end
+
+    local function OnChildRemoved(instance)
+        childRemovedEvent:Fire(instance)
+    end
+
     local function OnBackPackChildAdded(instance)
         if Controller._rod == instance or not IsRod(instance) then return end
 
@@ -66,8 +81,12 @@ function RodController.new()
         Controller._rod = instance
         Controller._castRemote = events.cast
         Controller._resetRemote = events.reset
+        
+        instance.Equipped:Connect(OnEquip)
+        instance.Unequipped:Connect(OnUnequip)
+        instance.ChildRemoved:Connect(OnChildRemoved)
 
-        bindableEvent:Fire(instance)
+        rodAddedEvent:Fire(instance)
     end
     
     local function OnCharacterAdded(newCharacter)
@@ -80,24 +99,10 @@ function RodController.new()
         backpack.ChildAdded:Connect(OnBackPackChildAdded)
     end
 
-    local OldNamecall
-    OldNamecall = hookmetamethod(game, "__namecall", function(self, ...)
-        local method = getnamecallmethod()
-        if not checkcaller() and method == "FireServer" then
-            if self.Name == "equip" then
-                local args = {...}
-                
-                if args[1].Parent == backpack then
-                    Controller._isEquipped = true
-                else
-                    Controller._isEquipped = false
-                end
-            end
-        end
-    
-        return OldNamecall(self, ...)
-    end)
-
+    local rodObject = Controller._rod
+    rodObject.Equipped:Connect(OnEquip)
+    rodObject.Unequipped:Connect(OnUnequip)
+    rodObject.ChildRemoved:Connect(OnChildRemoved)
 
     backpack.ChildAdded:Connect(OnBackPackChildAdded)
     LocalPlayer.CharacterAdded:Connect(OnCharacterAdded)
@@ -138,9 +143,21 @@ function RodController:IsEquipped()
 end
 
 function RodController:OnAdded(callback)
-    local bindableEvent = self._bindableEvent
+    local rodAddedEvent = self._rodAddedEvent
 
-    bindableEvent:Connect(callback)
+    rodAddedEvent:Connect(callback)
+end
+
+function RodController:OnEquipped(callback)
+    local rodEquippedEvent = self._rodEquippedEvent
+
+    rodEquippedEvent:Connect(callback)
+end
+
+function RodController:OnChildRemoved(callback)
+    local rodChildRemoved = self._rodChildRemoved
+
+    rodChildRemoved:Connect(callback)
 end
 
 return RodController
