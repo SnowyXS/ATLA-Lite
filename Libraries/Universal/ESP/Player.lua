@@ -137,6 +137,8 @@ function PlayerESP:HideObjects()
 end
 
 function PlayerESP:Remove()
+    local objects = self.objects
+    
     for _, object in pairs(objects) do
         object:Remove()
     end
