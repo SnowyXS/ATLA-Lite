@@ -1,15 +1,15 @@
+local BindableEvents = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/SLite/refs/heads/main/Libraries/Dependencies/BindableEvents.lua"))()
+
 local VirtualInputManager = game:GetService("VirtualInputManager")
+local Stats = game:GetService("Stats")
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local resources = ReplicatedStorage:WaitForChild("resources")
-local animations = resources:WaitForChild("animations")
-local fishingAnimations = animations:WaitForChild("fishing")
+local networkStats = Stats.Network
+local serverStatsItem = networkStats.ServerStatsItem
 
-local holdAnimation = fishingAnimations.casthold
-local throwAnimation = fishingAnimations.throw
-local waitingAnimation = fishingAnimations.waiting
+local dataPing = serverStatsItem["Data Ping"]
 
 local LocalPlayer = Players.LocalPlayer
 local backpack = LocalPlayer.Backpack
@@ -27,11 +27,13 @@ local function IsRod(instance)
 end
 
 function RodController.new()
+    local bindableEvent = BindableEvents:Create()
     local Controller = setmetatable({
         _rod = rodObject,
         _castRemote = castRemote,
         _resetRemote = reset,
-        _isEquipped = isEquipped
+        _isEquipped = isEquipped,
+        _bindableEvent = bindableEvent
     }, RodController)
 
     for _, v in pairs(backpack:GetChildren()) do
@@ -64,6 +66,8 @@ function RodController.new()
         Controller._rod = instance
         Controller._castRemote = events.cast
         Controller._resetRemote = events.reset
+
+        bindableEvent:Fire(instance)
     end
     
     local function OnCharacterAdded(newCharacter)
@@ -103,7 +107,7 @@ end
 
 function RodController:Cast(skip, percentage)
     self:Reset()
-    task.wait(0.2)
+    task.wait(dataPing:GetValue() / 1000)
 
     if not skip then return VirtualInputManager:SendMouseButtonEvent(0, 0, 0, true, game, 1) end
 
@@ -131,6 +135,12 @@ end
 
 function RodController:IsEquipped()
     return self._isEquipped
+end
+
+function RodController:OnAdded(callback)
+    local bindableEvent = self._bindableEvent
+
+    bindableEvent:Connect(callback)
 end
 
 return RodController
