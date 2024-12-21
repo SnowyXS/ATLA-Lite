@@ -57,7 +57,7 @@ function ServerEvents.new()
         local name = object.Name
 
         for _, event in pairs(list) do
-            if event == name or event:find(name) then 
+            if event == name or name:find(event) then 
                 Window:UpdateTextColor(event, green)
 
                 objects[event] = object
@@ -73,7 +73,7 @@ function ServerEvents.new()
         local name = object.Name
         
         for _, event in pairs(array) do
-            if event == name or event:find(name) then 
+            if event == name or name:find(event) then 
                 local newObject = fishing:FindFirstChild(name)
 
                 if not newObject then 
